@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: dev
+    include: base
+
+---
+
+server:
+  port: 8081
+#spring基本配置，开发环境
+spring:
+  profiles: dev
+  datasource:
+    name: test
+    url: jdbc:mysql://129.226.114.98:3306/numberone?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=false&serverTimezone=CTT
+    username: root
+    password: 123456
+license:
+  key: "b266593f-21d6-4772-9ef9-795a5faffc78"
+
+pic:
+  postUrl: http://127.0.0.1:8081
+  APPID : IdsRsnLAoS7d3O1FDHHSc6
+  APPKEY : BCMTPnVbqg8PVL1zbeBDj3
+  MASTERSECRET : 9GfC5TVPQJAXfbTUJ2ms98
+  msgPushUrl : http:///127.0.0.1:8081/appMsgPush
+  appPackagaName: ywApp.dclond
+
