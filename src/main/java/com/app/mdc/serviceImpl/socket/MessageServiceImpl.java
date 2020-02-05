@@ -133,7 +133,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         messageModel.setDeleted(0);
 
         User user = userMapper.selectById(messageModel.getSendUserId());
-        messageModel.setUserName(user.getName());
+        messageModel.setUserName(user.getUserName());
     }
 
     @Override
@@ -163,7 +163,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 		userEntityWrapper.in("id",userIds).eq("deleted",0);
 		List<User> userList=userMapper.selectList(userEntityWrapper);
 		//找出所有用户cid拼接
-		List<String> cids=userList.stream().map(User::getCid).collect(Collectors.toList());
+		List<String> cids=userList.stream().map(User::getUpUserId).collect(Collectors.toList());
 		cids = cids.stream().filter(Objects::nonNull).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
 		String CID=String.join(",",cids);
 

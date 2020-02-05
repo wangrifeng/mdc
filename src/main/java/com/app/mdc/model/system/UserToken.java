@@ -10,12 +10,13 @@ import java.util.Date;
 @TableName("sys_user_tokens")
 public class UserToken {
 
-    @TableId(value = "id", type = IdType.UUID)
+    @TableId(value = "id", type = IdType.AUTO)
     private String id;
 
     @TableField(value = "user_id")
     private String userId;//用户id
     private String token;//用户token
+    @TableField(value = "end_time")
     private Date endtime;//token失效时间
 
     public String getId() {

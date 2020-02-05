@@ -15,7 +15,7 @@
            users.NAME AS NAME,
            users.telephone AS telephone
         FROM
-           sys_users users
+           sys_user users
         left join socket_user_team userteam on userteam.user_id = users.id
         where userteam.team_id = #{teamId}
     </select>

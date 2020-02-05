@@ -63,14 +63,14 @@ public class SystemLogAspect {
         Log log = new Log();
         Date date = new Date();
         log.setCreatetime(date)
-                .setUpdatetime(new Date()).setStatus("A")
+                .setUpdatetime(new Date()).setStatus("0")
                 .setModule(opertion[0])
                 .setOperation(opertion[1])
                 .setIp(request.getRemoteAddr())
                 .setBrower(request.getHeader("User-agent"))
                 .setDeleted(0)
                 .setRequestTx(JSON.toJSONString(params))
-                .setUsername(currentUser == null? request.getParameter("username"):currentUser.getUsername())
+                .setUsername(currentUser == null? request.getParameter("username"):currentUser.getUserName())
                 .setResponseTx(opertion[2]);
         logService.saveOrUpdateLog(log);
     }

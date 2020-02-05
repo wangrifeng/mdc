@@ -30,7 +30,7 @@
         users.NAME AS NAME,
         users.telephone AS telephone
         FROM
-        sys_users users
+        sys_user users
         LEFT JOIN socket_message message ON ( message.deleted = 0 AND ( message.send_user_id = users.id OR message.receive_user_id = users.id ) )
         WHERE
         ( message.send_user_id = #{id} OR message.receive_user_id = #{id} )
@@ -109,7 +109,7 @@
                         (select a.content from socket_message a where a.createtime = max(message.createtime)) as content,
                         (select a.message_type from socket_message a where a.createtime = max(message.createtime)) as message_type
                     FROM
-                      sys_users users
+                      sys_user users
                     LEFT JOIN socket_message message ON
                       (
                         message.deleted = 0 AND ( message.send_user_id = users.id OR message.receive_user_id = users.id )
@@ -146,7 +146,7 @@
                         (select a.message_type from socket_message a where a.createtime = max(message.createtime)) as message_type
                     FROM
                       socket_team as team left join socket_user_team mid on mid.team_id = team.id
-                    left join sys_users users on users.id = mid.user_id
+                    left join sys_user users on users.id = mid.user_id
                     LEFT JOIN socket_message message ON message.team_id = team.id
                     WHERE
                       mid.user_id = #{id}

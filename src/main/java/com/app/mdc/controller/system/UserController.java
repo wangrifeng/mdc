@@ -10,6 +10,8 @@ import com.app.mdc.utils.viewbean.Page;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +28,7 @@ import java.util.Map;
  */
 @Controller
 	@RequestMapping("/admin/users")
+@Api("用户管理")
 public class UserController extends BaseController {
 
     private final UserService userService;
@@ -69,6 +72,7 @@ public class UserController extends BaseController {
     @PostMapping("/add")
     @SystemLogAnno(module = "用户管理", operation = "新增用户")
     @ResponseBody
+    @ApiOperation("新增用户")
     public ResponseResult add(@RequestParam Map<String,Object> map) {
         return userService.add(map);
     }

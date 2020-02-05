@@ -7,7 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ApiBaseAccessFilter extends BaseUtils implements HandlerInterceptor {
+public class ApiBaseAccessInterceptor extends BaseUtils implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) {
         //设置接口跨域问题

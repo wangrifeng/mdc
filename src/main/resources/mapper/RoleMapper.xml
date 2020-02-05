@@ -16,17 +16,17 @@
 
     <select id="findRolesByUserId" resultMap="BaseResultMap">
       select
-             roles.id as id,
+             roles.role_id as id,
              roles.status as status,
-             roles.deleted as deleted,
-             roles.createtime as createtime,
-             roles.updatetime as updatetime,
-             roles.code as code,
-             roles.name as name,
+             roles.del_flag as deleted,
+             roles.create_time as createtime,
+             roles.update_time as updatetime,
+             roles.role_key as code,
+             roles.role_name as name,
              roles.remark as remark
       from sys_role roles
-      left join sys_role_user mid on mid.role_id = roles.id
-      where mid.user_id = #{userId} and roles.deleted = 0
+      left join sys_user_role mid on mid.role_id = roles.role_id
+      where mid.user_id = #{userId} and roles.del_flag = 0
     </select>
 
 </mapper>

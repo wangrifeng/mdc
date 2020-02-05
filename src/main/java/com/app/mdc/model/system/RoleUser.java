@@ -14,13 +14,13 @@ import java.io.Serializable;
  * @author syf
  * @since 2019-06-11
  */
-@TableName("sys_role_user")
+@TableName("sys_user_role")
 public class RoleUser extends Model<RoleUser> {
 
     private static final long serialVersionUID = 1L;
-
-    @TableId(value = "id", type = IdType.UUID)
-    private String id;
+//
+//    @TableId(value = "id", type = IdType.UUID)
+//    private String id;
     /**
      * 角色id
      */
@@ -31,13 +31,13 @@ public class RoleUser extends Model<RoleUser> {
     private String userId;
 
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+//    public String getId() {
+//        return id;
+//    }
+//
+//    public void setId(String id) {
+//        this.id = id;
+//    }
 
     public String getRoleId() {
         return roleId;
@@ -57,13 +57,13 @@ public class RoleUser extends Model<RoleUser> {
 
     @Override
     protected Serializable pkVal() {
-        return this.id;
+        return this.userId + this.roleId;
     }
 
     @Override
     public String toString() {
         return "RoleUser{" +
-        ", id=" + id +
+//        ", id=" + id +
         ", roleId=" + roleId +
         ", userId=" + userId +
         "}";

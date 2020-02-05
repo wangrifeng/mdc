@@ -1,9 +1,11 @@
 package com.app.mdc.model.system;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,23 +19,29 @@ import java.util.Date;
  * @since 2019-08-01
  */
 @TableName("sys_log")
+@Data
 public class Log extends Model<Log> {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.UUID)
+    @TableId(value = "id", type = IdType.AUTO)
     private String id;
     private String brower;
+    @TableField(value = "create_time")
     private Date createtime;
     private String ip;
     private String module;
     private String operation;
     private String remarks;
     private String status;
+    @TableField("update_time")
     private Date updatetime;
+    @TableField("user_name")
     private String username;
     private Integer deleted;
+    @TableField("request_tx")
     private String requestTx;
+    @TableField("response_tx")
     private String responseTx;
 
     public String getId() {
