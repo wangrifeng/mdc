@@ -27,7 +27,7 @@ public class LoginTest {
     public void login(){
         Map<String,String> param  = new HashMap<>();
         param.put("loginName","admin3");
-        param.put("password","123456");
+        param.put("password","223456");
         String s = HttpUtil.doPost(HOST + "/doLogin", param);
         System.out.println(s);
     }
@@ -37,6 +37,17 @@ public class LoginTest {
         Map<String,String> param  = new HashMap<>();
         param.put("userId","102");
         String s = HttpUtil.doPost(HOST + "/doLoginOut", param);
+        System.out.println(s);
+    }
+
+    @Test
+    public void updatePwd(){
+        Map<String,String> param  = new HashMap<>();
+        param.put("type","1");
+        param.put("id","104");
+        param.put("oldPassword","223456");
+        param.put("newPassword","323456");
+        String s = HttpUtil.doPost(HOST + "/updatePwd", param);
         System.out.println(s);
     }
 

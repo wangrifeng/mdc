@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @Controller
 @Api("核心接口")
-public class MainController extends BaseController{
+public class MainController extends BaseController {
 
     private static Logger logger = LoggerFactory.getLogger(MainController.class);
 
@@ -53,20 +53,22 @@ public class MainController extends BaseController{
 
     /**
      * 校验app版本，是否需要更新
+     *
      * @return String
      */
     @RequestMapping(value = "checkAppVersion")
     @ResponseBody
-    public String checkVersion(){
+    public String checkVersion() {
         Map<String, String> params = paramsService.findSystemParams();
         return params.get("app_version");
     }
 
     /**
      * 用户登录接口
-     * @param loginName 用户名
-     * @param password 密码
-     * @param loginType 登录类型，区分：app,pc
+     *
+     * @param loginName   用户名
+     * @param password    密码
+     * @param loginType   登录类型，区分：app,pc
      * @param httpSession session
      * @return session
      */
@@ -76,8 +78,8 @@ public class MainController extends BaseController{
     @ApiOperation("用户登录")
     public ResponseResult doLogin(@RequestParam String loginName,
                                   @RequestParam String password,
-                                  @RequestParam(required = false,defaultValue = "0") String loginType,
-                                  HttpSession httpSession){
+                                  @RequestParam(required = false, defaultValue = "0") String loginType,
+                                  HttpSession httpSession) {
         ResponseResult responseResult = new ResponseResult();
         try {
             Map map = userService.doUserLogin(loginName, password, httpSession, loginType);
@@ -90,6 +92,7 @@ public class MainController extends BaseController{
 
     /**
      * 用户登录接口
+     *
      * @param userId 用户id
      * @return session
      */
@@ -97,7 +100,7 @@ public class MainController extends BaseController{
     @SystemLogAnno(module = "用户管理", operation = "退出登录")
     @ResponseBody
     @ApiOperation("退出登录")
-    public ResponseResult doLoginOut(@RequestParam Integer userId,HttpSession session){
+    public ResponseResult doLoginOut(@RequestParam Integer userId, HttpSession session) {
         session.removeAttribute("user");
         userService.removeTokenByUserId(userId);
         return ResponseResult.success();
@@ -106,11 +109,12 @@ public class MainController extends BaseController{
 
     /**
      * 获取系统所有参数值
+     *
      * @return params列表
      */
     @PostMapping(value = "params")
     @ResponseBody
-    public ResponseResult findSystemParams(){
+    public ResponseResult findSystemParams() {
         ResponseResult responseResult = new ResponseResult();
         Map<String, String> params = paramsService.findSystemParams();
         responseResult.setData(params);
@@ -120,7 +124,8 @@ public class MainController extends BaseController{
 
     /**
      * 图片显示，文件下载
-     * @param id id
+     *
+     * @param id                  id
      * @param httpServletResponse response
      * @throws UnsupportedEncodingException 文件未找到异常
      */
@@ -128,7 +133,7 @@ public class MainController extends BaseController{
     @ResponseBody
     public void downloadFile(@PathVariable String id, HttpServletResponse httpServletResponse) throws UnsupportedEncodingException {
         File file = fileService.findFileById(id);
-        httpServletResponse.setHeader("Content-Disposition", "attachment; filename="+ URLEncoder.encode(file.getFilename(),"UTF-8"));
+        httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(file.getFilename(), "UTF-8"));
         OutputStream out;
         try (InputStream in = new FileInputStream(picConfig.getSavePath() + file.getFilepath())) {
             int len;
@@ -144,12 +149,13 @@ public class MainController extends BaseController{
 
     /**
      * 获取文件详情接口
+     *
      * @param ids 文件id
      * @return file实体类
      */
     @RequestMapping(value = "getFile/{ids}")
     @ResponseBody
-    public ResponseResult getFile(@PathVariable String ids){
+    public ResponseResult getFile(@PathVariable String ids) {
         ResponseResult responseResult = new ResponseResult();
         List<File> file = fileService.findFilesByIds(ids);
         responseResult.setData(file);
@@ -158,6 +164,7 @@ public class MainController extends BaseController{
 
     /**
      * 修改密码
+     *
      * @param id          id
      * @param newPassword 新密码
      * @param oldPassword 老密码
@@ -166,38 +173,42 @@ public class MainController extends BaseController{
     @RequestMapping(value = "updatePwd")
     @SystemLogAnno(module = "用户管理", operation = "app端修改用户密码")
     @ResponseBody
-    public ResponseResult updatePwd(@RequestParam String id,
-                                    @RequestParam String newPassword,
-                                    @RequestParam String oldPassword) {
+    public ResponseResult updatePwd(
+            @RequestParam Integer type,
+            @RequestParam String id,
+            @RequestParam String newPassword,
+            @RequestParam String oldPassword) {
         ResponseResult responseResult = new ResponseResult();
         try {
-            userService.updatePwd(id,newPassword,oldPassword);
+            userService.updatePwd(type,id, newPassword, oldPassword);
         } catch (BusinessException e) {
             responseResult.setErrMsg(ApiErrEnum.ERR500.toString(), e.getMessage());
         }
         return responseResult;
     }
 
-	/**
-	 * 根据键值获取参数
-	 * @param keyName 键值
-	 * @return 参数
-	 */
+    /**
+     * 根据键值获取参数
+     *
+     * @param keyName 键值
+     * @return 参数
+     */
     @RequestMapping(value = "getAppParam")
     @ResponseBody
-    public ResponseResult getAppParam(@RequestParam String keyName){
-		Params params = paramsService.getAppParam(keyName);
+    public ResponseResult getAppParam(@RequestParam String keyName) {
+        Params params = paramsService.getAppParam(keyName);
         return ResponseResult.success().setData(params);
     }
 
     /**
      * 新增
-     * @param map	versionNumber版本号	versionInfo版本信息
-     * @return	返回正确错误信息
+     *
+     * @param map versionNumber版本号	versionInfo版本信息
+     * @return 返回正确错误信息
      */
     @RequestMapping(value = "addAppVersionLog")
     @ResponseBody
-    public ResponseResult addAppVersionLog(@RequestParam Map<String, Object> map){
+    public ResponseResult addAppVersionLog(@RequestParam Map<String, Object> map) {
         return appVersionLogService.addAppVersionLog(map);
     }
 }

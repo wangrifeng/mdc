@@ -44,6 +44,9 @@ public class User {
 	@TableField("password")
 	private String password;
 
+	@TableField("pay_password")
+	private String payPassword;
+
 	@TableField("salt")
 	private String salt;
 
