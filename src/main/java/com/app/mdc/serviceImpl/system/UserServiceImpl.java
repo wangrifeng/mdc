@@ -121,6 +121,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             tbUser.setUpdateTime(new Date());
             tbUser.fromMap(map);
             tbUser.setPassword(Md5Utils.hash(loginName, map.get("password").toString()));
+            tbUser.setEmail(map.get("email").toString());
             int userCount = userMapper.insert(tbUser);
 
             //新增用户角色中间表

@@ -19,6 +19,7 @@ public class LoginTest {
         param.put("userName","admin—3");
         param.put("roleId","10");
         param.put("password","123456");
+        param.put("email","mdc@qq.com");
         String s = HttpUtil.doPost(HOST + "/admin/users/add", param);
         System.out.println(s);
     }
