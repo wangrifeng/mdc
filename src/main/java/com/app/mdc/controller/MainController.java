@@ -33,6 +33,7 @@ import java.util.Map;
  */
 @Controller
 @Api("核心接口")
+@RequestMapping("/")
 public class MainController extends BaseController {
 
     private static Logger logger = LoggerFactory.getLogger(MainController.class);

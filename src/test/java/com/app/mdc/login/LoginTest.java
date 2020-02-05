@@ -15,21 +15,21 @@ public class LoginTest {
     @Test
     public void register(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","admin3");
-        param.put("userName","admin—3");
+        param.put("loginName","admin4");
+        param.put("userName","admin—4");
         param.put("roleId","10");
         param.put("password","123456");
         param.put("email","mdc@qq.com");
-        String s = HttpUtil.doPost(HOST + "/admin/users/add", param);
+        String s = HttpUtil.doPost(HOST + "/admin/users/add", param,null);
         System.out.println(s);
     }
 
     @Test
     public void login(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","admin3");
-        param.put("password","223456");
-        String s = HttpUtil.doPost(HOST + "/doLogin", param);
+        param.put("loginName","admin4");
+        param.put("password","123456");
+        String s = HttpUtil.doPost(HOST + "/doLogin", param,null);
         System.out.println(s);
     }
 
@@ -37,7 +37,7 @@ public class LoginTest {
     public void loginOut(){
         Map<String,String> param  = new HashMap<>();
         param.put("userId","102");
-        String s = HttpUtil.doPost(HOST + "/doLoginOut", param);
+        String s = HttpUtil.doPost(HOST + "/doLoginOut", param,null);
         System.out.println(s);
     }
 
@@ -45,10 +45,10 @@ public class LoginTest {
     public void updatePwd(){
         Map<String,String> param  = new HashMap<>();
         param.put("type","1");
-        param.put("id","104");
-        param.put("oldPassword","223456");
-        param.put("newPassword","323456");
-        String s = HttpUtil.doPost(HOST + "/updatePwd", param);
+        param.put("id","105");
+        param.put("oldPassword","423456");
+        param.put("newPassword","423456");
+        String s = HttpUtil.doPost(HOST + "/admin/users/updatePwd", param,"2cb5cc2a-05ea-4849-b9aa-13f49dc41c4d");
         System.out.println(s);
     }
 

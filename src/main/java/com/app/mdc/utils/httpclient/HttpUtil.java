@@ -2,6 +2,7 @@ package com.app.mdc.utils.httpclient;
 
 import com.alibaba.fastjson.JSON;
 import com.app.mdc.model.system.ApiLog;
+import com.baomidou.mybatisplus.toolkit.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -132,7 +133,7 @@ public class HttpUtil {
 		return resultString;
 	}
 
-	public static String doPost(String url, Map<String, String> param) {
+	public static String doPost(String url, Map<String, String> param,String token) {
 		// 创建Httpclient对象
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		CloseableHttpResponse response = null;
@@ -145,6 +146,9 @@ public class HttpUtil {
 			RequestConfig requestConfig = RequestConfig.custom()
 					.setConnectTimeout(3000).setConnectionRequestTimeout(3000)
 					.setSocketTimeout(3000).build();
+			if(StringUtils.isNotEmpty(token)){
+				httpPost.setHeader("usertoken",token);
+			}
 			httpPost.setConfig(requestConfig);
 
 			// 创建参数列表
@@ -173,7 +177,7 @@ public class HttpUtil {
 	}
 
 	public static String doPost(String url) {
-		return doPost(url, null);
+		return doPost(url, null,null);
 	}
 
 	public static String doPostJson(String url, String json) {

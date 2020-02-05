@@ -289,7 +289,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         //校验token是否在当前时间生效
         EntityWrapper<UserToken> entityWrapper = new EntityWrapper<>();
-        entityWrapper.gt("endtime", new Date())
+        entityWrapper.gt("end_time", new Date())
                 .eq("token", userToken);
         List<UserToken> usertokens = userTokenMapper.selectList(entityWrapper);
         if (usertokens.size() == 0) {

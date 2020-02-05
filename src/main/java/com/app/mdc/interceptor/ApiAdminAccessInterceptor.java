@@ -62,8 +62,6 @@ public class ApiAdminAccessInterceptor extends BaseUtils implements HandlerInter
         if (httpSession.getAttribute("user") == null){
             try {
                 User user = userService.findUserByToken(userToken);
-
-
                 httpSession.setAttribute("user", user);
             }catch (BusinessException e){
                 e.printStackTrace();
