@@ -34,37 +34,37 @@ public class ApiAdminAccessInterceptor extends BaseUtils implements HandlerInter
         httpServletResponse.setHeader("Access-control-expose-headers", "Authorization");
 
         String userToken = httpServletRequest.getHeader("usertoken");
-//        if ( isEmpty(userToken) ){
-//            ResponseResult responseResult = new ResponseResult();
-//            httpServletResponse.setContentType("text/html;charset=utf-8");
-//            Writer writer = httpServletResponse.getWriter();
-//            responseResult.setErrMsg(ApiErrEnum.ERR100.toString(), ApiErrEnum.ERR100.getDesc());
-//            writer.write(JSONObject.toJSONString(responseResult));
-//            writer.flush();
-//            writer.close();
-//            return false;
-//        }
-//        HttpSession httpSession = httpServletRequest.getSession();
-//
-//        //判断session中是否有user，如果有则跳过拦截
-//        if (httpSession.getAttribute("user") == null){
-//            try {
-//                User user = userService.findUserByToken(userToken);
-//
-//
-//                httpSession.setAttribute("user", user);
-//            }catch (BusinessException e){
-//                e.printStackTrace();
-//                ResponseResult responseResult = new ResponseResult();
-//                httpServletResponse.setContentType("text/html;charset=utf-8");
-//                Writer writer = httpServletResponse.getWriter();
-//                responseResult.setErrMsg(ApiErrEnum.ERR101.toString(), ApiErrEnum.ERR101.getDesc());
-//                writer.write(JSONObject.toJSONString(responseResult));
-//                writer.flush();
-//                writer.close();
-//                return false;
-//            }
-//        }
+        if ( isEmpty(userToken) ){
+            ResponseResult responseResult = new ResponseResult();
+            httpServletResponse.setContentType("text/html;charset=utf-8");
+            Writer writer = httpServletResponse.getWriter();
+            responseResult.setErrMsg(ApiErrEnum.ERR100.toString(), ApiErrEnum.ERR100.getDesc());
+            writer.write(JSONObject.toJSONString(responseResult));
+            writer.flush();
+            writer.close();
+            return false;
+        }
+        HttpSession httpSession = httpServletRequest.getSession();
+
+        //判断session中是否有user，如果有则跳过拦截
+        if (httpSession.getAttribute("user") == null){
+            try {
+                User user = userService.findUserByToken(userToken);
+
+
+                httpSession.setAttribute("user", user);
+            }catch (BusinessException e){
+                e.printStackTrace();
+                ResponseResult responseResult = new ResponseResult();
+                httpServletResponse.setContentType("text/html;charset=utf-8");
+                Writer writer = httpServletResponse.getWriter();
+                responseResult.setErrMsg(ApiErrEnum.ERR101.toString(), ApiErrEnum.ERR101.getDesc());
+                writer.write(JSONObject.toJSONString(responseResult));
+                writer.flush();
+                writer.close();
+                return false;
+            }
+        }
         return true;
     }
 
