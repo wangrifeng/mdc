@@ -77,6 +77,8 @@ public class User {
 	@TableField("up_user_id")
 	private String upUserId;
 
+	@TableField("level")
+	private Integer level;
 
 	public void fromMap(Map<String, Object> map) {
 		if (map.get("id") != null) {
