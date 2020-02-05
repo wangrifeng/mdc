@@ -144,8 +144,8 @@ public class HttpUtil {
 
 			//请求设置超时时间
 			RequestConfig requestConfig = RequestConfig.custom()
-					.setConnectTimeout(3000).setConnectionRequestTimeout(3000)
-					.setSocketTimeout(3000).build();
+					.setConnectTimeout(10000).setConnectionRequestTimeout(10000)
+					.setSocketTimeout(10000).build();
 			if(StringUtils.isNotEmpty(token)){
 				httpPost.setHeader("usertoken",token);
 			}
