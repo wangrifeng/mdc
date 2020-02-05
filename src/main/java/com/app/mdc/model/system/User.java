@@ -77,6 +77,9 @@ public class User {
 	@TableField("up_user_id")
 	private String upUserId;
 
+	@TableField("pay_password")
+	private String payPassword;
+
 	@TableField("level")
 	private Integer level;
 	@TableField("send_code")
@@ -160,6 +163,22 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getPayPassword() {
+		return payPassword;
+	}
+
+	public void setPayPassword(String payPassword) {
+		this.payPassword = payPassword;
+	}
+
+	public Integer getLevel() {
+		return level;
+	}
+
+	public void setLevel(Integer level) {
+		this.level = level;
 	}
 
 	public String getSalt() {

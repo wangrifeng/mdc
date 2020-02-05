@@ -2,6 +2,7 @@ package com.app.mdc.serviceImpl.system;
 
 import com.app.mdc.enums.ApiErrEnum;
 import com.app.mdc.exception.BusinessException;
+import com.app.mdc.mapper.mdc.WalletMapper;
 import com.app.mdc.mapper.system.RoleMapper;
 import com.app.mdc.mapper.system.RoleUserMapper;
 import com.app.mdc.mapper.system.UserMapper;
@@ -37,6 +38,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final RoleUserMapper roleUserMapper;
     private final RoleMapper roleMapper;
     private final WalletService walletService;
+    private final WalletMapper walletMapper;
 
     @Autowired
     private VerificationCodeService verificationCodeService;
@@ -47,12 +49,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private static final String USER_STATUS_FROZEN = "1";
 
     @Autowired
-    public UserServiceImpl(WalletService walletService,UserMapper userMapper, UserTokenMapper userTokenMapper, RoleUserMapper roleUserMapper, RoleMapper roleMapper) {
+    public UserServiceImpl(WalletMapper walletMapper,WalletService walletService,UserMapper userMapper, UserTokenMapper userTokenMapper, RoleUserMapper roleUserMapper, RoleMapper roleMapper) {
         this.userMapper = userMapper;
         this.userTokenMapper = userTokenMapper;
         this.roleUserMapper = roleUserMapper;
         this.roleMapper = roleMapper;
         this.walletService = walletService;
+        this.walletMapper = walletMapper;
     }
 
     @Override
@@ -135,7 +138,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             tbUser.setDelFlag(0);
             tbUser.setCreateTime(new Date());
             tbUser.setUpdateTime(new Date());
-			tbUser.setPassword(Md5Utils.hash(loginName,map.get("password").toString()));
+            tbUser.setEmail(map.get("email").toString());
+            tbUser.setPassword(Md5Utils.hash(loginName,map.get("password").toString()));
             tbUser.setSendCode(random);
             tbUser.setUpUserId(sendUser.get("userId").toString());
 			int userCount = userMapper.insert(tbUser);
