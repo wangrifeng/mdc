@@ -62,4 +62,13 @@ public class LoginTest {
         System.out.println(s);
     }
 
+    @Test
+    public void updateGestureSwitch(){
+        Map<String,String> param  = new HashMap<>();
+        param.put("userId","105");
+        param.put("gestureSwitch","1");
+        String s = HttpUtil.doPost(HOST + "/admin/users/updateGestureSwitch", param,"2cb5cc2a-05ea-4849-b9aa-13f49dc41c4d");
+        System.out.println(s);
+    }
+
 }

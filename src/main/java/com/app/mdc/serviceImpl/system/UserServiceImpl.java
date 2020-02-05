@@ -17,7 +17,6 @@ import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -378,6 +377,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         EntityWrapper<UserToken> userTokenEntityWrapper = new EntityWrapper<>();
         userTokenEntityWrapper.eq("user_id", userId);
         userTokenMapper.delete(userTokenEntityWrapper);
+    }
+
+    @Override
+    public void updateGestureSwitch(Integer gestureSwitch, String userId) {
+        User user = new User();
+        user.setId(userId);
+        user.setGestureSwitch(gestureSwitch);
+        this.baseMapper.updateById(user);
     }
 
 }
