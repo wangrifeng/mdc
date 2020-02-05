@@ -8,6 +8,6 @@ import java.util.Date;
 public class LogUtils {
 
     public static String getInterfaceMessage(User user, String interfaces){
-        return DateUtil.getDate("yyyy-MM-dd hh:mm:ss",0,new Date())+" "+user.getName()+interfaces;
+        return DateUtil.getDate("yyyy-MM-dd hh:mm:ss",0,new Date())+" "+user.getUserName()+interfaces;
     }
 }

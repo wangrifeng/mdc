@@ -12,13 +12,13 @@ import java.util.Map;
 @Component
 public interface UserMapper extends BaseMapper<User> {
 
-    @Select("SELECT * FROM sys_users")
+    @Select("SELECT * FROM sys_user")
     List<Map> getUserList();
     
-    @Select("select count(id) from sys_users where username=#{0}")
+    @Select("select count(1) from sys_user where login_name=#{0}")
     Integer user(String username);
 
-    @Select("select count(id) from sys_users where name=#{0}")
+    @Select("select count(1) from sys_user where user_name=#{0}")
     Integer isRepeat(String name);
 
     List<Map<String,Object>> getOperaterBook(@Param(value = "userId") String userId);

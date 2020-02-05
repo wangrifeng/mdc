@@ -11,6 +11,8 @@ import com.app.mdc.service.system.FileService;
 import com.app.mdc.service.system.ParamsService;
 import com.app.mdc.service.system.UserService;
 import com.app.mdc.utils.viewbean.ResponseResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,7 @@ import java.util.Map;
  * maincontroller
  */
 @Controller
+@Api("核心接口")
 public class MainController extends BaseController{
 
     private static Logger logger = LoggerFactory.getLogger(MainController.class);
@@ -61,7 +64,7 @@ public class MainController extends BaseController{
 
     /**
      * 用户登录接口
-     * @param username 用户名
+     * @param loginName 用户名
      * @param password 密码
      * @param loginType 登录类型，区分：app,pc
      * @param httpSession session
@@ -70,18 +73,34 @@ public class MainController extends BaseController{
     @PostMapping(value = "doLogin")
     @SystemLogAnno(module = "用户管理", operation = "用户登录")
     @ResponseBody
-    public ResponseResult doLogin(@RequestParam String username,
+    @ApiOperation("用户登录")
+    public ResponseResult doLogin(@RequestParam String loginName,
                                   @RequestParam String password,
-                                  @RequestParam(defaultValue = "") String loginType,
+                                  @RequestParam(required = false,defaultValue = "0") String loginType,
                                   HttpSession httpSession){
         ResponseResult responseResult = new ResponseResult();
         try {
-            Map map = userService.doUserLogin(username, password, httpSession, loginType);
+            Map map = userService.doUserLogin(loginName, password, httpSession, loginType);
             responseResult.setData(map);
         } catch (BusinessException e) {
             responseResult.setErrMsg(ApiErrEnum.ERR500.toString(), e.getMessage());
         }
         return responseResult;
+    }
+
+    /**
+     * 用户登录接口
+     * @param userId 用户id
+     * @return session
+     */
+    @PostMapping(value = "doLoginOut")
+    @SystemLogAnno(module = "用户管理", operation = "退出登录")
+    @ResponseBody
+    @ApiOperation("退出登录")
+    public ResponseResult doLoginOut(@RequestParam Integer userId,HttpSession session){
+        session.removeAttribute("user");
+        userService.removeTokenByUserId(userId);
+        return ResponseResult.success();
     }
 
 

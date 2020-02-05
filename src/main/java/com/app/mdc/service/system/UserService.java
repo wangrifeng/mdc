@@ -93,4 +93,10 @@ public interface UserService extends IService<User> {
 	 * @return
 	 */
 	List<Map<String,Object>> pcAddressBook(String userId);
+
+    /**
+     * 删除用户对应的token
+     * @param userId
+     */
+    void removeTokenByUserId(Integer userId);
 }

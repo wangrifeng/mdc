@@ -12,8 +12,8 @@
         u.rank,
         '' as companyName
         FROM
-        sys_users u,
-        sys_role_user ru,
+        sys_user u,
+        sys_user_role ru,
         sys_role r
         <where>
             u.id = ru.user_id
@@ -33,8 +33,8 @@
             u.rank,
             '' as companyName
         FROM
-            sys_users u,
-            sys_role_user ru,
+            sys_user u,
+            sys_user_role ru,
             sys_role r
         <where>
             u.id = ru.user_id
@@ -55,7 +55,7 @@
             u.rank,
             c.name as companyName
         FROM
-            sys_users u left join tb_company c
+            sys_user u left join tb_company c
             on u.companyid=c.id
         <where>
             u.companyid IN ( SELECT company_id FROM sys_user_company WHERE user_id = #{userId} )
@@ -74,8 +74,8 @@
         u.rank,
         '' as companyName
         FROM
-        sys_users u,
-        sys_role_user ru,
+        sys_user u,
+        sys_user_role ru,
         sys_role r
         <where>
             u.id = ru.user_id
@@ -95,8 +95,8 @@
             u.rank,
             '' as companyName
         FROM
-            sys_users u,
-            sys_role_user ru,
+            sys_user u,
+            sys_user_role ru,
             sys_role r
         <where>
             u.id = ru.user_id
@@ -116,10 +116,10 @@
             u.rank,
             c.name as companyName
         FROM
-            sys_users u left join tb_company c
+            sys_user u left join tb_company c
             on u.companyid=c.id
         <where>
-            and u.companyid IN ( SELECT companyid FROM sys_users WHERE id =  #{userId} )
+            and u.companyid IN ( SELECT companyid FROM sys_user WHERE id =  #{userId} )
             and u.id != #{userId}
             AND u.deleted =0
         </where>
@@ -136,7 +136,7 @@
         u.rank,
         c.name as companyName
         FROM
-        sys_users u
+        sys_user u
         left join tb_company c
         on u.companyid=c.id
         <where>

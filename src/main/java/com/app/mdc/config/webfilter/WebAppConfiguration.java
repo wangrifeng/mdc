@@ -1,7 +1,7 @@
 package com.app.mdc.config.webfilter;
 
-import com.app.mdc.interceptor.ApiAdminAccessFilter;
-import com.app.mdc.interceptor.ApiBaseAccessFilter;
+import com.app.mdc.interceptor.ApiAdminAccessInterceptor;
+import com.app.mdc.interceptor.ApiBaseAccessInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -14,12 +14,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class WebAppConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
-    ApiAdminAccessFilter ApiAdminAccessFilter() {
-        return new ApiAdminAccessFilter();
+    ApiAdminAccessInterceptor ApiAdminAccessFilter() {
+        return new ApiAdminAccessInterceptor();
     }
     @Bean
-    ApiBaseAccessFilter ApiBaseAccessFilter() {
-        return new ApiBaseAccessFilter();
+    ApiBaseAccessInterceptor ApiBaseAccessFilter() {
+        return new ApiBaseAccessInterceptor();
     }
 
     @Override

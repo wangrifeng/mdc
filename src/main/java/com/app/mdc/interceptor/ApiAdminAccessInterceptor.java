@@ -1,13 +1,13 @@
 package com.app.mdc.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.app.mdc.config.whiteList.WhiteListProperties;
 import com.app.mdc.enums.ApiErrEnum;
 import com.app.mdc.exception.BusinessException;
 import com.app.mdc.model.system.User;
 import com.app.mdc.service.system.UserService;
 import com.app.mdc.utils.BaseUtils;
 import com.app.mdc.utils.viewbean.ResponseResult;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,11 +16,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.Writer;
+import java.util.List;
 
-public class ApiAdminAccessFilter extends BaseUtils implements HandlerInterceptor {
+public class ApiAdminAccessInterceptor extends BaseUtils implements HandlerInterceptor {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private WhiteListProperties whiteListProperties;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)
@@ -33,6 +37,13 @@ public class ApiAdminAccessFilter extends BaseUtils implements HandlerIntercepto
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type,usertoken");
         httpServletResponse.setHeader("Access-Control-Allow-Credentials","*");
         httpServletResponse.setHeader("Access-control-expose-headers", "Authorization");
+
+        //判断是否为白名单接口
+        String requestURI = httpServletRequest.getRequestURI();
+        List<String> blankList = whiteListProperties.getBlankList();
+        if(blankList != null && blankList.size() > 0 && blankList.contains(requestURI)){
+            return true;
+        }
 
         String userToken = httpServletRequest.getHeader("usertoken");
         if ( isEmpty(userToken) ){

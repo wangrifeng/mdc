@@ -22,8 +22,8 @@
 		FROM
 			sys_menu m
 			left join sys_role_menu rm on rm.menu_id = m.id
-			left join sys_role_user ru on ru.role_id = rm.role_id
-			left join sys_users u on u.id = ru.user_id
+			left join sys_user_role ru on ru.role_id = rm.role_id
+			left join sys_user u on u.id = ru.user_id
 		WHERE
 			u.id = #{userId}
 			and m.level=1
@@ -46,8 +46,8 @@
 		FROM
 		sys_menu m
 		left join sys_role_menu rm on rm.menu_id = m.id
-		left join sys_role_user ru on ru.role_id = rm.role_id
-		left join sys_users u on u.id = ru.user_id
+		left join sys_user_role ru on ru.role_id = rm.role_id
+		left join sys_user u on u.id = ru.user_id
 		<where>
 			<if test="userId != null and userId !='' ">
 				AND u.id = #{userId}
