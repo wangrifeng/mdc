@@ -103,4 +103,11 @@ public interface UserService extends IService<User> {
      * @param userId
      */
     void removeTokenByUserId(Integer userId);
+
+    /**
+     * 更新手势密码状态
+     * @param gestureSwitch
+     * @param userId
+     */
+    void updateGestureSwitch(Integer gestureSwitch, String userId);
 }

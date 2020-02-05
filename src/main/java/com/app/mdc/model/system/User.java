@@ -277,6 +277,9 @@ public class User {
 		this.sendCode = sendCode;
 	}
 
+	@TableField("gesture_switch")
+	private Integer gestureSwitch;
+
 	public void fromMap(Map<String, Object> map) {
 		if (map.get("id") != null) {
 			this.id = (String) map.get("id");

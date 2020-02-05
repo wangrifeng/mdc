@@ -117,6 +117,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping("/updatePwd")
     @SystemLogAnno(module = "用户管理", operation = "app端修改用户密码")
+    @ApiOperation("app端修改用户密码")
     @ResponseBody
     public ResponseResult updatePwd(
             @RequestParam Integer type,
@@ -134,6 +135,27 @@ public class UserController extends BaseController {
         }
         return responseResult;
     }
+
+
+    /**
+     * 修改密码
+     *
+     * @param gestureSwitch    0关 1开
+     * @param userId 用户id
+     * @throws BusinessException 抛出错误
+     */
+    @RequestMapping("/updateGestureSwitch")
+    @SystemLogAnno(module = "用户管理", operation = "手势密码开关")
+    @ApiOperation("手势密码开关")
+    @ResponseBody
+    public ResponseResult updateGestureSwitch(
+            @RequestParam Integer gestureSwitch,
+            @RequestParam String userId
+    ) {
+        userService.updateGestureSwitch(gestureSwitch,userId);
+        return ResponseResult.success();
+    }
+
 
     /**
      * 手机端通讯录
