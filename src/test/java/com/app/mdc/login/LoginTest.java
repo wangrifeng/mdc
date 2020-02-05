@@ -15,8 +15,8 @@ public class LoginTest {
     @Test
     public void register(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","admin2");
-        param.put("userName","admin—2");
+        param.put("loginName","admin3");
+        param.put("userName","admin—3");
         param.put("roleId","10");
         param.put("password","123456");
         String s = HttpUtil.doPost(HOST + "/admin/users/add", param);
@@ -26,7 +26,7 @@ public class LoginTest {
     @Test
     public void login(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","admin2");
+        param.put("loginName","admin3");
         param.put("password","123456");
         String s = HttpUtil.doPost(HOST + "/doLogin", param);
         System.out.println(s);

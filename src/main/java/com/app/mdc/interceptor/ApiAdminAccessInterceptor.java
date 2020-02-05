@@ -1,6 +1,7 @@
 package com.app.mdc.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.app.mdc.config.whiteList.WhiteListProperties;
 import com.app.mdc.enums.ApiErrEnum;
 import com.app.mdc.exception.BusinessException;
 import com.app.mdc.model.system.User;
@@ -15,11 +16,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.Writer;
+import java.util.List;
 
 public class ApiAdminAccessInterceptor extends BaseUtils implements HandlerInterceptor {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private WhiteListProperties whiteListProperties;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)
@@ -32,6 +37,13 @@ public class ApiAdminAccessInterceptor extends BaseUtils implements HandlerInter
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type,usertoken");
         httpServletResponse.setHeader("Access-Control-Allow-Credentials","*");
         httpServletResponse.setHeader("Access-control-expose-headers", "Authorization");
+
+        //判断是否为白名单接口
+        String requestURI = httpServletRequest.getRequestURI();
+        List<String> blankList = whiteListProperties.getBlankList();
+        if(blankList != null && blankList.size() > 0 && blankList.contains(requestURI)){
+            return true;
+        }
 
         String userToken = httpServletRequest.getHeader("usertoken");
         if ( isEmpty(userToken) ){
