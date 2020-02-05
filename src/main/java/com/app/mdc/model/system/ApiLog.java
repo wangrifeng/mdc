@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 
  * </p>
  *
- * @author 王日锋
+ * @author
  * @since 2019-08-05
  */
 @TableName("sys_api_log")

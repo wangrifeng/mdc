@@ -10,7 +10,7 @@ import java.util.Map;
  *  服务类
  * </p>
  *
- * @author 王日锋
+ * @author
  * @since 2019-08-05
  */
 public interface ApiLogService extends IService<ApiLog> {

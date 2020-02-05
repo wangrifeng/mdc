@@ -21,7 +21,7 @@ public class MPGenerator {
 		//1. 全局配置
 		GlobalConfig config = new GlobalConfig();
 		config.setActiveRecord(true) // 是否支持AR模式
-			  .setAuthor("sss") // 作者
+			  .setAuthor("") // 作者
 			  .setOutputDir("D:\\mdc\\src\\main\\java") // 生成路径
 			  .setFileOverride(false)  // 文件覆盖
 			  .setIdType(IdType.UUID) // 主键策略
@@ -35,7 +35,7 @@ public class MPGenerator {
 		DataSourceConfig dsConfig  = new DataSourceConfig();
 		dsConfig.setDbType(DbType.MYSQL)  // 设置数据库类型
 				.setDriverName("com.mysql.cj.jdbc.Driver")
-				.setUrl("jdbc:mysql://127.0.0.1:3306/mdc?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=false&serverTimezone=CTT")
+				.setUrl("jdbc:mysql://129.226.114.98:3306/mdc?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=false&serverTimezone=CTT")
 				.setUsername("root")
 				.setPassword("123456");
 		 
@@ -44,16 +44,16 @@ public class MPGenerator {
 		stConfig.setCapitalMode(true) //全局大写命名
 				.setDbColumnUnderline(true)  // 指定表名 字段名是否使用下划线
 				.setNaming(NamingStrategy.underline_to_camel) // 数据库表映射到实体的命名策略
-				.setTablePrefix("tb_")
-				.setInclude("tb_devops_wo");  // 生成的表
+				.setTablePrefix("mdc_")
+				.setInclude("mdc_wallet");  // 生成的表
 		
 		//4. 包名策略配置 
 		PackageConfig pkConfig = new PackageConfig();
-		pkConfig.setParent("com.mdc.cn.mdc")
-				.setMapper("mapper")
-				.setService("service")
-				.setController("controller")
-				.setEntity("model")
+		pkConfig.setParent("com.app.mdc")
+				.setMapper("mapper.mdc")
+				.setService("service.mdc")
+				.setController("controller.mdc")
+				.setEntity("model.mdc")
 				.setXml("mapper");
 		
 		//5. 整合配置

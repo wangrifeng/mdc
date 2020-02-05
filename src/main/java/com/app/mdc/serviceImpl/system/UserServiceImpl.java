@@ -6,10 +6,12 @@ import com.app.mdc.mapper.system.RoleMapper;
 import com.app.mdc.mapper.system.RoleUserMapper;
 import com.app.mdc.mapper.system.UserMapper;
 import com.app.mdc.mapper.system.UserTokenMapper;
+import com.app.mdc.model.mdc.Wallet;
 import com.app.mdc.model.system.Role;
 import com.app.mdc.model.system.RoleUser;
 import com.app.mdc.model.system.User;
 import com.app.mdc.model.system.UserToken;
+import com.app.mdc.service.mdc.WalletService;
 import com.app.mdc.service.system.UserService;
 import com.app.mdc.utils.Md5Utils;
 import com.app.mdc.utils.encryptdecrypt.MD5EncryptDecrypt;
@@ -34,6 +36,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final UserTokenMapper userTokenMapper;
     private final RoleUserMapper roleUserMapper;
     private final RoleMapper roleMapper;
+    private final WalletService walletService;
 
     @Value("${license.key}")
     private String linceseKey;
@@ -42,11 +45,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private static final String USER_STATUS_FROZEN = "1";
 
     @Autowired
-    public UserServiceImpl(UserMapper userMapper, UserTokenMapper userTokenMapper, RoleUserMapper roleUserMapper, RoleMapper roleMapper) {
+    public UserServiceImpl(WalletService walletService,UserMapper userMapper, UserTokenMapper userTokenMapper, RoleUserMapper roleUserMapper, RoleMapper roleMapper) {
         this.userMapper = userMapper;
         this.userTokenMapper = userTokenMapper;
         this.roleUserMapper = roleUserMapper;
         this.roleMapper = roleMapper;
+        this.walletService = walletService;
     }
 
     @Override
@@ -115,16 +119,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return ResponseResult.fail(ApiErrEnum.ERR600);
         }else if(isRepeat>0) {
             return ResponseResult.fail(ApiErrEnum.ERR602);
+        }else if(map.get("sendCode") == null){
+            return ResponseResult.fail();
         }else {
-
+            //获取推送人id
+            int sendCode = Integer.parseInt(map.get("sendCode").toString());
+            Map<String,Object> sendUser = userMapper.getUserBySendCode(sendCode);
+            //生成6位随机的邀请码
+            int random = (int)((Math.random()*9+1)*100000);
             //新增用户
             User tbUser=new User();
+            tbUser.fromMap(map);
             tbUser.setDelFlag(0);
             tbUser.setCreateTime(new Date());
             tbUser.setUpdateTime(new Date());
-			tbUser.fromMap(map);
 			tbUser.setPassword(Md5Utils.hash(loginName,map.get("password").toString()));
-            int userCount = userMapper.insert(tbUser);
+            tbUser.setSendCode(random);
+            tbUser.setUpUserId(sendUser.get("userId").toString());
+			int userCount = userMapper.insert(tbUser);
 
 			//新增用户角色中间表
 			String userId=tbUser.getId();
@@ -139,6 +151,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 }
             }
 
+            //添加钱包
+            try {
+                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
+            }catch (Exception e){
+                return ResponseResult.fail();
+            }
             return userCount == 1  ? ResponseResult.success() : ResponseResult.fail();
         }
     }
