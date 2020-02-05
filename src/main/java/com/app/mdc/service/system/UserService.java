@@ -63,13 +63,17 @@ public interface UserService extends IService<User> {
 
     /**
      * 修改密码
+     *
+     * @param type 密码类型 0登录密码 1支付密码
      * @param id    id
      * @param newPassword   新密码
      * @param oldPassword   老密码
+     * @param verCode 验证码
+     * @param verId 生成验证码的id
      * @return  int
      * @throws BusinessException    抛出错误
      */
-    Integer updatePwd(String id,String newPassword,String oldPassword) throws BusinessException;
+    Integer updatePwd(Integer type, String id, String newPassword, String oldPassword, String verCode, String verId) throws BusinessException;
 
     /**
      * 手机端通讯录

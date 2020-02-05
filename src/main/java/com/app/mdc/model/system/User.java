@@ -77,6 +77,8 @@ public class User {
 	@TableField("up_user_id")
 	private String upUserId;
 
+	@TableField("level")
+	private Integer level;
 	@TableField("send_code")
 	private int sendCode;
 

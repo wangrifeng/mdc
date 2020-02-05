@@ -176,7 +176,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 		para.put("text", param.get("text").toString());
 		para.put("CID", CID);
 
-        return HttpUtil.doPost(picConfig.getMsgPushUrl(), para);
+        return HttpUtil.doPost(picConfig.getMsgPushUrl(), para,null);
     }
 
     @Override
