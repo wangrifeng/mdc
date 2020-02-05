@@ -211,7 +211,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/src/main/resources/lib/pageoffice4.5.0.10.jar</systemPath>
 		</dependency>-->
-		<dependency>
+		<!--<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 			<version>5.5.0</version>
@@ -241,7 +241,7 @@
 			<groupId>org.xhtmlrenderer</groupId>
 			<artifactId>flying-saucer-pdf</artifactId>
 			<version>9.0.7</version>
-		</dependency>
+		</dependency>-->
 
 		<!--<dependency>
 			<groupId>org.springframework.boot</groupId>
