@@ -11,6 +11,7 @@ import com.app.mdc.model.system.RoleUser;
 import com.app.mdc.model.system.User;
 import com.app.mdc.model.system.UserToken;
 import com.app.mdc.service.system.UserService;
+import com.app.mdc.utils.Md5Utils;
 import com.app.mdc.utils.encryptdecrypt.MD5EncryptDecrypt;
 import com.app.mdc.utils.jvm.LinceseUtils;
 import com.app.mdc.utils.viewbean.ResponseResult;
@@ -107,7 +108,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional(rollbackFor = Exception.class)
     public ResponseResult add(Map<String,Object> map) {
         //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
-        Integer count=userMapper.user(map.get("loginName").toString());
+        String loginName = map.get("loginName").toString();
+        Integer count=userMapper.user(loginName);
         Integer isRepeat=userMapper.isRepeat(map.get("userName").toString());
         if(count>0) {
             return ResponseResult.fail(ApiErrEnum.ERR600);
@@ -121,7 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             tbUser.setCreateTime(new Date());
             tbUser.setUpdateTime(new Date());
 			tbUser.fromMap(map);
-			tbUser.setPassword(MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(map.get("password").toString())));
+			tbUser.setPassword(Md5Utils.hash(loginName,map.get("password").toString()));
             int userCount = userMapper.insert(tbUser);
 
 			//新增用户角色中间表
@@ -146,10 +148,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public ResponseResult update(Map<String,Object> map) {
 		//判断username是否重复
     	EntityWrapper<User> userEntityWrapper=new EntityWrapper<>();
-    	userEntityWrapper.eq("username",map.get("username")).eq("deleted",0);
+    	userEntityWrapper.eq("login_name",map.get("loginName")).eq("del_flag",0);
     	List<User> userList=this.baseMapper.selectList(userEntityWrapper);
 
-        if(userList.size()>0 && !map.get("id").equals(userList.get(0).getId())) {
+        if(userList.size()>0 && !map.get("user_id").equals(userList.get(0).getId())) {
             return ResponseResult.fail(ApiErrEnum.ERR600);
         }else {
             //用户
@@ -157,7 +159,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             user.setUpdateTime(new Date());
 			user.fromMap(map);
             if(map.get("password")!=null){
-                user.setPassword(MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(map.get("password").toString())));
+                user.setPassword(Md5Utils.hash(map.get("loginName").toString(),map.get("password").toString()));
             }
             int userCount = userMapper.updateById(user);
 
@@ -222,7 +224,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         //密码校验
-        String userPassword = MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(password));
+        String userPassword = Md5Utils.hash(username,password);
         User user = users.get(0);
 
         if(USER_STATUS_FROZEN.equals(user.getStatus())){
@@ -303,8 +305,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Integer updatePwd(String id,String newPassword,String oldPassword) throws BusinessException {
         //先验证老密码对不对
+        User u = userMapper.selectById(id);
+        if(u == null){
+            throw new BusinessException("用户不存在");
+        }
+
         Map<String,Object> map=new HashMap<>();
-        map.put("password",MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(oldPassword)));
+        map.put("password",Md5Utils.hash(u.getLoginName(),oldPassword));
         map.put("id",id);
         int count=userMapper.selectByMap(map).size();
 
@@ -312,7 +319,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             //修改新密码
             User user=new User();
             user.setId(id);
-            user.setPassword(MD5EncryptDecrypt.normalMd5(MD5EncryptDecrypt.normalMd5(newPassword)));
+            user.setPassword(Md5Utils.hash(u.getLoginName(),newPassword));
             user.setUpdateTime(new Date());
             return userMapper.updateById(user);
         }else{
