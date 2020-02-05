@@ -13,7 +13,7 @@ import java.util.Map;
  *  服务类
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-06-19
  */
 public interface QuestionService extends IService<Question> {

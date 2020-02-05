@@ -16,7 +16,7 @@ import java.util.Map;
  * 
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-06-17
  */
 @TableName("sys_district")

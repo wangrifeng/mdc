@@ -11,7 +11,7 @@ import java.io.Serializable;
  * 
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-06-11
  */
 @TableName("sys_role_user")

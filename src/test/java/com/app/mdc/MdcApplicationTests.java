@@ -22,18 +22,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ReflectionUtils;
+import org.web3j.crypto.Bip39Wallet;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.WalletUtils;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.Web3ClientVersion;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.utils.Convert;
 
 import java.io.*;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -219,22 +234,45 @@ public class MdcApplicationTests {
 	}
 
 	@Test
-	public void testMap(){
-		Map map1 = new HashMap<>();
-		map1.put("code","1");
-		Map map2 = new HashMap<>();
-		map2.put("code","2");
-		List<Map> list = new ArrayList<>();
-		list.add(map1);
-		list.add(map2);
-		Map map3 = new HashMap<>();
-		map3.put("1","ese");
-		map3.put("2","dad");
-		map3.put("3","dasda");
-		for(Map map : list){
-			map3.remove(map.get("code"));
-		}
-		System.out.println(map3);
+	public void testMap() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException, ExecutionException, InterruptedException {
+		/*Web3j web3 = Web3j.build(new HttpService("https://mainnet.infura.io/v3/50d1c4c05dbd472b85e4acf1cf58b01b"));
+
+		Web3ClientVersion web3ClientVersion = web3.web3ClientVersion().sendAsync().get();
+		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
+		System.out.println(clientVersion);*/
+
+		String keyStoreDir = "D:/walletTest";
+		System.out.println("生成keyStore文件的默认目录：" + keyStoreDir);
+		String passWord="123456";
+		/*String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
+		System.out.println(name);*/
+		String walleFilePath=keyStoreDir+"/UTC--2020-02-05T06-56-39.656000000Z--931f93ce911000d32458eb3e52b175df36d046a1.json";
+
+		Credentials credentials = WalletUtils.loadCredentials(passWord, walleFilePath);
+		String address = credentials.getAddress();
+		BigInteger publicKey = credentials.getEcKeyPair().getPublicKey();
+		BigInteger privateKey = credentials.getEcKeyPair().getPrivateKey();
+
+		System.out.println("address="+address);
+		System.out.println("public key="+publicKey);
+		System.out.println("private key="+privateKey);
+
+		Web3j web3j = Web3j.build(new HttpService("http://ropsten.infura.io/v3/97b5a1d9eb3a4fcebb12e219f1417725"));
+
+		Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
+		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
+		System.out.println("version=" + clientVersion);
+
+		if (web3j == null) return;
+		//String address = "0xda66286c6d6c238218693dc8508265cf88478fab";//等待查询余额的地址
+		//第二个参数：区块的参数，建议选最新区块
+		EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
+		//格式转化 wei-ether
+		String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether");
+		System.out.println(blanceETH);
+
+
+
 	}
 
 }

@@ -12,7 +12,7 @@ import java.util.Map;
  *  服务类
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-08-15
  */
 public interface AppVersionLogService extends IService<AppVersionLog> {

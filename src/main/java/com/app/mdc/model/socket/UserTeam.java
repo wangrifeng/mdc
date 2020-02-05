@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-07-23
  */
 @TableName("socket_user_team")

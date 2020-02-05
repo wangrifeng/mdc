@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-08-23
  */
 @TableName("sys_app_version_log")

@@ -14,7 +14,7 @@ import java.util.Date;
  * 
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-07-23
  */
 @TableName("socket_team")

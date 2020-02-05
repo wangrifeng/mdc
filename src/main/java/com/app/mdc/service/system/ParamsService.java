@@ -12,7 +12,7 @@ import java.util.Map;
  *  服务类
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-06-12
  */
 public interface ParamsService extends IService<Params> {

@@ -12,7 +12,7 @@ import com.app.mdc.utils.viewbean.ResponseResult;
  *  服务类
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-06-12
  */
 public interface DictService extends IService<Dict> {

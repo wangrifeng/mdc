@@ -12,7 +12,7 @@ import java.util.List;
  *  服务类
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-07-23
  */
 public interface TeamService extends IService<Team> {

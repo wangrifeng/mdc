@@ -13,7 +13,7 @@ import java.util.Date;
  * 
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-08-01
  */
 @TableName("sys_log")

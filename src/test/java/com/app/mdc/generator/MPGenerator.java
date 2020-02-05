@@ -21,7 +21,7 @@ public class MPGenerator {
 		//1. 全局配置
 		GlobalConfig config = new GlobalConfig();
 		config.setActiveRecord(true) // 是否支持AR模式
-			  .setAuthor("王日锋") // 作者
+			  .setAuthor("sss") // 作者
 			  .setOutputDir("D:\\mdc\\src\\main\\java") // 生成路径
 			  .setFileOverride(false)  // 文件覆盖
 			  .setIdType(IdType.UUID) // 主键策略
@@ -35,7 +35,7 @@ public class MPGenerator {
 		DataSourceConfig dsConfig  = new DataSourceConfig();
 		dsConfig.setDbType(DbType.MYSQL)  // 设置数据库类型
 				.setDriverName("com.mysql.cj.jdbc.Driver")
-				.setUrl("jdbc:mysql://192.168.1.201:3306/mdc?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=false&serverTimezone=CTT")
+				.setUrl("jdbc:mysql://127.0.0.1:3306/mdc?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=false&serverTimezone=CTT")
 				.setUsername("root")
 				.setPassword("123456");
 		 

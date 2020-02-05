@@ -8,7 +8,7 @@ import com.app.mdc.model.socket.UserTeam;
  *  服务类
  * </p>
  *
- * @author syf
+ * @author
  * @since 2019-07-23
  */
 public interface UserTeamService extends IService<UserTeam> {
