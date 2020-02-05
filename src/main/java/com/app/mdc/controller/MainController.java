@@ -178,10 +178,12 @@ public class MainController extends BaseController {
             @RequestParam Integer type,
             @RequestParam String id,
             @RequestParam String newPassword,
-            @RequestParam String oldPassword) {
+            @RequestParam String oldPassword,
+            @RequestParam String verCode,
+            @RequestParam String verId) {
         ResponseResult responseResult = new ResponseResult();
         try {
-            userService.updatePwd(type,id, newPassword, oldPassword);
+            userService.updatePwd(type,id, newPassword, oldPassword, verCode, verId);
         } catch (BusinessException e) {
             responseResult.setErrMsg(ApiErrEnum.ERR500.toString(), e.getMessage());
         }

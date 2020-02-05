@@ -52,4 +52,13 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
         return verificationCode.getId();
     }
 
+    @Override
+    public boolean validateVerCode(String verCode, String verId) {
+        VerificationCode verificationCode = this.baseMapper.selectById(verId);
+        if(verificationCode == null){
+            return false;
+        }
+        return verCode.equals(verificationCode.getCode());
+    }
+
 }

@@ -11,11 +11,13 @@ import com.app.mdc.model.system.RoleUser;
 import com.app.mdc.model.system.User;
 import com.app.mdc.model.system.UserToken;
 import com.app.mdc.service.system.UserService;
+import com.app.mdc.service.system.VerificationCodeService;
 import com.app.mdc.utils.Md5Utils;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final UserTokenMapper userTokenMapper;
     private final RoleUserMapper roleUserMapper;
     private final RoleMapper roleMapper;
-
+    @Autowired
+    private VerificationCodeService verificationCodeService;
     @Value("${license.key}")
     private String linceseKey;
 
@@ -300,7 +303,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Integer updatePwd(Integer type, String id, String newPassword, String oldPassword) throws BusinessException {
+    public Integer updatePwd(Integer type, String id, String newPassword, String oldPassword, String verCode, String verId) throws BusinessException {
+        //验证验证码是否正确
+        boolean isVerCodeValidated = verificationCodeService.validateVerCode(verCode,verId);
+        if(!isVerCodeValidated){
+            throw new BusinessException("验证码验证失败");
+        }
+
         //先验证老密码对不对
         User u = userMapper.selectById(id);
         if (u == null) {

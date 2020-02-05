@@ -48,6 +48,8 @@ public class LoginTest {
         param.put("id","105");
         param.put("oldPassword","423456");
         param.put("newPassword","423456");
+        param.put("verId","7");
+        param.put("verCode","IPGICp");
         String s = HttpUtil.doPost(HOST + "/admin/users/updatePwd", param,"2cb5cc2a-05ea-4849-b9aa-13f49dc41c4d");
         System.out.println(s);
     }

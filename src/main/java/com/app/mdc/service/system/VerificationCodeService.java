@@ -12,4 +12,12 @@ public interface VerificationCodeService extends IService<VerificationCode> {
      * @param userId
      */
     Integer getVerificationCode(Integer userId) throws BusinessException;
+
+    /**
+     * 验证验证码是狗正确
+     * @param verCode
+     * @param verId
+     * @return
+     */
+    boolean validateVerCode(String verCode, String verId);
 }

@@ -111,6 +111,8 @@ public class UserController extends BaseController {
      * @param id          id
      * @param newPassword 新密码
      * @param oldPassword 老密码
+     * @param verCode 验证码
+     * @param verId 生成验证码的id
      * @throws BusinessException 抛出错误
      */
     @RequestMapping("/updatePwd")
@@ -120,10 +122,13 @@ public class UserController extends BaseController {
             @RequestParam Integer type,
             @RequestParam String id,
             @RequestParam String newPassword,
-            @RequestParam String oldPassword) {
+            @RequestParam String oldPassword,
+            @RequestParam String verCode,
+            @RequestParam String verId
+            ) {
         ResponseResult responseResult = new ResponseResult();
         try {
-            userService.updatePwd(type, id, newPassword, oldPassword);
+            userService.updatePwd(type, id, newPassword, oldPassword,verCode,verId);
         } catch (BusinessException e) {
             responseResult.setErrMsg(ApiErrEnum.ERR500.toString(), e.getMessage());
         }
