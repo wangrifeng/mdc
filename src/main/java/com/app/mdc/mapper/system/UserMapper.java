@@ -21,7 +21,7 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("select count(1) from sys_user where user_name=#{0}")
     Integer isRepeat(String name);
 
-    @Select("select user_id as userId from sys_user where send_code=#{0}")
+    @Select("select user_id as userId,up_user_id as upUserId ,up_user_ids as upUserIds from sys_user where send_code=#{0}")
     Map<String,Object> getUserBySendCode(int sendCode);
 
     List<Map<String,Object>> getOperaterBook(@Param(value = "userId") String userId);

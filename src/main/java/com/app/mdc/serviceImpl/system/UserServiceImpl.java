@@ -13,6 +13,7 @@ import com.app.mdc.model.system.RoleUser;
 import com.app.mdc.model.system.User;
 import com.app.mdc.model.system.UserToken;
 import com.app.mdc.service.mdc.WalletService;
+import com.app.mdc.service.system.UserLevelService;
 import com.app.mdc.service.system.UserService;
 import com.app.mdc.service.system.VerificationCodeService;
 import com.app.mdc.utils.Md5Utils;
@@ -38,7 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final RoleMapper roleMapper;
     private final WalletService walletService;
     private final WalletMapper walletMapper;
-
+    private UserLevelService userLevelService;
     @Autowired
     private VerificationCodeService verificationCodeService;
     @Value("${license.key}")
@@ -48,13 +49,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private static final String USER_STATUS_FROZEN = "1";
 
     @Autowired
-    public UserServiceImpl(WalletMapper walletMapper,WalletService walletService,UserMapper userMapper, UserTokenMapper userTokenMapper, RoleUserMapper roleUserMapper, RoleMapper roleMapper) {
+    public UserServiceImpl(WalletMapper walletMapper, WalletService walletService, UserMapper userMapper, UserTokenMapper userTokenMapper, RoleUserMapper roleUserMapper, RoleMapper roleMapper, UserLevelService userLevelService) {
         this.userMapper = userMapper;
         this.userTokenMapper = userTokenMapper;
         this.roleUserMapper = roleUserMapper;
         this.roleMapper = roleMapper;
         this.walletService = walletService;
         this.walletMapper = walletMapper;
+        this.userLevelService = userLevelService;
     }
 
     @Override
@@ -120,15 +122,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Integer count=userMapper.user(loginName);
         Integer isRepeat=userMapper.isRepeat(map.get("userName").toString());
         if(count>0) {
+            //登录名称重复
             return ResponseResult.fail(ApiErrEnum.ERR600);
         }else if(isRepeat>0) {
+            //用户名称重复
             return ResponseResult.fail(ApiErrEnum.ERR602);
         }else if(map.get("sendCode") == null){
+            //推荐码不存在
             return ResponseResult.fail();
         }else {
+            // 新增用户
             //获取推送人id
             int sendCode = Integer.parseInt(map.get("sendCode").toString());
             Map<String,Object> sendUser = userMapper.getUserBySendCode(sendCode);
+            String sendUserId = sendUser.get("userId").toString();
             //生成6位随机的邀请码
             int random = (int)((Math.random()*9+1)*100000);
             //新增用户
@@ -140,8 +147,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             tbUser.setEmail(map.get("email").toString());
             tbUser.setPassword(Md5Utils.hash(loginName,map.get("password").toString()));
             tbUser.setSendCode(random);
-            tbUser.setUpUserId(sendUser.get("userId").toString());
+            tbUser.setUpUserId(sendUserId);
+            //获取所有人推荐人id
+            String upUserIds = "";
+            Object sendUpUserIdsObj = sendUser.get("upUserIds");
+            if(sendUser.get("upUserId") == null){
+                //推荐人本身没有推荐人 最顶级
+                upUserIds = sendUserId;
+            }else{
+                //推荐人还有推荐人
+                upUserIds = sendUpUserIdsObj.toString() + "," + sendUserId;
+            }
+            tbUser.setUpUserIds(upUserIds);
 			int userCount = userMapper.insert(tbUser);
+
+			//新增用户层级关系
+            userLevelService.addLevelRelation(upUserIds,tbUser.getId());
 
 			//新增用户角色中间表
 			String userId=tbUser.getId();
@@ -158,7 +179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             //添加钱包
             try {
-                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
+                walletService.allet(Integer.parseInt(userId),(String)map.get("walletPassword"));
             }catch (Exception e){
                 return ResponseResult.fail();
             }

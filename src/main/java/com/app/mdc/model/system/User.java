@@ -74,8 +74,13 @@ public class User {
 	@TableField("remark")
 	private String remark;
 
+	//直属推荐人id
 	@TableField("up_user_id")
 	private String upUserId;
+
+	//所有推荐人id
+	@TableField("up_user_ids")
+	private String upUserIds;
 
 	@TableField("pay_password")
 	private String payPassword;
