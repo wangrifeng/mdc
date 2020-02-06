@@ -179,7 +179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             //添加钱包
             try {
-                walletService.allet(Integer.parseInt(userId),(String)map.get("walletPassword"));
+                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
             }catch (Exception e){
                 return ResponseResult.fail();
             }
