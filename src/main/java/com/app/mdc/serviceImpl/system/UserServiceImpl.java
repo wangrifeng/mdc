@@ -129,6 +129,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             //获取推送人id
             int sendCode = Integer.parseInt(map.get("sendCode").toString());
             Map<String,Object> sendUser = userMapper.getUserBySendCode(sendCode);
+            if(sendUser == null || sendUser.get("userId") == null){
+                //推送码失效
+                return ResponseResult.fail(ApiErrEnum.ERR201);
+            }
             //生成6位随机的邀请码
             int random = (int)((Math.random()*9+1)*100000);
             //新增用户

@@ -14,6 +14,7 @@ import com.app.mdc.utils.httpclient.HttpUtil;
 import com.app.mdc.utils.jvm.JvmUtils;
 import com.app.mdc.utils.viewbean.Page;
 import com.app.mdc.utils.viewbean.ResponseResult;
+import com.app.mdc.utils.wallet.MonitorTransfer;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.app.mdc.schedule.service.ScheduleService;
 import org.junit.Test;
@@ -22,19 +23,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ReflectionUtils;
-import org.web3j.crypto.Bip39Wallet;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.WalletUtils;
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.*;
+import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.ClientTransactionManager;
+import org.web3j.tx.Contract;
+import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import java.io.*;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -234,7 +246,20 @@ public class MdcApplicationTests {
 	}
 
 	@Test
-	public void testMap() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException, ExecutionException, InterruptedException {
+	public void Testss(){
+    	/*System.out.println(BigDecimal.ONE);
+		System.out.println(new BigDecimal(3));*/
+    	Long l = 1000000000000000000L;
+		BigDecimal b = new BigDecimal(String.valueOf(l));
+    	BigDecimal s = new BigDecimal("0.3");
+    	//BigInteger s = new BigInteger("1000");
+
+    	System.out.println(b.multiply(s).stripTrailingZeros().toPlainString());
+    	System.out.println(new Uint256(new BigInteger(b.multiply(s).stripTrailingZeros().toPlainString())).getValue());
+	}
+
+	@Test
+	public void testMap() throws Exception {
 		/*Web3j web3 = Web3j.build(new HttpService("https://mainnet.infura.io/v3/50d1c4c05dbd472b85e4acf1cf58b01b"));
 
 		Web3ClientVersion web3ClientVersion = web3.web3ClientVersion().sendAsync().get();
@@ -244,9 +269,9 @@ public class MdcApplicationTests {
 		String keyStoreDir = "D:/walletTest";
 		System.out.println("生成keyStore文件的默认目录：" + keyStoreDir);
 		String passWord="123456";
-		/*String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
-		System.out.println(name);*/
-		String walleFilePath=keyStoreDir+"/UTC--2020-02-05T06-56-39.656000000Z--931f93ce911000d32458eb3e52b175df36d046a1.json";
+//		String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
+//		System.out.println(name);
+		String walleFilePath=keyStoreDir+"/UTC--2020-02-06T02-46-47.330000000Z--5065d510249259532225db0e979368ee084e7c5f.json";
 
 		Credentials credentials = WalletUtils.loadCredentials(passWord, walleFilePath);
 		String address = credentials.getAddress();
@@ -257,14 +282,33 @@ public class MdcApplicationTests {
 		System.out.println("public key="+publicKey);
 		System.out.println("private key="+privateKey);
 
-		Web3j web3j = Web3j.build(new HttpService("http://ropsten.infura.io/v3/97b5a1d9eb3a4fcebb12e219f1417725"));
+		Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
 
 		Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
 		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
 		System.out.println("version=" + clientVersion);
 
 		if (web3j == null) return;
-		//String address = "0xda66286c6d6c238218693dc8508265cf88478fab";//等待查询余额的地址
+		//String address = "0x5065d510249259532225db0e979368ee084e7c5f";//等待查询余额的地址
+
+		//通过密码和keystore文件获得钱包控制权
+		//转账交易
+
+//		List<EthBlock.TransactionResult> txs = web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send().getBlock().getTransactions();
+//		txs.forEach(tx -> {
+//			EthBlock.TransactionObject transaction = (EthBlock.TransactionObject) tx.get();
+//
+//			System.out.println(transaction.getFrom());
+//		});
+
+		/*String address_to = "0xa029180EF446cB6e64933848791539b7eeb12B35";
+		TransactionReceipt send = Transfer.sendFunds(web3j, credentials, address_to, new BigDecimal(1), Convert.Unit.FINNEY).send();
+		System.out.println("Transaction complete:");
+		System.out.println("trans hash=" + send.getTransactionHash());
+		System.out.println("from :" + send.getFrom());
+		System.out.println("to:" + send.getTo());
+		System.out.println("gas used=" + send.getGasUsed());
+		System.out.println("status: " + send.getStatus());*/
 		//第二个参数：区块的参数，建议选最新区块
 		EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
 		//格式转化 wei-ether
@@ -272,7 +316,153 @@ public class MdcApplicationTests {
 		System.out.println(blanceETH);
 
 
+//		String methodName = "balanceOf";
+//		List inputParameters = new ArrayList<>();
+//		List<TypeReference<?>> outputParameters = new ArrayList<>();
+//		Address fromAddress = new Address(address);
+//		inputParameters.add(fromAddress);
+//
+//		TypeReference<Uint256> typeReference = new TypeReference() {};
+//		outputParameters.add(typeReference);
+//		Function function = new Function(methodName, inputParameters, outputParameters);
+//		String data = FunctionEncoder.encode(function);
+//		Transaction transaction = Transaction.createEthCallTransaction(address, "0xdac17f958d2ee523a2206206994597c13d831ec7", data);
+//
+//		EthCall ethCall;
+//		BigInteger balanceValue = BigInteger.ZERO;
+//		try {
+//			ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send();
+//			List results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
+//			System.out.println(results);
+//			//balanceValue = (BigInteger) results.get(0).getValue();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 	}
 
+	@Test
+	public void testMDC() throws ExecutionException, InterruptedException, IOException, CipherException {
+    	//BigInteger p = BigInteger.valueOf(1000000000000000000L);
+    	String p = "000000000000000000";
+    	String fromAddress = "0x5065d510249259532225db0e979368ee084e7c5f";
+    	String contractAddress = "0x53509548c0ce0be4bb88b85f4d2c37b2c5cd1546";
+		String methodName = "balanceOf";
+		List<Type> inputParameters = new ArrayList<>();
+		List<TypeReference<?>> outputParameters = new ArrayList<>();
+		Address address = new Address(fromAddress);
+		inputParameters.add(address);
+
+		TypeReference<Uint256> typeReference = new TypeReference<Uint256>() {
+		};
+		outputParameters.add(typeReference);
+		Function function = new Function(methodName, inputParameters, outputParameters);
+		String data = FunctionEncoder.encode(function);
+		Transaction transaction = Transaction.createEthCallTransaction(fromAddress, contractAddress, data);
+
+		EthCall ethCall;
+		BigInteger balanceValue = BigInteger.ZERO;
+		Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
+
+		Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
+		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
+		System.out.println("version=" + clientVersion);
+
+
+		String passWord="123456";
+//		String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
+//		System.out.println(name);
+		String walleFilePath="D:/walletTest/UTC--2020-02-06T02-46-47.330000000Z--5065d510249259532225db0e979368ee084e7c5f.json";
+
+		Credentials credentials = WalletUtils.loadCredentials(passWord, walleFilePath);
+		//String fromAddress = credentials.getAddress();
+
+
+
+		EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(
+				fromAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
+		BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+		Address toAddress = new Address("0xa029180EF446cB6e64933848791539b7eeb12B35");
+		BigInteger b = new BigInteger(1000+p);
+		Uint256 value = new Uint256(b);
+		List<Type> parametersList = new ArrayList<>();
+		parametersList.add(toAddress);
+		parametersList.add(value);
+		List<TypeReference<?>> outList = new ArrayList<>();
+		/*Function transfer = new Function("transfer", parametersList, outList);
+		String encodedFunction = FunctionEncoder.encode(transfer);
+		BigInteger gasPrice = Convert.toWei(BigDecimal.valueOf(18), Convert.Unit.GWEI).toBigInteger();
+		RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice,
+				BigInteger.valueOf(100000), contractAddress, encodedFunction);
+		byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
+		String hexValue = Numeric.toHexString(signedMessage);
+
+		EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
+		String transactionHash = ethSendTransaction.getTransactionHash();
+		System.out.println(transactionHash);*/
+		try {
+			ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send();
+			List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
+			System.out.println(results);
+			balanceValue = (BigInteger) results.get(0).getValue();
+			System.out.println(balanceValue);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testqq() throws ExecutionException, InterruptedException {
+		String methodName = "decimals";
+		String fromAddr = "0x5065d510249259532225db0e979368ee084e7c5f";
+		String contractAddress = "0x53509548c0ce0be4bb88b85f4d2c37b2c5cd1546";
+		int decimal = 0;
+		List<Type> inputParameters = new ArrayList<>();
+		List<TypeReference<?>> outputParameters = new ArrayList<>();
+
+		TypeReference<Uint256> typeReference = new TypeReference<Uint256>() {};
+		outputParameters.add(typeReference);
+
+		Function function = new Function(methodName, inputParameters, outputParameters);
+
+		String data = FunctionEncoder.encode(function);
+		Transaction transaction = Transaction.createEthCallTransaction(fromAddr, contractAddress, data);
+
+		EthCall ethCall;
+		Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
+
+		Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
+		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
+		System.out.println("version=" + clientVersion);
+		try {
+			ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).sendAsync().get();
+			List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
+			decimal = Integer.parseInt(results.get(0).getValue().toString());
+			System.out.println(decimal);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testssss() throws IOException {
+		Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
+		/*List<EthBlock.TransactionResult> txs = web3j.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, true).send().getBlock().getTransactions();
+		txs.forEach(tx -> {
+			EthBlock.TransactionObject transaction = (EthBlock.TransactionObject) tx.get();
+
+			System.out.println(transaction.getFrom());
+		});*/
+		ClientTransactionManager transactionManager = new ClientTransactionManager(web3j,
+				"0x5065d510249259532225db0e979368ee084e7c5f");
+		MonitorTransfer token = MonitorTransfer.load("0x53509548c0ce0be4bb88b85f4d2c37b2c5cd1546", web3j, transactionManager,
+				Contract.GAS_PRICE, Contract.GAS_LIMIT);
+		token.transferEventObservable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST)
+				.subscribe(tx -> {
+							String toAddress = tx._to.getValue();
+							String fromAddress = tx._from.getValue();
+							String txHash = tx._transactionHash.toString();
+							System.out.println("toAddress:"+toAddress+"--------txHash:"+txHash);
+						});
+	}
 }
