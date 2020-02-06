@@ -57,23 +57,23 @@ public class ContractDailyRewardServiceImpl implements RewardService {
             String unit = contract.getUnit();
             BigDecimal incomeRate = contract.getIncomeRate();
             BigDecimal salary = amount.multiply(incomeRate);
-            String remark = "合约信息为" + JSON.toJSONString(contract)+";";
+            String remark = "合约信息为" + JSON.toJSONString(contract) + ";";
 
             BigDecimal newReceivedIncome = userContract.getReceivedIncome().add(salary);
-            //进阶合约 判断是否三倍出局
+            //合约 判断是否2倍出局
             boolean isOut = false;
-            if (contract.getType() == 2) {
-                //3倍合约
-                BigDecimal thirdMutify = contract.getAmount().multiply(new BigDecimal(3));
-                if (newReceivedIncome.compareTo(thirdMutify) == 1) {
-                    //重新计算薪水
-                    salary = thirdMutify.subtract(userContract.getReceivedIncome());
-                    newReceivedIncome = userContract.getReceivedIncome().add(salary);
-                    //出局
-                    isOut = true;
-                    remark +="进阶合约已超过三倍,出局";
-                }
+
+            //2倍合约
+            BigDecimal thirdMutify = contract.getAmount().multiply(new BigDecimal(2));
+            if (newReceivedIncome.compareTo(thirdMutify) == 1) {
+                //重新计算薪水
+                salary = thirdMutify.subtract(userContract.getReceivedIncome());
+                newReceivedIncome = userContract.getReceivedIncome().add(salary);
+                //出局
+                isOut = true;
+                remark += "合约已超过2倍,出局";
             }
+
             //薪水入库
             InCome inCome = new InCome(salary, unit, contract.getId(), 1, remark, contract.getAmount(), contract.getIncomeRate(), selDate, new Date());
             inComeService.insert(inCome);
@@ -84,7 +84,7 @@ public class ContractDailyRewardServiceImpl implements RewardService {
             uc.setReceivedIncome(newReceivedIncome);
             userContractService.updateById(uc);
 
-            if(isOut){
+            if (isOut) {
                 userContractService.deleteById(userContract.getId());
             }
         }
