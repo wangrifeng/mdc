@@ -29,4 +29,7 @@ public interface UserMapper extends BaseMapper<User> {
     List<Map<String,Object>> getCompanyUserBook(@Param(value = "userId") String userId);
 
     List<Map<String,Object>> getPcAddressBook(@Param(value = "userId") String userId);
+
+    @Select("SELECT user_id FROM sys_user where del_flag = 0")
+    List<Integer> findAllUserIds();
 }

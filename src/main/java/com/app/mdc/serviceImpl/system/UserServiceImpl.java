@@ -431,4 +431,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         this.baseMapper.updateById(user);
     }
 
+    @Override
+    public List<Integer> findAllUserIds() {
+        return this.baseMapper.findAllUserIds();
+    }
+
 }

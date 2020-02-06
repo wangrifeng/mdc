@@ -110,4 +110,10 @@ public interface UserService extends IService<User> {
      * @param userId
      */
     void updateGestureSwitch(Integer gestureSwitch, String userId);
+
+    /**
+     * 查询所有计算收益用户的id
+     * @return
+     */
+    List<Integer> findAllUserIds();
 }
