@@ -75,6 +75,9 @@ mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   global-config:
     db-column-underline: true #驼峰下划线转换
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+    logic-delete-value: 1
+    logic-not-delete-value: 0
   configuration:
     call-setters-on-nulls: true
 

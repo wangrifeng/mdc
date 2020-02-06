@@ -1,6 +1,7 @@
 package com.app.mdc;
 
 import com.app.mdc.controller.socket.MessageSocket;
+import com.app.mdc.serviceImpl.mdc.reward.AllRewardJob;
 import com.app.mdc.utils.jvm.JvmUtils;
 import com.app.mdc.utils.jvm.LinceseUtils;
 import org.mybatis.spring.annotation.MapperScan;
@@ -45,6 +46,7 @@ public class MdcApplication {
         logger.info("======AppApplication===启动 success==encoding=" + encoding);
         MessageSocket.setApplicationContext(applicationContext);
 
+        applicationContext.getBean(AllRewardJob.class).execute();
 	}
 
 }

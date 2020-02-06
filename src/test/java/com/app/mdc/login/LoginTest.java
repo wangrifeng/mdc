@@ -15,11 +15,12 @@ public class LoginTest {
     @Test
     public void register(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","admin4");
-        param.put("userName","admin—4");
+        param.put("loginName","sendtest3");
+        param.put("userName","sendtest3");
         param.put("roleId","10");
         param.put("password","123456");
         param.put("email","mdc@qq.com");
+        param.put("sendCode","355210");
         String s = HttpUtil.doPost(HOST + "/admin/users/add", param,null);
         System.out.println(s);
     }
@@ -66,7 +67,7 @@ public class LoginTest {
     public void updateGestureSwitch(){
         Map<String,String> param  = new HashMap<>();
         param.put("userId","105");
-        param.put("gestureSwitch","1");
+        param.put("gestureSwitch","0");
         String s = HttpUtil.doPost(HOST + "/admin/users/updateGestureSwitch", param,"2cb5cc2a-05ea-4849-b9aa-13f49dc41c4d");
         System.out.println(s);
     }
