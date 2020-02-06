@@ -63,7 +63,7 @@ public class ContractDailyRewardServiceImpl implements RewardService {
             boolean isOut = false;
 
             //2倍合约
-            BigDecimal thirdMutify = contract.getAmount().multiply(new BigDecimal(2));
+            BigDecimal thirdMutify = contract.getAmount().multiply(contract.getOutRate());
             if (newReceivedIncome.compareTo(thirdMutify) == 1) {
                 //重新计算薪水
                 salary = thirdMutify.subtract(userContract.getReceivedIncome());
