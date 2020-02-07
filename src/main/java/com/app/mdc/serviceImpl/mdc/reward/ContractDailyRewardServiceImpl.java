@@ -102,7 +102,7 @@ public class ContractDailyRewardServiceImpl implements RewardService {
                 //烧伤值
                 BigDecimal burnValue = contract.getAmount().multiply(contract.getIncomeRate());
                 //1.分享收益
-                BigDecimal shareSalary = this.getShareSalary(levelIds, selDate, burnValue);
+                BigDecimal shareSalary = this.getShareSalary(levelIds, selDate, userId,burnValue);
                 //2.管理收益
                 BigDecimal manageSalary = this.getManageSalary(levelIds, selDate, userId, burnValue);
             } else {
@@ -253,10 +253,11 @@ public class ContractDailyRewardServiceImpl implements RewardService {
      *
      * @param levelIds
      * @param selDate
+     * @param userId
      * @param burnValue 烧伤值
      * @return
      */
-    private BigDecimal getShareSalary(Map<Integer,  Map<String,Object>> levelIds, Date selDate, BigDecimal burnValue) {
+    private BigDecimal getShareSalary(Map<Integer, Map<String, Object>> levelIds, Date selDate, Integer userId, BigDecimal burnValue) {
         if (levelIds == null || levelIds.size() == 0) {
             return new BigDecimal(0);
         }
@@ -266,6 +267,19 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         if (directNumber == 0) {
             return new BigDecimal(0);
         }
+
+        //查询该用户是否已经计算过管理奖
+        EntityWrapper<InCome> inComeEntityWrapper = new EntityWrapper<>();
+        inComeEntityWrapper
+                .eq("type",1)
+                .eq("user_id",userId)
+                .eq("sel_date",new SimpleDateFormat("yyyy-MM-dd").format(selDate).substring(0,10));
+        List<InCome> inComes = inComeService.selectList(inComeEntityWrapper);
+        if(inComes.size() == 0){
+            //该用户没有合约收益 非签约合约用户 无分享奖
+            return  new BigDecimal(0);
+        }
+        InCome inCome = inComes.get(0);
 
         //查询所有被推荐人收益分代总和
         Map<Integer, Map<String,Object>> staticIncomeGroupByLevel = inComeService.selectStaticIncomeGroupByLevel(levelIds, selDate, burnValue);
@@ -312,6 +326,11 @@ public class ContractDailyRewardServiceImpl implements RewardService {
                         .add(this.getLevelSum(staticIncomeGroupByLevel, 10).multiply(new BigDecimal("0.03")));
 
         }
+
+        InCome i = new InCome();
+        i.setId(inCome.getId());
+        i.setShareSalary(shareSalary);
+        inComeService.updateById(i);
         return shareSalary;
     }
 
