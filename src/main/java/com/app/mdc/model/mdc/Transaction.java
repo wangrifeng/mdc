@@ -49,11 +49,11 @@ public class Transaction extends Model<Transaction> {
      */
     private BigDecimal fromAmount;
 
-    private BigDecimal fromWalletType;
+    private String fromWalletType;
 
     private BigDecimal toAmount;
 
-    private BigDecimal toWalletType;
+    private String toWalletType;
 
     private BigDecimal feeAmount;
     /**
@@ -69,6 +69,9 @@ public class Transaction extends Model<Transaction> {
      */
     private String remark;
 
+    private String transactionStatus;
+
+    private String transactionHash;
 
     public Integer getTransactionId() {
         return transactionId;
@@ -118,11 +121,11 @@ public class Transaction extends Model<Transaction> {
         this.fromAmount = fromAmount;
     }
 
-    public BigDecimal getFromWalletType() {
+    public String getFromWalletType() {
         return fromWalletType;
     }
 
-    public void setFromWalletType(BigDecimal fromWalletType) {
+    public void setFromWalletType(String fromWalletType) {
         this.fromWalletType = fromWalletType;
     }
 
@@ -134,11 +137,11 @@ public class Transaction extends Model<Transaction> {
         this.toAmount = toAmount;
     }
 
-    public BigDecimal getToWalletType() {
+    public String getToWalletType() {
         return toWalletType;
     }
 
-    public void setToWalletType(BigDecimal toWalletType) {
+    public void setToWalletType(String toWalletType) {
         this.toWalletType = toWalletType;
     }
 
@@ -172,6 +175,22 @@ public class Transaction extends Model<Transaction> {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(String transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+
+    public String getTransactionHash() {
+        return transactionHash;
+    }
+
+    public void setTransactionHash(String transactionHash) {
+        this.transactionHash = transactionHash;
     }
 
     @Override

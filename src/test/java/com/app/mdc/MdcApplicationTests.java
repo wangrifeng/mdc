@@ -249,13 +249,19 @@ public class MdcApplicationTests {
 	public void Testss(){
     	/*System.out.println(BigDecimal.ONE);
 		System.out.println(new BigDecimal(3));*/
-    	Long l = 1000000000000000000L;
-		BigDecimal b = new BigDecimal(String.valueOf(l));
-    	BigDecimal s = new BigDecimal("0.3");
-    	//BigInteger s = new BigInteger("1000");
-
-    	System.out.println(b.multiply(s).stripTrailingZeros().toPlainString());
-    	System.out.println(new Uint256(new BigInteger(b.multiply(s).stripTrailingZeros().toPlainString())).getValue());
+//    	Long l = 1000000000000000000L;
+//		BigDecimal b = new BigDecimal(String.valueOf(l));
+//    	BigDecimal s = new BigDecimal("0.3");
+//    	//BigInteger s = new BigInteger("1000");
+//
+//    	System.out.println(b.multiply(s).stripTrailingZeros().toPlainString());
+//    	System.out.println(new Uint256(new BigInteger(b.multiply(s).stripTrailingZeros().toPlainString())).getValue());
+		BigDecimal b = new BigDecimal(1.077222040999999997);
+		BigDecimal c = new BigDecimal(1.027201040999978997);
+		BigDecimal d = b.subtract(c);
+		BigDecimal a = new BigDecimal(0.05);
+		BigDecimal e = d.subtract(a);
+		System.out.println(e);
 	}
 
 	@Test
@@ -301,14 +307,14 @@ public class MdcApplicationTests {
 //			System.out.println(transaction.getFrom());
 //		});
 
-		/*String address_to = "0xa029180EF446cB6e64933848791539b7eeb12B35";
-		TransactionReceipt send = Transfer.sendFunds(web3j, credentials, address_to, new BigDecimal(1), Convert.Unit.FINNEY).send();
+		String address_to = "0xa029180EF446cB6e64933848791539b7eeb12B35";
+		TransactionReceipt send = Transfer.sendFunds(web3j, credentials, address_to, new BigDecimal(50), Convert.Unit.FINNEY).send();
 		System.out.println("Transaction complete:");
 		System.out.println("trans hash=" + send.getTransactionHash());
 		System.out.println("from :" + send.getFrom());
 		System.out.println("to:" + send.getTo());
 		System.out.println("gas used=" + send.getGasUsed());
-		System.out.println("status: " + send.getStatus());*/
+		System.out.println("status: " + send.getStatus());
 		//第二个参数：区块的参数，建议选最新区块
 		EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
 		//格式转化 wei-ether
@@ -346,22 +352,8 @@ public class MdcApplicationTests {
     	//BigInteger p = BigInteger.valueOf(1000000000000000000L);
     	String p = "000000000000000000";
     	String fromAddress = "0x5065d510249259532225db0e979368ee084e7c5f";
-    	String contractAddress = "0x53509548c0ce0be4bb88b85f4d2c37b2c5cd1546";
-		String methodName = "balanceOf";
-		List<Type> inputParameters = new ArrayList<>();
-		List<TypeReference<?>> outputParameters = new ArrayList<>();
-		Address address = new Address(fromAddress);
-		inputParameters.add(address);
+    	String contractAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7";
 
-		TypeReference<Uint256> typeReference = new TypeReference<Uint256>() {
-		};
-		outputParameters.add(typeReference);
-		Function function = new Function(methodName, inputParameters, outputParameters);
-		String data = FunctionEncoder.encode(function);
-		Transaction transaction = Transaction.createEthCallTransaction(fromAddress, contractAddress, data);
-
-		EthCall ethCall;
-		BigInteger balanceValue = BigInteger.ZERO;
 		Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
 
 		Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
@@ -383,7 +375,7 @@ public class MdcApplicationTests {
 				fromAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
 		BigInteger nonce = ethGetTransactionCount.getTransactionCount();
 		Address toAddress = new Address("0xa029180EF446cB6e64933848791539b7eeb12B35");
-		BigInteger b = new BigInteger(1000+p);
+		BigInteger b = new BigInteger(100+p);
 		Uint256 value = new Uint256(b);
 		List<Type> parametersList = new ArrayList<>();
 		parametersList.add(toAddress);
@@ -397,9 +389,25 @@ public class MdcApplicationTests {
 		byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
 		String hexValue = Numeric.toHexString(signedMessage);
 
-		EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
+		EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).send();
 		String transactionHash = ethSendTransaction.getTransactionHash();
 		System.out.println(transactionHash);*/
+		Thread.sleep(60000);
+		String methodName = "balanceOf";
+		List<Type> inputParameters = new ArrayList<>();
+		List<TypeReference<?>> outputParameters = new ArrayList<>();
+		Address address = new Address(fromAddress);
+		inputParameters.add(address);
+
+		TypeReference<Uint256> typeReference = new TypeReference<Uint256>() {
+		};
+		outputParameters.add(typeReference);
+		Function function = new Function(methodName, inputParameters, outputParameters);
+		String data = FunctionEncoder.encode(function);
+		Transaction transaction = Transaction.createEthCallTransaction(fromAddress, contractAddress, data);
+
+		EthCall ethCall;
+		BigInteger balanceValue = BigInteger.ZERO;
 		try {
 			ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send();
 			List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());

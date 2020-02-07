@@ -6,6 +6,7 @@ public enum ApiErrEnum {
     ERR100("请入参usertoken！"),
     ERR101("access failed！"),
     ERR201("该推送码已失效，请重新填写有效推送码"),
+    ERR202("支付密码错误，请重新填写"),
     ERR301("该文件已被删除，请选择其他文件"),
     ERR302("该文件已不存在，请选择其他文件"),
     ERR500( "数据处理失败！"),
