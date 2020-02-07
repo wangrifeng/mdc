@@ -20,4 +20,9 @@ public class InComeServiceImpl extends ServiceImpl<InComeMapper, InCome> impleme
     public Map<Integer, Map<String,Object>> selectStaticIncomeGroupByLevel(Map<Integer, Map<String,Object>> levelIds, Date selDate, BigDecimal burnValue) {
         return this.baseMapper.selectStaticIncomeGroupByLevel(levelIds,selDate,burnValue.doubleValue());
     }
+
+    @Override
+    public Map<String, Object> getAdvanceShareSalary(Date selDate, Integer userId) {
+        return this.baseMapper.getAdvanceShareSalary(selDate,userId);
+    }
 }

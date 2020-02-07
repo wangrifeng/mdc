@@ -20,4 +20,12 @@ public interface InComeService extends IService<InCome> {
      * @return
      */
     Map<Integer, Map<String,Object>> selectStaticIncomeGroupByLevel(Map<Integer, Map<String,Object>> levelIds, Date selDate, BigDecimal burnValue);
+
+    /**
+     * 查询伞下进阶卡总数和收益总数
+     * @param selDate
+     * @param userId
+     * @return
+     */
+    Map<String, Object> getAdvanceShareSalary(Date selDate, Integer userId);
 }
