@@ -15,12 +15,12 @@ public class LoginTest {
     @Test
     public void register(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","sendtest3");
-        param.put("userName","sendtest3");
+        param.put("loginName","105test");
+        param.put("userName","105test");
         param.put("roleId","10");
         param.put("password","123456");
         param.put("email","mdc@qq.com");
-        param.put("sendCode","355210");
+        param.put("sendCode","8888");
         String s = HttpUtil.doPost(HOST + "/admin/users/add", param,null);
         System.out.println(s);
     }

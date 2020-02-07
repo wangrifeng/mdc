@@ -10,4 +10,26 @@
         </foreach>
     </insert>
 
+    <select id="selectRecedUserIds" resultType="Map">
+        select
+        group_concat(reced_id) as ids,
+        `level`
+        from
+        sys_user_level
+        where
+        rec_id = #{userId}
+        group by
+        level
+    </select>
+
+    <select id="getTotalSum" resultType="BigDecimal">
+        select
+        sum(sc.amount)
+        from
+        sys_user_level sul
+        join mdc_user_contract muc on sul.reced_id = muc.user_id
+        join sys_contract sc on muc.contract_id = sc.id
+        where
+        rec_id = #{userId} and type = 1
+    </select>
 </mapper>

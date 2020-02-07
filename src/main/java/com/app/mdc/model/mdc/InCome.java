@@ -16,14 +16,27 @@ public class InCome {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+
+    @TableField("user_id")
+    private Integer userId;
+
     @TableField("salary")
     private BigDecimal salary;
+
+    @TableField("contract_salary")
+    private BigDecimal contractSalary;
+
+    @TableField("share_salary")
+    private BigDecimal shareSalary;
 
     @TableField("type")
     private Integer type;
 
     @TableField("unit")
     private String unit;
+
+    @TableField("number")
+    private Integer number;
 
     @TableField("contract_id")
     private Integer contractId;
@@ -46,11 +59,17 @@ public class InCome {
     @TableField("create_by")
     private String createBy;
 
+    @TableField("is_cal_msalary")
+    private Integer isCalMsalary;
+
+    @TableField("manage_salary")
+    private BigDecimal manageSalary;
+
     public InCome() {
     }
 
-    public InCome(BigDecimal salary, String unit, Integer contractId, int type, String remark, BigDecimal amount, BigDecimal incomeRate,Date selDate, Date createTime) {
-        this.salary = salary;
+    public InCome(Integer userId, String unit, Integer contractId, int type, String remark, BigDecimal amount, BigDecimal incomeRate,Date selDate, Date createTime) {
+        this.userId = userId;
         this.unit = unit;
         this.contractId = contractId;
         this.type = type;

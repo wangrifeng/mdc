@@ -6,8 +6,10 @@ import com.app.mdc.service.mdc.ContractService;
 import com.app.mdc.service.system.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +32,7 @@ public class AllRewardJob {
 
     private static final Executor executor = Executors.newFixedThreadPool(10);
 
+    @Transactional
     public void execute() throws BusinessException {
         //找出所有用户ids
         List<Integer> userIds = userService.findAllUserIds();
@@ -48,9 +51,16 @@ public class AllRewardJob {
         instance.add(Calendar.DAY_OF_MONTH, -1); //当前时间减去一天，即一天前的时间
         Date selDate = instance.getTime();
 
+        //计算所有用户的静态收益
         for (Integer userId : userIds) {
-//            executor.execute(new Thread(() -> contractDailyRewardService.calculate(userId, contractCache,selDate)));
-            contractDailyRewardService.calculate(userId, contractCache,selDate);
+            contractDailyRewardService.calculateContractSalary(userId, contractCache,selDate);
         }
+
+        //计算所有用户的额外收益
+        for (Integer userId : userIds) {
+            contractDailyRewardService.calculateShareSalary(userId, contractCache,selDate);
+        }
+
+
     }
 }

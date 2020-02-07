@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserLevelServiceImpl extends ServiceImpl<UserLevelMapper, UserLevel> implements UserLevelService {
@@ -27,5 +29,15 @@ public class UserLevelServiceImpl extends ServiceImpl<UserLevelMapper, UserLevel
             userLevels.add(userLevel);
         }
         this.baseMapper.batchInsert(userLevels);
+    }
+
+    @Override
+    public Map<Integer,  Map<String,Object>> selectRecedUserIds(Integer userId) {
+        return this.baseMapper.selectRecedUserIds(userId);
+    }
+
+    @Override
+    public BigDecimal getTotalSum(Integer userId) {
+        return this.baseMapper.getTotalSum(userId);
     }
 }

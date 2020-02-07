@@ -80,6 +80,7 @@ mybatis-plus:
     logic-not-delete-value: 0
   configuration:
     call-setters-on-nulls: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #pagehelper插件配置
 pagehelper:
@@ -91,7 +92,7 @@ pagehelper:
 
 logging:
   level:
-    com.mdc.cn.mdc: DEBUG
+    com.app.mdc: INFO
     org.springframework.web: TRACE
   config: classpath:logback-spring.xml
 

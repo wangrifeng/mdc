@@ -23,8 +23,8 @@ public class UserContract {
     @TableField("contract_id")
     private Integer contractId;
 
-    @TableField("received_income")
-    private BigDecimal receivedIncome;
+    @TableField("number")
+    private Integer number;
 
     @TableLogic
     private Integer delFlag;
