@@ -104,11 +104,86 @@ public class ContractDailyRewardServiceImpl implements RewardService {
                 BigDecimal shareSalary = this.getShareSalary(levelIds, selDate, userId, burnValue);
                 //2.管理收益
                 BigDecimal manageSalary = this.getManageSalary(levelIds, selDate, userId, burnValue);
+                //3.更新用户签约余额
+                updateUserSignContractSum(userId,selDate);
             } else {
                 //进阶分享
                 BigDecimal shareSalary = this.getAdvanceShareSalary(selDate, userId);
+                //更新用户进阶余额
+                advanceContractSum(userId,selDate,contract.getOutRate());
             }
         }
+    }
+
+    //更新用户进阶余额
+    private void advanceContractSum(Integer userId, Date selDate, BigDecimal outRate) {
+        EntityWrapper<InCome> inComeEntityWrapper = new EntityWrapper<>();
+        inComeEntityWrapper
+                .eq("type", 2)
+                .eq("user_id", userId)
+                .eq("sel_date", new SimpleDateFormat("yyyy-MM-dd").format(selDate).substring(0, 10));
+        List<InCome> inComes = inComeService.selectList(inComeEntityWrapper);
+        if (inComes.size() == 0) {
+            //该用户没有合约收益 非签约合约用户 无管理奖
+            return;
+        }
+        InCome inCome = inComes.get(0);
+
+        InCome i = new InCome();
+        i.setId(inCome.getId());
+
+        //获取当前收益
+        BigDecimal salary = inCome.getContractSalary().add(inCome.getShareSalary());
+
+        //计算用户签约收益总数
+        User user = userService.selectById(userId);
+        User u = new User();
+        u.setId(userId.toString());
+
+        //获取收益总数
+        BigDecimal advanceContractSum = user.getAdvanceContractSum().add(salary);
+        //判断收益是否出局
+        BigDecimal outLine = inCome.getAmount().multiply(new BigDecimal(inCome.getNumber())).multiply(outRate);
+        if(advanceContractSum.compareTo(outLine) >= 0){
+           //重新计算最终收益
+            salary = outLine.subtract(user.getAdvanceContractSum());
+           //重新赋值用户余额
+            advanceContractSum = outLine;
+            i.setRemark(inCome.getRemark() + " 合约上限,进阶合约已出局");
+        }
+        i.setSalary(salary);
+        u.setAdvanceContractSum(advanceContractSum);
+        inComeService.updateById(i);
+        userService.updateById(u);
+    }
+
+    //3.更新用户签约余额
+    private void updateUserSignContractSum(Integer userId, Date selDate) {
+        EntityWrapper<InCome> inComeEntityWrapper = new EntityWrapper<>();
+        inComeEntityWrapper
+                .eq("type", 1)
+                .eq("user_id", userId)
+                .eq("sel_date", new SimpleDateFormat("yyyy-MM-dd").format(selDate).substring(0, 10));
+        List<InCome> inComes = inComeService.selectList(inComeEntityWrapper);
+        if (inComes.size() == 0) {
+            //该用户没有合约收益 非签约合约用户 无管理奖
+            return;
+        }
+        InCome inCome = inComes.get(0);
+
+        //更新最终收益
+        InCome i = new InCome();
+        i.setId(inCome.getId());
+        BigDecimal salary = inCome.getContractSalary().add(inCome.getShareSalary()).add(inCome.getManageSalary());
+        i.setSalary(salary);
+        inComeService.updateById(i);
+
+        //计算用户签约收益总数
+        User user = userService.selectById(userId);
+        User u = new User();
+        u.setId(userId.toString());
+        u.setSignContractSum(user.getSignContractSum().add(salary));
+        userService.updateById(u);
     }
 
     /**
