@@ -272,12 +272,13 @@ public class MdcApplicationTests {
 		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
 		System.out.println(clientVersion);*/
 
-		String keyStoreDir = "D:/walletTest";
+		String keyStoreDir = "D:/walletTrue";
 		System.out.println("生成keyStore文件的默认目录：" + keyStoreDir);
 		String passWord="123456";
-//		String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
-//		System.out.println(name);
-		String walleFilePath=keyStoreDir+"/UTC--2020-02-06T02-46-47.330000000Z--5065d510249259532225db0e979368ee084e7c5f.json";
+		String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
+		System.out.println(name);
+		/*String walleFilePath=keyStoreDir+"/UTC--2020-02-06T02-46-47.330000000Z--5065d510249259532225db0e979368ee084e7c5f.json";*/
+        String walleFilePath=keyStoreDir+"/"+name;
 
 		Credentials credentials = WalletUtils.loadCredentials(passWord, walleFilePath);
 		String address = credentials.getAddress();
@@ -288,13 +289,13 @@ public class MdcApplicationTests {
 		System.out.println("public key="+publicKey);
 		System.out.println("private key="+privateKey);
 
-		Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
+		/*Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
 
 		Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
 		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
 		System.out.println("version=" + clientVersion);
 
-		if (web3j == null) return;
+		if (web3j == null) return;*/
 		//String address = "0x5065d510249259532225db0e979368ee084e7c5f";//等待查询余额的地址
 
 		//通过密码和keystore文件获得钱包控制权
@@ -307,19 +308,19 @@ public class MdcApplicationTests {
 //			System.out.println(transaction.getFrom());
 //		});
 
-		String address_to = "0xa029180EF446cB6e64933848791539b7eeb12B35";
+		/*String address_to = "0xa029180EF446cB6e64933848791539b7eeb12B35";
 		TransactionReceipt send = Transfer.sendFunds(web3j, credentials, address_to, new BigDecimal(50), Convert.Unit.FINNEY).send();
 		System.out.println("Transaction complete:");
 		System.out.println("trans hash=" + send.getTransactionHash());
 		System.out.println("from :" + send.getFrom());
 		System.out.println("to:" + send.getTo());
 		System.out.println("gas used=" + send.getGasUsed());
-		System.out.println("status: " + send.getStatus());
+		System.out.println("status: " + send.getStatus());*/
 		//第二个参数：区块的参数，建议选最新区块
-		EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
+		/*EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
 		//格式转化 wei-ether
 		String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether");
-		System.out.println(blanceETH);
+		System.out.println(blanceETH);*/
 
 
 //		String methodName = "balanceOf";
@@ -354,7 +355,7 @@ public class MdcApplicationTests {
     	String fromAddress = "0x5065d510249259532225db0e979368ee084e7c5f";
     	String contractAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7";
 
-		Web3j web3j = Web3j.build(new HttpService("https://ropsten.infura.io/v3/4098a0ceccd5421fa162fb549adea10a"));
+		Web3j web3j = Web3j.build(new HttpService("https://mainnet.infura.io/v3/50d1c4c05dbd472b85e4acf1cf58b01b"));
 
 		Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
 		String clientVersion = web3ClientVersion.getWeb3ClientVersion();
@@ -374,16 +375,17 @@ public class MdcApplicationTests {
 		EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(
 				fromAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
 		BigInteger nonce = ethGetTransactionCount.getTransactionCount();
-		Address toAddress = new Address("0xa029180EF446cB6e64933848791539b7eeb12B35");
-		BigInteger b = new BigInteger(100+p);
+		Address toAddress = new Address("0xda66286c6d6c238218693dc8508265cf88478fab");
+		BigInteger b = new BigInteger("400000");
 		Uint256 value = new Uint256(b);
 		List<Type> parametersList = new ArrayList<>();
 		parametersList.add(toAddress);
 		parametersList.add(value);
 		List<TypeReference<?>> outList = new ArrayList<>();
-		/*Function transfer = new Function("transfer", parametersList, outList);
+		Function transfer = new Function("transfer", parametersList, outList);
 		String encodedFunction = FunctionEncoder.encode(transfer);
 		BigInteger gasPrice = Convert.toWei(BigDecimal.valueOf(18), Convert.Unit.GWEI).toBigInteger();
+		System.out.println(gasPrice);
 		RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice,
 				BigInteger.valueOf(100000), contractAddress, encodedFunction);
 		byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
@@ -391,7 +393,9 @@ public class MdcApplicationTests {
 
 		EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).send();
 		String transactionHash = ethSendTransaction.getTransactionHash();
-		System.out.println(transactionHash);*/
+		System.out.println(transactionHash);
+        System.out.println(ethSendTransaction.getResult());
+        System.out.println(ethSendTransaction.getJsonrpc());
 		Thread.sleep(60000);
 		String methodName = "balanceOf";
 		List<Type> inputParameters = new ArrayList<>();
