@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.enums.IdType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -89,6 +90,13 @@ public class User {
 	private Integer level;
 	@TableField("send_code")
 	private int sendCode;
+
+
+	@TableField("sign_contract_sum")
+	private BigDecimal signContractSum;
+
+	@TableField("advance_contract_sum")
+	private BigDecimal advanceContractSum;
 
 	public String getId() {
 		return id;

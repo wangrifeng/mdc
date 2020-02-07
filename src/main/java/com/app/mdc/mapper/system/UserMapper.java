@@ -32,4 +32,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("SELECT user_id FROM sys_user where del_flag = 0")
     List<Integer> findAllUserIds();
+
+    @Select("select user_id as id,user_name as userName,level from sys_user where find_in_set(user_id,#{0})")
+    List<User> getDirectUserLevel(String ids);
 }

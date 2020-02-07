@@ -7,7 +7,6 @@ import com.app.mdc.mapper.system.RoleMapper;
 import com.app.mdc.mapper.system.RoleUserMapper;
 import com.app.mdc.mapper.system.UserMapper;
 import com.app.mdc.mapper.system.UserTokenMapper;
-import com.app.mdc.model.mdc.Wallet;
 import com.app.mdc.model.system.Role;
 import com.app.mdc.model.system.RoleUser;
 import com.app.mdc.model.system.User;
@@ -28,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
+
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final UserMapper userMapper;
@@ -438,6 +437,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<Integer> findAllUserIds() {
         return this.baseMapper.findAllUserIds();
+    }
+
+    @Override
+    public List<User> getDirectUserLevel(String ids) {
+        return this.baseMapper.getDirectUserLevel(ids);
     }
 
 }

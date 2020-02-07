@@ -116,4 +116,11 @@ public interface UserService extends IService<User> {
      * @return
      */
     List<Integer> findAllUserIds();
+
+    /**
+     * 获取直接会员的信息
+     * @param ids
+     * @return
+     */
+    List<User> getDirectUserLevel(String ids);
 }
