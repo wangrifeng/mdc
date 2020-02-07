@@ -44,7 +44,6 @@ public class ContractDailyRewardServiceImpl implements RewardService {
     private UserService userService;
 
     @Override
-    @Transactional
     public void calculateContractSalary(Integer userId, Map<Integer, Contract> contractCache, Date selDate) {
         //查询该用户绑定的合约信息
         EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
