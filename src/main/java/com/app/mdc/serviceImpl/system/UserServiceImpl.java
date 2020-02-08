@@ -7,10 +7,8 @@ import com.app.mdc.mapper.system.RoleMapper;
 import com.app.mdc.mapper.system.RoleUserMapper;
 import com.app.mdc.mapper.system.UserMapper;
 import com.app.mdc.mapper.system.UserTokenMapper;
-import com.app.mdc.model.system.Role;
-import com.app.mdc.model.system.RoleUser;
-import com.app.mdc.model.system.User;
-import com.app.mdc.model.system.UserToken;
+import com.app.mdc.model.mdc.InCome;
+import com.app.mdc.model.system.*;
 import com.app.mdc.service.mdc.WalletService;
 import com.app.mdc.service.system.UserLevelService;
 import com.app.mdc.service.system.UserService;
@@ -26,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -182,7 +181,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             //添加钱包
             try {
-                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
+//                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
             }catch (Exception e){
                 return ResponseResult.fail();
             }
@@ -442,6 +441,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<User> getDirectUserLevel(String ids) {
         return this.baseMapper.getDirectUserLevel(ids);
+    }
+
+    /**
+     * 铜牌玩家： 直推10人 ，合约体量达到8万$，拿公会成员收益5%
+     *
+     * 银牌玩家：直推10人 ，有2个部门产生铜牌，合约体量达到20万$，拿公会成员收益8%
+     *
+     * 金牌玩家：直推15人 ，有2个部门产生银牌经纪人，合约体量达到50万$，拿公会成员收益10%
+     *
+     * 王牌玩家：直推15人，有2个部门产生金牌经纪人，合约体量达到150万美金$，拿公会成员收益15%
+     *
+     * @param userId
+     */
+    @Override
+    public void updateUserLevel(Integer userId) {
+        //查询当前用户所有的推荐人
+        List<Integer> recIds = userLevelService.selectRecIdsByRecedId(userId);
+        if(recIds.size() == 0){
+            return;
+        }
+        for(Integer recId :recIds){
+            Map<Integer, Map<String, Object>> levelIds = userLevelService.selectRecedUserIds(recId);
+            //获取直推用户的id
+            String levelOneIds = levelIds.get(1).get("ids").toString();
+            String[] split = levelOneIds.split(",");
+            Integer directNumber = split.length;
+            if (directNumber == 0) {
+                //无直推用户
+                return;
+            }
+
+        }
     }
 
 }

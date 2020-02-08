@@ -5,6 +5,7 @@ import com.app.mdc.model.system.UserLevel;
 import com.baomidou.mybatisplus.service.IService;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 public interface UserLevelService extends IService<UserLevel> {
@@ -29,4 +30,11 @@ public interface UserLevelService extends IService<UserLevel> {
      * @return
      */
     BigDecimal getTotalSum(Integer userId);
+
+    /**
+     * 查询当前用户所有的推荐人
+     * @param userId
+     * @return
+     */
+    List<Integer> selectRecIdsByRecedId(Integer userId);
 }

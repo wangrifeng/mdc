@@ -44,4 +44,13 @@ public class UserContract {
     @TableField("update_time")
     private Date updateTime;
 
+    public UserContract(Integer userId, Integer contractId, Integer number, Date date, String userName) {
+        this.userId = userId;
+        this.contractId = contractId;
+        this.number = number;
+        this.createTime = date;
+        this.createBy = userName;
+        this.updateTime = date;
+        this.updateBy = userName;
+    }
 }

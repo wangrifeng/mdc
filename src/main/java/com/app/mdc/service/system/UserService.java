@@ -123,4 +123,10 @@ public interface UserService extends IService<User> {
      * @return
      */
     List<User> getDirectUserLevel(String ids);
+
+    /**
+     * 更新用户的等级
+     * @param userId
+     */
+    void updateUserLevel(Integer userId);
 }

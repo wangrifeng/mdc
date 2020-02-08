@@ -40,4 +40,9 @@ public class UserLevelServiceImpl extends ServiceImpl<UserLevelMapper, UserLevel
     public BigDecimal getTotalSum(Integer userId) {
         return this.baseMapper.getTotalSum(userId);
     }
+
+    @Override
+    public List<Integer> selectRecIdsByRecedId(Integer userId) {
+        return this.baseMapper.selectRecIdsByRecedId(userId);
+    }
 }

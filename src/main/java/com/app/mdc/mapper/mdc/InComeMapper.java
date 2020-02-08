@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -28,4 +29,13 @@ public interface InComeMapper extends BaseMapper<InCome> {
      * @return
      */
     Map<String, Object> getAdvanceShareSalary(@Param("selDate") Date selDate, @Param("userId") Integer userId);
+
+    /**
+     * 计算直推用户伞下签约卡收益 烧杀
+     * @param userId
+     * @param selDate
+     * @param burnValue
+     * @return
+     */
+    BigDecimal getTotalSum(@Param("userId") Integer userId, @Param("selDate") Date selDate,@Param("burnValue") double burnValue);
 }

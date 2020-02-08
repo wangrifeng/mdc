@@ -24,12 +24,22 @@
 
     <select id="getTotalSum" resultType="BigDecimal">
         select
-        sum(sc.amount)
+        ifnull(sum(sc.amount),0)
         from
         sys_user_level sul
         join mdc_user_contract muc on sul.reced_id = muc.user_id
         join sys_contract sc on muc.contract_id = sc.id
         where
         rec_id = #{userId} and type = 1
+    </select>
+
+    <select id="selectRecIdsByRecedId" resultType="Integer">
+        select
+        rec_id as recId
+        from
+        sys_user_level
+        where
+        reced_id = #{user_id}
+        order by level asc
     </select>
 </mapper>
