@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ReflectionUtils;
 import org.web3j.abi.FunctionEncoder;
@@ -476,5 +478,24 @@ public class MdcApplicationTests {
 							String txHash = tx._transactionHash.toString();
 							System.out.println("toAddress:"+toAddress+"--------txHash:"+txHash);
 						});
+	}
+
+	@Test
+	public void TestDate(){
+    	Date date = new Date();
+
+    	System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",0,date));
+		System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",Calendar.HOUR_OF_DAY,1,date));
+		/*String time = DateUtil.getDate("ss mm HH dd MM ?",Calendar.MINUTE,1,date);
+		System.out.println(time);*/
+		System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",0,DateUtil.getDate(Calendar.MINUTE,1,date)));
+    	/*ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+    	//threadPoolTaskScheduler.initialize();
+        threadPoolTaskScheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+				System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",0,new Date()));
+            }
+        },DateUtil.getDate(Calendar.MINUTE,1,date));*/
 	}
 }

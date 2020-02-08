@@ -11,6 +11,7 @@ import com.app.mdc.model.mdc.Wallet;
 import com.app.mdc.model.system.User;
 import com.app.mdc.service.mdc.TransactionService;
 import com.app.mdc.utils.Md5Utils;
+import com.app.mdc.utils.date.DateUtil;
 import com.app.mdc.utils.viewbean.Page;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -19,6 +20,7 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.FunctionEncoder;
@@ -34,17 +36,13 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -142,6 +140,18 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         //0-充值
         transaction.setTransactionType("0");
         transactionMapper.insert(transaction);
+        try {
+            Thread.sleep(60000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        BigDecimal balance = getBalance(toAddress,InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc());
+        if(balance != null && balance.doubleValue()>= new Double(investMoney)){
+            transaction.setTransactionStatus("1");
+            transactionMapper.updateById(transaction);
+        }else{
+            confirm(new Date(),toAddress,InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc(),investMoney,userId,transaction.getTransactionId().toString());
+        }
         return ResponseResult.success();
     }
 
@@ -149,6 +159,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     @Override
     public ResponseResult cashOutUSDT(String userId,String payPassword, String toAddress, String cashOutMoney) throws InterruptedException {
         BigDecimal cashOut = new BigDecimal(cashOutMoney);
+        BigDecimal toBalance = getBalance(toAddress,InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc());
         Transaction transaction = new Transaction();
         try {
             String transactionHash = transfer(userId,payPassword,cashOutMoney,InfuraInfo.WALLET_PATH.getDesc(),InfuraInfo.WALLET_ADDRESS.getDesc(),toAddress,"0");
@@ -169,8 +180,8 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         transaction.setToWalletAddress(toAddress);
         //0-usdt
         transaction.setToWalletType("0");
-        //1-交易完成
-        transaction.setTransactionStatus("1");
+        //0-交易进行中
+        transaction.setTransactionStatus("0");
         //1-提现
         transaction.setTransactionType("1");
         transactionMapper.insert(transaction);
@@ -181,6 +192,19 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         BigDecimal balance = wallet.getUstdBlance();
         wallet.setUstdBlance(balance.subtract(cashOut));
         walletMapper.updateById(wallet);
+
+        try {
+            Thread.sleep(60000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        BigDecimal b = getBalance(toAddress,InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc());
+        if(b != null && b.doubleValue()>= toBalance.doubleValue()){
+            transaction.setTransactionStatus("1");
+            transactionMapper.updateById(transaction);
+        }else{
+            confirm(new Date(),toAddress,InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc(),cashOutMoney,userId,transaction.getTransactionId().toString());
+        }
         return ResponseResult.success();
     }
 
@@ -290,6 +314,84 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return balanceValue;
     }
+
+    private void confirm(Date time,String fromAddress,String contractAddress,String money,String userId,String transactionId){
+        //定时第一次15分钟后执行
+        System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",0,time));
+        System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",Calendar.MINUTE,15,time));
+        User u = userMapper.selectById(userId);
+        EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
+        walletEntityWrapper.eq("user_id",userId);
+        Wallet wallet = walletMapper.selectList(walletEntityWrapper).get(0);
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.initialize();
+        threadPoolTaskScheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+                Date date = new Date();
+                System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",0,date));
+                BigDecimal balanceValue = getBalance(fromAddress,contractAddress);
+                if(balanceValue == null || balanceValue.doubleValue() <= new Double(money)){
+                    //钱未到账继续第二次定时
+                    System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",Calendar.HOUR_OF_DAY,1,date));
+                    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+                    scheduler.initialize();
+                    scheduler.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            Date lastDate = new Date();
+                            System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",0,lastDate));
+                            BigDecimal balance = getBalance(fromAddress,contractAddress);
+                            if(balance == null || balance.doubleValue() <= new Double(money)){
+                                //钱未到账继续第三次定时
+                                System.out.println(DateUtil.getDate("yyyy-MM-dd HH:mm:ss",Calendar.HOUR_OF_DAY,2,lastDate));
+                                ThreadPoolTaskScheduler lastScheduler = new ThreadPoolTaskScheduler();
+                                lastScheduler.initialize();
+                                lastScheduler.schedule(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        BigDecimal lastBalance = getBalance(fromAddress,contractAddress);
+                                        if(lastBalance == null || lastBalance.doubleValue() <= new Double(money)){
+                                            //钱未到账，交易失败
+                                            updateTransaction(transactionId,"-1");
+                                        }else{
+                                            //钱已到账
+                                            transact(userId,u.getPayPassword(),money,wallet.getWalletPath(),wallet.getAddress(),InfuraInfo.WALLET_ADDRESS.getDesc(),"0",transactionId,"1");
+                                        }
+                                    }
+                                },DateUtil.getDate(Calendar.HOUR_OF_DAY,2,lastDate));
+                            }else{
+                                //钱已到账
+                                transact(userId,u.getPayPassword(),money,wallet.getWalletPath(),wallet.getAddress(),InfuraInfo.WALLET_ADDRESS.getDesc(),"0",transactionId,"1");
+                            }
+                        }
+                    },DateUtil.getDate(Calendar.HOUR_OF_DAY,1,date));
+                }else{
+                    //钱已到账
+                    transact(userId,u.getPayPassword(),money,wallet.getWalletPath(),wallet.getAddress(),InfuraInfo.WALLET_ADDRESS.getDesc(),"0",transactionId,"1");
+                }
+            }
+        }, DateUtil.getDate(Calendar.MINUTE,15,time));
+    }
+
+    private void transact(String userId,String payPassword,String balance,String walletPath,String walletAddress,String toAddress,String walletType,String transactionId,String transactionStatus){
+        try {
+            transfer(userId,payPassword,balance,walletPath,walletAddress,toAddress,walletType);
+            updateTransaction(transactionId,transactionStatus);
+        } catch (IOException | CipherException | ExecutionException | InterruptedException | BusinessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateTransaction(String transactionId,String transactionStatus){
+        Transaction transaction = transactionMapper.selectById(transactionId);
+        transaction.setTransactionStatus(transactionStatus);
+        transactionMapper.updateById(transaction);
+
+    }
+
+
 }
