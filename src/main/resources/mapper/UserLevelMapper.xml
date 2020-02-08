@@ -39,7 +39,33 @@
         from
         sys_user_level
         where
-        reced_id = #{user_id}
+        reced_id = #{userId}
         order by level asc
+    </select>
+
+    <select id="getDirectCount" resultType="Integer">
+        select
+        ifnull(count(1),0)
+        from
+        sys_user_level
+        where
+        rec_id =#{userId} and level = 1
+    </select>
+
+
+    <select id="getDirectUsers" resultType="com.app.mdc.model.system.User">
+        select
+        user_id as id ,
+        `level` ,
+        user_name as userName
+        from
+        sys_user where user_id in(
+     select
+        reced_id
+        from
+        sys_user_level
+        where
+        rec_id =#{userId} and level = 1
+        )
     </select>
 </mapper>

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.math.BigDecimal;
+
 public interface UserContractMapper extends BaseMapper<UserContract> {
 
     @Select("select sc.id,amount,income_rate as incomeRate from mdc_user_contract muc join sys_contract sc on sc.id = muc.contract_id where muc.user_id = #{userId} and sc.type = #{type}")
@@ -18,4 +20,18 @@ public interface UserContractMapper extends BaseMapper<UserContract> {
      * @return
      */
     UserContract getUserContractByTypeAndUserId(@Param("userId") Integer userId,@Param("type") Integer type);
+
+    /**
+     * 查询工会签约合约总额
+     * @param userId
+     * @return
+     */
+    BigDecimal getUnionSignTotalMoney(Integer userId);
+
+    /**
+     * 查询工会的进阶总额
+     * @param userId
+     * @return
+     */
+    BigDecimal getUnionAdvanceTotalMoney(Integer userId);
 }

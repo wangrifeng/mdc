@@ -15,12 +15,12 @@ public class LoginTest {
     @Test
     public void register(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","2-cc");
-        param.put("userName","2-cc");
+        param.put("loginName","1-j");
+        param.put("userName","1-j");
         param.put("roleId","10");
         param.put("password","123456");
         param.put("email","mdc@qq.com");
-        param.put("sendCode","7777");
+        param.put("sendCode","8888");
         String s = HttpUtil.doPost(HOST + "/admin/users/add", param,null);
         System.out.println(s);
     }
@@ -28,7 +28,7 @@ public class LoginTest {
     @Test
     public void login(){
         Map<String,String> param  = new HashMap<>();
-        param.put("loginName","admin4");
+        param.put("loginName","2-cc");
         param.put("password","123456");
         String s = HttpUtil.doPost(HOST + "/doLogin", param,null);
         System.out.println(s);

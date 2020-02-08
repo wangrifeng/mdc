@@ -9,6 +9,7 @@ import com.app.mdc.mapper.system.UserMapper;
 import com.app.mdc.mapper.system.UserTokenMapper;
 import com.app.mdc.model.mdc.InCome;
 import com.app.mdc.model.system.*;
+import com.app.mdc.service.mdc.UserContractService;
 import com.app.mdc.service.mdc.WalletService;
 import com.app.mdc.service.system.UserLevelService;
 import com.app.mdc.service.system.UserService;
@@ -40,6 +41,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserLevelService userLevelService;
     @Autowired
     private VerificationCodeService verificationCodeService;
+    @Autowired
+    private UserContractService userContractService;
     @Value("${license.key}")
     private String linceseKey;
 
@@ -114,65 +117,65 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseResult add(Map<String,Object> map) {
+    public ResponseResult add(Map<String, Object> map) {
         //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
         String loginName = map.get("loginName").toString();
-        Integer count=userMapper.user(loginName);
-        Integer isRepeat=userMapper.isRepeat(map.get("userName").toString());
-        if(count>0) {
+        Integer count = userMapper.user(loginName);
+        Integer isRepeat = userMapper.isRepeat(map.get("userName").toString());
+        if (count > 0) {
             //登录名称重复
             return ResponseResult.fail(ApiErrEnum.ERR600);
-        }else if(isRepeat>0) {
+        } else if (isRepeat > 0) {
             //用户名称重复
             return ResponseResult.fail(ApiErrEnum.ERR602);
-        }else if(map.get("sendCode") == null){
+        } else if (map.get("sendCode") == null) {
             //推荐码不存在
             return ResponseResult.fail();
-        }else {
+        } else {
             // 新增用户
             //获取推送人id
             int sendCode = Integer.parseInt(map.get("sendCode").toString());
-            Map<String,Object> sendUser = userMapper.getUserBySendCode(sendCode);
-            if(sendUser == null || sendUser.get("userId") == null){
+            Map<String, Object> sendUser = userMapper.getUserBySendCode(sendCode);
+            if (sendUser == null || sendUser.get("userId") == null) {
                 //推送码失效
                 return ResponseResult.fail(ApiErrEnum.ERR201);
             }
             String sendUserId = sendUser.get("userId").toString();
             //生成6位随机的邀请码
-            int random = (int)((Math.random()*9+1)*100000);
+            int random = (int) ((Math.random() * 9 + 1) * 100000);
             //新增用户
-            User tbUser=new User();
+            User tbUser = new User();
             tbUser.fromMap(map);
             tbUser.setDelFlag(0);
             tbUser.setCreateTime(new Date());
             tbUser.setUpdateTime(new Date());
             tbUser.setEmail(map.get("email").toString());
-            tbUser.setPassword(Md5Utils.hash(loginName,map.get("password").toString()));
+            tbUser.setPassword(Md5Utils.hash(loginName, map.get("password").toString()));
             tbUser.setSendCode(random);
             tbUser.setUpUserId(sendUserId);
             //获取所有人推荐人id
             String upUserIds = "";
             Object sendUpUserIdsObj = sendUser.get("upUserIds");
-            if(sendUser.get("upUserId") == null){
+            if (sendUser.get("upUserId") == null) {
                 //推荐人本身没有推荐人 最顶级
                 upUserIds = sendUserId;
-            }else{
+            } else {
                 //推荐人还有推荐人
                 upUserIds = sendUpUserIdsObj.toString() + "," + sendUserId;
             }
             tbUser.setUpUserIds(upUserIds);
-			int userCount = userMapper.insert(tbUser);
+            int userCount = userMapper.insert(tbUser);
 
-			//新增用户层级关系
-            userLevelService.addLevelRelation(upUserIds,tbUser.getId());
+            //新增用户层级关系
+            userLevelService.addLevelRelation(upUserIds, tbUser.getId());
 
-			//新增用户角色中间表
-			String userId=tbUser.getId();
-			String roleId=map.get("roleId").toString();
-            if(StringUtils.isNotEmpty(roleId)) {
-                String[] arr=roleId.split(",");
+            //新增用户角色中间表
+            String userId = tbUser.getId();
+            String roleId = map.get("roleId").toString();
+            if (StringUtils.isNotEmpty(roleId)) {
+                String[] arr = roleId.split(",");
                 for (String string : arr) {
-                    RoleUser roleUser=new RoleUser();
+                    RoleUser roleUser = new RoleUser();
                     roleUser.setRoleId(string);
                     roleUser.setUserId(userId);
                     roleUserMapper.insert(roleUser);
@@ -182,10 +185,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             //添加钱包
             try {
 //                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
-            }catch (Exception e){
+            } catch (Exception e) {
                 return ResponseResult.fail();
             }
-            return userCount == 1  ? ResponseResult.success() : ResponseResult.fail();
+            return userCount == 1 ? ResponseResult.success() : ResponseResult.fail();
         }
     }
 
@@ -350,8 +353,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Integer updatePwd(Integer type, String id, String newPassword, String oldPassword, String verCode, String verId) throws BusinessException {
         //验证验证码是否正确
-        boolean isVerCodeValidated = verificationCodeService.validateVerCode(verCode,verId);
-        if(!isVerCodeValidated){
+        boolean isVerCodeValidated = verificationCodeService.validateVerCode(verCode, verId);
+        if (!isVerCodeValidated) {
             throw new BusinessException("验证码验证失败");
         }
 
@@ -445,34 +448,70 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 铜牌玩家： 直推10人 ，合约体量达到8万$，拿公会成员收益5%
-     *
+     * <p>
      * 银牌玩家：直推10人 ，有2个部门产生铜牌，合约体量达到20万$，拿公会成员收益8%
-     *
-     * 金牌玩家：直推15人 ，有2个部门产生银牌经纪人，合约体量达到50万$，拿公会成员收益10%
-     *
-     * 王牌玩家：直推15人，有2个部门产生金牌经纪人，合约体量达到150万美金$，拿公会成员收益15%
+     * <p>
+     * 金牌玩家：直推15人 ，有3个部门产生银牌经纪人，合约体量达到50万$，拿公会成员收益10%
+     * <p>
+     * 王牌玩家：直推15人，有3个部门产生金牌经纪人，合约体量达到150万美金$，拿公会成员收益15%
      *
      * @param userId
      */
     @Override
     public void updateUserLevel(Integer userId) {
-        //查询当前用户所有的推荐人
-        List<Integer> recIds = userLevelService.selectRecIdsByRecedId(userId);
-        if(recIds.size() == 0){
-            return;
-        }
-        for(Integer recId :recIds){
-            Map<Integer, Map<String, Object>> levelIds = userLevelService.selectRecedUserIds(recId);
-            //获取直推用户的id
-            String levelOneIds = levelIds.get(1).get("ids").toString();
-            String[] split = levelOneIds.split(",");
-            Integer directNumber = split.length;
-            if (directNumber == 0) {
-                //无直推用户
-                return;
+        //查询工会签约合约总额
+        BigDecimal unionSignTotalMoney = userContractService.getUnionSignTotalMoney(userId);
+        //查询公工会的进阶合约总额
+        BigDecimal unionAdvanceTotalMoney = userContractService.getUnionAdvanceTotalMoney(userId);
+        //获取直推人员等级
+        List<User> directUsers = userLevelService.getDirectUsers(userId);
+        //判断当前用户等级
+        Integer copperCount = 0;
+        Integer sliverCount = 0;
+        Integer goldCount = 0;
+        for (User du : directUsers) {
+            switch (du.getLevel()) {
+                case 1:
+                    copperCount++;
+                case 2:
+                    sliverCount++;
+                case 3:
+                    goldCount++;
             }
-
         }
+        Integer directNumber = directUsers.size();
+        Integer level = 0;
+        if (directNumber >= 15 && goldCount >= 3 && unionSignTotalMoney.compareTo(new BigDecimal("1500000")) >= 0) {
+            //王牌玩家
+            level = 4;
+        }else if(directNumber >= 15 && sliverCount >= 3 && unionSignTotalMoney.compareTo(new BigDecimal("500000")) >= 0){
+            //金牌玩家
+            level = 3;
+        }else if(directNumber >= 10 && copperCount >= 2 && unionSignTotalMoney.compareTo(new BigDecimal("200000")) >= 0){
+            //银牌玩家
+            level = 2;
+        }else if(directNumber >= 10  && unionSignTotalMoney.compareTo(new BigDecimal("80000")) >= 0){
+            //铜牌玩家
+            level = 1;
+        }
+        //更新用户的level 及工会总额
+        User user = new User();
+        user.setId(userId.toString());
+        user.setLevel(level);
+        user.setUnionSignTotalMoney(unionSignTotalMoney);
+        user.setUnionAdvanceTotalMoney(unionAdvanceTotalMoney);
+        this.updateById(user);
+
+        //当前用户更新完成 更新父用户的level及签约 进阶总额
+        User currentUser = this.selectById(userId);
+        String upUserId = currentUser.getUpUserId();
+        if(StringUtils.isEmpty(upUserId)){
+            //到顶 没有父级
+            return;
+        }else{
+            this.updateUserLevel(Integer.parseInt(upUserId));
+        }
+
     }
 
 }

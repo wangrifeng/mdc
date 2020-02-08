@@ -5,6 +5,7 @@ import com.app.mdc.model.mdc.Contract;
 import com.app.mdc.model.mdc.UserContract;
 import com.baomidou.mybatisplus.service.IService;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -35,4 +36,18 @@ public interface UserContractService extends IService<UserContract> {
      * @return
      */
     UserContract getUserContractByTypeAndUserId(Integer userId, Integer type);
+
+    /**
+     * 查询工会签约合约总额
+     * @param userId
+     * @return
+     */
+    BigDecimal getUnionSignTotalMoney(Integer userId);
+
+    /**
+     * 获取工会的进阶总额
+     * @param userId
+     * @return
+     */
+    BigDecimal getUnionAdvanceTotalMoney(Integer userId);
 }

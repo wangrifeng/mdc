@@ -37,4 +37,18 @@ public interface UserLevelService extends IService<UserLevel> {
      * @return
      */
     List<Integer> selectRecIdsByRecedId(Integer userId);
+
+    /**
+     * 获取直推人数
+     * @param userId
+     * @return
+     */
+    Integer getDirectCount(Integer userId);
+
+    /**
+     * 获取直推用户的信息
+     * @param userId
+     * @return
+     */
+    List<User> getDirectUsers(Integer userId);
 }
