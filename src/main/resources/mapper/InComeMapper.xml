@@ -19,7 +19,7 @@
         ifnull(sum(mi.contract_salary),0) as totalIncome
         from
         sys_user_level sul
-        join mdc_income mi on mi.user_id = sul.reced_id and mi.sel_date = #{selDate} and mi.type = 2
+        join mdc_income mi on mi.user_id = sul.reced_id and mi.sel_date = left(#{selDate},10) and mi.type = 2
         where
         sul.rec_id = #{userId}
     </select>

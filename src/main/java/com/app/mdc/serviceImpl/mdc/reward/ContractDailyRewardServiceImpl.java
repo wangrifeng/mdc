@@ -228,6 +228,8 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         } else if (cardNumber >= 8000) {
             //会员体量达到8000张，拿伞下进阶卡收益的25%
             rate = new BigDecimal("0.25");
+        }else{
+            rate= new BigDecimal(0);
         }
         BigDecimal advanceShareSalary = totalIncome.multiply(rate);
 
@@ -283,6 +285,11 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         //该用户未计算过管理奖 进行计算
         if (levelIds == null || levelIds.size() == 0) {
             //无被推荐人
+            InCome finalIncome = new InCome();
+            finalIncome.setId(inCome.getId());
+            finalIncome.setManageSalary(new BigDecimal(0));
+            finalIncome.setIsCalMsalary(1);
+            inComeService.updateById(finalIncome);
             return new BigDecimal(0);
         }
         String levelOneIds = levelIds.get(1).get("ids").toString();
@@ -290,6 +297,11 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         Integer directNumber = split.length;
         if (directNumber == 0) {
             //无直推用户
+            InCome finalIncome = new InCome();
+            finalIncome.setId(inCome.getId());
+            finalIncome.setManageSalary(new BigDecimal(0));
+            finalIncome.setIsCalMsalary(1);
+            inComeService.updateById(finalIncome);
             return new BigDecimal(0);
         }
 //        //查询合约体量
@@ -334,6 +346,15 @@ public class ContractDailyRewardServiceImpl implements RewardService {
 //        }
         //查询当前用户信息
         User currentUser = userService.selectById(userId);
+        if(currentUser.getLevel() == 0){
+            //无身份 没有管理奖 更新用户的管理收益
+            InCome finalIncome = new InCome();
+            finalIncome.setId(inCome.getId());
+            finalIncome.setManageSalary(new BigDecimal(0));
+            finalIncome.setIsCalMsalary(1);
+            inComeService.updateById(finalIncome);
+            return new BigDecimal(0);
+        }
         BigDecimal manageRate = this.getRateByLevel(currentUser.getLevel());
         //从所有直推会员中获取直属收益
         BigDecimal count = new BigDecimal(0);
