@@ -33,4 +33,11 @@ public interface UserLevelMapper extends BaseMapper<UserLevel> {
      * @return
      */
     BigDecimal getTotalSum(Integer userId);
+
+    /**
+     * 查询当前用户所有的推荐人
+     * @param userId
+     * @return
+     */
+    List<Integer> selectRecIdsByRecedId(Integer userId);
 }

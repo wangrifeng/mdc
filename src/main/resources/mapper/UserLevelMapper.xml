@@ -32,4 +32,14 @@
         where
         rec_id = #{userId} and type = 1
     </select>
+
+    <select id="selectRecIdsByRecedId" resultType="Integer">
+        select
+        rec_id as recId
+        from
+        sys_user_level
+        where
+        reced_id = #{user_id}
+        order by level asc
+    </select>
 </mapper>
