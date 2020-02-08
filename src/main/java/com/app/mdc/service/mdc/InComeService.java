@@ -28,4 +28,13 @@ public interface InComeService extends IService<InCome> {
      * @return
      */
     Map<String, Object> getAdvanceShareSalary(Date selDate, Integer userId);
+
+    /**
+     * 计算直推用户伞下总收益
+     * @param userId
+     * @param selDate
+     * @param burnValue
+     * @return
+     */
+    BigDecimal getTotalSum(Integer userId, Date selDate, double burnValue);
 }

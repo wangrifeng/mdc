@@ -25,4 +25,9 @@ public class InComeServiceImpl extends ServiceImpl<InComeMapper, InCome> impleme
     public Map<String, Object> getAdvanceShareSalary(Date selDate, Integer userId) {
         return this.baseMapper.getAdvanceShareSalary(selDate,userId);
     }
+
+    @Override
+    public BigDecimal getTotalSum(Integer userId, Date selDate, double burnValue) {
+        return this.baseMapper.getTotalSum(userId,selDate,burnValue);
+    }
 }

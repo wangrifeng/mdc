@@ -11,4 +11,11 @@ import java.util.Map;
  */
 public interface UserContractService extends IService<UserContract> {
 
+    /**
+     * 查询用户合约卡详情
+     * @param userId
+     * @param type
+     * @return
+     */
+    Contract selectContractByUserId(Integer userId,Integer type);
 }

@@ -46,7 +46,7 @@ public class MdcApplication {
         logger.info("======AppApplication===启动 success==encoding=" + encoding);
         MessageSocket.setApplicationContext(applicationContext);
 
-        applicationContext.getBean(AllRewardJob.class).execute();
+//        applicationContext.getBean(AllRewardJob.class).execute();
 	}
 
 }

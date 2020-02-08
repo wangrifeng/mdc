@@ -103,14 +103,14 @@ public class ContractDailyRewardServiceImpl implements RewardService {
                 //1.分享收益
                 BigDecimal shareSalary = this.getShareSalary(levelIds, selDate, userId, burnValue);
                 //2.管理收益
-                BigDecimal manageSalary = this.getManageSalary(levelIds, selDate, userId, burnValue);
+                BigDecimal manageSalary = this.getManageSalary(levelIds, selDate, userId, burnValue, contractCache);
                 //3.更新用户签约余额
-                updateUserSignContractSum(userId,selDate);
+                updateUserSignContractSum(userId, selDate);
             } else {
                 //进阶分享
                 BigDecimal shareSalary = this.getAdvanceShareSalary(selDate, userId);
                 //更新用户进阶余额
-                advanceContractSum(userId,selDate,contract.getOutRate());
+                advanceContractSum(userId, selDate, contract.getOutRate());
             }
         }
     }
@@ -144,10 +144,10 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         BigDecimal advanceContractSum = user.getAdvanceContractSum().add(salary);
         //判断收益是否出局
         BigDecimal outLine = inCome.getAmount().multiply(new BigDecimal(inCome.getNumber())).multiply(outRate);
-        if(advanceContractSum.compareTo(outLine) >= 0){
-           //重新计算最终收益
+        if (advanceContractSum.compareTo(outLine) >= 0) {
+            //重新计算最终收益
             salary = outLine.subtract(user.getAdvanceContractSum());
-           //重新赋值用户余额
+            //重新赋值用户余额
             advanceContractSum = outLine;
             i.setRemark(inCome.getRemark() + " 合约上限,进阶合约已出局");
         }
@@ -198,7 +198,7 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         Map<String, Object> numberAndTotalIncome = inComeService.getAdvanceShareSalary(selDate, userId);
         Integer cardNumber = Integer.parseInt(numberAndTotalIncome.get("cardNumber").toString());
         BigDecimal totalIncome = new BigDecimal(numberAndTotalIncome.get("totalIncome").toString());
-        if(cardNumber == 0){
+        if (cardNumber == 0) {
             //伞下没有进阶卡 不做任何处理
             return new BigDecimal(0);
         }
@@ -228,8 +228,8 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         } else if (cardNumber >= 8000) {
             //会员体量达到8000张，拿伞下进阶卡收益的25%
             rate = new BigDecimal("0.25");
-        }else{
-            rate= new BigDecimal(0);
+        } else {
+            rate = new BigDecimal(0);
         }
         BigDecimal advanceShareSalary = totalIncome.multiply(rate);
 
@@ -263,7 +263,7 @@ public class ContractDailyRewardServiceImpl implements RewardService {
      * @param burnValue
      * @return
      */
-    private BigDecimal getManageSalary(Map<Integer, Map<String, Object>> levelIds, Date selDate, Integer userId, BigDecimal burnValue) {
+    private BigDecimal getManageSalary(Map<Integer, Map<String, Object>> levelIds, Date selDate, Integer userId, BigDecimal burnValue, Map<Integer, Contract> contractCache) {
         //查询该用户是否已经计算过管理奖
         EntityWrapper<InCome> inComeEntityWrapper = new EntityWrapper<>();
         inComeEntityWrapper
@@ -346,7 +346,7 @@ public class ContractDailyRewardServiceImpl implements RewardService {
 //        }
         //查询当前用户信息
         User currentUser = userService.selectById(userId);
-        if(currentUser.getLevel() == 0){
+        if (currentUser.getLevel() == 0) {
             //无身份 没有管理奖 更新用户的管理收益
             InCome finalIncome = new InCome();
             finalIncome.setId(inCome.getId());
@@ -361,25 +361,32 @@ public class ContractDailyRewardServiceImpl implements RewardService {
         for (User du : directUsers) {
             if (du.getLevel() >= currentUser.getLevel()) {
                 //平级现象 直推会员等级高于当前用户 当前用户拿直推用户的管理奖的6%
+                //查询用户对应的合约信息
+                Contract contract = userContractService.selectContractByUserId(userId, 1);
+                if (contract == null) {
+                    logger.info("用户" + currentUser.getUserName() + "获取" + du.getUserName() + "的平级收益为" + 0);
+                    continue;
+                }
+
+                BigDecimal duBurnValue = contract.getAmount().multiply(contract.getIncomeRate());
+
                 //用户的所有被推荐人id
                 Map<Integer, Map<String, Object>> directLevelIds = userLevelService.selectRecedUserIds(Integer.parseInt(du.getId()));
                 //递归查询直推用户的管理奖
-                BigDecimal directUserManageSalary = this.getManageSalary(directLevelIds, selDate, Integer.parseInt(du.getId()), burnValue);
+                BigDecimal directUserManageSalary = this.getManageSalary(directLevelIds, selDate, Integer.parseInt(du.getId()), duBurnValue, contractCache);
                 //平级用户管理奖带来的收益
                 BigDecimal directUserManageInCome = directUserManageSalary.multiply(new BigDecimal("0.06"));
-                logger.info("用户" + du.getUserName() + "的平级收益为" + directUserManageInCome);
-                count.add(directUserManageInCome);
-            } else if (du.getLevel() == 0) {
-                //没有身份的用户没有任何奖项
+                logger.info("用户" + currentUser.getUserName() + "获取" + du.getUserName() + "的平级收益为" + directUserManageInCome);
+                count = count.add(directUserManageInCome);
             } else {
                 //极差现象 比率为直推用户伞下的 差比率
                 BigDecimal subtractRate = manageRate.subtract(this.getRateByLevel(du.getLevel()));
                 //计算直推用户伞下的总收益
-                BigDecimal diretUserTotalSum = userLevelService.getTotalSum(Integer.parseInt(du.getId()));
+                BigDecimal diretUserTotalSum = inComeService.getTotalSum(Integer.parseInt(du.getId()), selDate, burnValue.doubleValue());
                 //该直推用户带来的极差收益
                 BigDecimal directUserSubtractInCome = diretUserTotalSum.multiply(subtractRate);
-                logger.info("用户" + du.getUserName() + "的极差收益为" + directUserSubtractInCome);
-                count.add(directUserSubtractInCome);
+                logger.info("用户" + currentUser.getUserName() + "获取" + du.getUserName() + "的极差收益为" + directUserSubtractInCome);
+                count = count.add(directUserSubtractInCome);
             }
         }
         //更新用户的管理收益
@@ -400,14 +407,16 @@ public class ContractDailyRewardServiceImpl implements RewardService {
      */
     private BigDecimal getRateByLevel(Integer level) {
         switch (level) {
+            case 0:
+                return new BigDecimal("0");
             case 1:
-                return new BigDecimal(0.05);
+                return new BigDecimal("0.05");
             case 2:
-                return new BigDecimal(0.08);
+                return new BigDecimal("0.08");
             case 3:
-                return new BigDecimal(0.1);
+                return new BigDecimal("0.1");
             case 4:
-                return new BigDecimal(0.15);
+                return new BigDecimal("0.15");
         }
         return new BigDecimal(0);
     }

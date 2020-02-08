@@ -1,6 +1,7 @@
 package com.app.mdc.serviceImpl.mdc;
 
 import com.app.mdc.mapper.mdc.UserContractMapper;
+import com.app.mdc.model.mdc.Contract;
 import com.app.mdc.model.mdc.UserContract;
 import com.app.mdc.service.mdc.UserContractService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
@@ -15,4 +16,8 @@ import java.util.Map;
 public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, UserContract> implements UserContractService {
 
 
+    @Override
+    public Contract selectContractByUserId(Integer userId, Integer type) {
+        return this.baseMapper.selectContractByUserId(userId,type);
+    }
 }

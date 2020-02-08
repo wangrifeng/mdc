@@ -24,7 +24,7 @@
 
     <select id="getTotalSum" resultType="BigDecimal">
         select
-        sum(sc.amount)
+        ifnull(sum(sc.amount),0)
         from
         sys_user_level sul
         join mdc_user_contract muc on sul.reced_id = muc.user_id

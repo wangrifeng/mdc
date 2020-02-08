@@ -23,4 +23,14 @@
         where
         sul.rec_id = #{userId}
     </select>
+
+    <select id="getTotalSum" resultType="BigDecimal">
+        select
+        ifnull(sum(if(mi.contract_salary > #{burnValue}, #{burnValue} , mi.contract_salary )),0)
+        from
+        sys_user_level sul
+        join mdc_income mi on mi.user_id = sul.reced_id and mi.sel_date = left(#{selDate},10) and mi.type = 1
+        where
+        sul.rec_id = #{userId}
+    </select>
 </mapper>
