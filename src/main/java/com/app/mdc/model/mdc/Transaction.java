@@ -35,7 +35,7 @@ public class Transaction extends Model<Transaction> {
     /**
      * 支出钱包id
      */
-    private Integer fromWalletId;
+    private String fromWalletAddress;
     /**
      * 收取用户id
      */
@@ -43,17 +43,17 @@ public class Transaction extends Model<Transaction> {
     /**
      * 收取钱包id
      */
-    private Integer toWalletId;
+    private String toWalletAddress;
     /**
      * 交易金额
      */
     private BigDecimal fromAmount;
 
-    private BigDecimal fromWalletType;
+    private String fromWalletType;
 
     private BigDecimal toAmount;
 
-    private BigDecimal toWalletType;
+    private String toWalletType;
 
     private BigDecimal feeAmount;
     /**
@@ -69,6 +69,9 @@ public class Transaction extends Model<Transaction> {
      */
     private String remark;
 
+    private String transactionStatus;
+
+    private String transactionHash;
 
     public Integer getTransactionId() {
         return transactionId;
@@ -86,12 +89,12 @@ public class Transaction extends Model<Transaction> {
         this.fromUserId = fromUserId;
     }
 
-    public Integer getFromWalletId() {
-        return fromWalletId;
+    public String getFromWalletAddress() {
+        return fromWalletAddress;
     }
 
-    public void setFromWalletId(Integer fromWalletId) {
-        this.fromWalletId = fromWalletId;
+    public void setFromWalletAddress(String fromWalletAddress) {
+        this.fromWalletAddress = fromWalletAddress;
     }
 
     public Integer getToUserId() {
@@ -102,12 +105,12 @@ public class Transaction extends Model<Transaction> {
         this.toUserId = toUserId;
     }
 
-    public Integer getToWalletId() {
-        return toWalletId;
+    public String getToWalletAddress() {
+        return toWalletAddress;
     }
 
-    public void setToWalletId(Integer toWalletId) {
-        this.toWalletId = toWalletId;
+    public void setToWalletAddress(String toWalletAddress) {
+        this.toWalletAddress = toWalletAddress;
     }
 
     public BigDecimal getFromAmount() {
@@ -118,11 +121,11 @@ public class Transaction extends Model<Transaction> {
         this.fromAmount = fromAmount;
     }
 
-    public BigDecimal getFromWalletType() {
+    public String getFromWalletType() {
         return fromWalletType;
     }
 
-    public void setFromWalletType(BigDecimal fromWalletType) {
+    public void setFromWalletType(String fromWalletType) {
         this.fromWalletType = fromWalletType;
     }
 
@@ -134,11 +137,11 @@ public class Transaction extends Model<Transaction> {
         this.toAmount = toAmount;
     }
 
-    public BigDecimal getToWalletType() {
+    public String getToWalletType() {
         return toWalletType;
     }
 
-    public void setToWalletType(BigDecimal toWalletType) {
+    public void setToWalletType(String toWalletType) {
         this.toWalletType = toWalletType;
     }
 
@@ -174,6 +177,22 @@ public class Transaction extends Model<Transaction> {
         this.remark = remark;
     }
 
+    public String getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(String transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+
+    public String getTransactionHash() {
+        return transactionHash;
+    }
+
+    public void setTransactionHash(String transactionHash) {
+        this.transactionHash = transactionHash;
+    }
+
     @Override
     protected Serializable pkVal() {
         return this.transactionId;
@@ -184,9 +203,9 @@ public class Transaction extends Model<Transaction> {
         return "Transaction{" +
         ", transactionId=" + transactionId +
         ", fromUserId=" + fromUserId +
-        ", fromWalletId=" + fromWalletId +
+        ", fromWalletAddress=" + fromWalletAddress +
         ", toUserId=" + toUserId +
-        ", toWalletId=" + toWalletId +
+        ", toWalletAddress=" + toWalletAddress +
         ", transactionType=" + transactionType +
         ", createTime=" + createTime +
         ", remark=" + remark +

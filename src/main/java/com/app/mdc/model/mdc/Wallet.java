@@ -51,6 +51,7 @@ public class Wallet extends Model<Wallet> {
     /**
      * 余额
      */
+    private BigDecimal ethBlance;
     private BigDecimal ustdBlance;
 
     private BigDecimal mdcBlance;
@@ -140,6 +141,14 @@ public class Wallet extends Model<Wallet> {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public BigDecimal getEthBlance() {
+        return ethBlance;
+    }
+
+    public void setEthBlance(BigDecimal ethBlance) {
+        this.ethBlance = ethBlance;
     }
 
     @Override
