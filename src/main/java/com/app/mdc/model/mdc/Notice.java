@@ -6,18 +6,31 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 
-import java.util.Date;
 
-@TableName("mdc_notice")
+@TableName("sys_notice")
 @Data
 public class Notice {
 
     @TableId(value = "id",type= IdType.AUTO)
     private Integer id;
 
-    @TableField("message")
-    private  String message;
+    /** 公告ID */
+    @TableField("notice_id")
+    private Long noticeId;
 
-    @TableField("create_time")
-    private Date createTime;
+    /** 公告标题 */
+    @TableField("notice_title")
+    private String noticeTitle;
+
+    /** 公告类型（1通知 2公告） */
+    @TableField("notice_type")
+    private String noticeType;
+
+    /** 公告内容 */
+    @TableField("notice_content")
+    private String noticeContent;
+
+    /** 公告状态（0正常 1关闭） */
+    @TableField("status")
+    private String status;
 }

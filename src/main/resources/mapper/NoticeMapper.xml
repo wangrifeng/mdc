@@ -4,9 +4,9 @@
 
     <select id="selectNewest" resultType="com.app.mdc.model.mdc.Notice">
        select
-       id,message, create_time
+       notice_id as noticeId,notice_title as noticeTitle,notice_type as noticeType,notice_content as noticeContent,status
        from
-       mdc_notice
-       where id = (select max(id) from mdc_notice)
+       sys_notice
+       where notice_id = (select max(notice_id) from sys_notice)
    </select>
 </mapper>
