@@ -52,6 +52,20 @@ public interface TransactionService extends IService<Transaction> {
      */
     ResponseResult cashOutUSDT(String userId,String walletId,String toAddress,String cashOutMoney) throws InterruptedException;
 
+    /**
+     * 购买合约交易
+     * @param userId 用户id
+     * @param money 购买钱
+     * @return ResponseResult
+     */
     ResponseResult buyContract(String userId,String money);
+
+    /**
+     * 购买进阶卡交易
+     * @param userId 用户id
+     * @param money 购买钱
+     * @return ResponseResult
+     */
+    ResponseResult buyAdvance(String userId,String money);
 
 }
