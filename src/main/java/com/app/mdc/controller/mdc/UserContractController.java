@@ -2,6 +2,8 @@ package com.app.mdc.controller.mdc;
 
 import com.app.mdc.exception.BusinessException;
 import com.app.mdc.service.mdc.UserContractService;
+import com.app.mdc.service.system.UserService;
+import com.app.mdc.service.system.VerificationCodeService;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,10 +28,18 @@ public class UserContractController {
 
     @Autowired
     private UserContractService userContractService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private VerificationCodeService verificationCodeService;
 
     @RequestMapping(value = "/add",method = POST)
     @ApiOperation("新增用户合同")
-    public ResponseResult add(@RequestParam Integer userId,@RequestParam Integer contractId,@RequestParam Integer number) throws BusinessException {
+    public ResponseResult add(@RequestParam String payPassword,@RequestParam String verCode ,@RequestParam String verId ,@RequestParam Integer userId,@RequestParam Integer contractId,@RequestParam Integer number) throws BusinessException {
+        userService.validatePayPassword(userId,payPassword);
+        if(!verificationCodeService.validateVerCode(verCode,verId)){
+            throw new BusinessException("验证码校验错误");
+        }
         userContractService.add(userId,contractId,number);
         return ResponseResult.success();
     }
@@ -45,14 +55,22 @@ public class UserContractController {
 
     @RequestMapping(value = "/upgrade",method = POST)
     @ApiOperation("合约升级")
-    public ResponseResult upgrade(@RequestParam Integer userId,@RequestParam Integer ucId,@RequestParam Integer upgradeId,@RequestParam String payToken) throws BusinessException {
-        userContractService.upgrade(userId,ucId,payToken,upgradeId);
+    public ResponseResult upgrade(@RequestParam String payPassword,@RequestParam String verCode ,@RequestParam String verId ,@RequestParam Integer userId,@RequestParam Integer ucId,@RequestParam Integer upgradeId) throws BusinessException {
+        userService.validatePayPassword(userId,payPassword);
+        if(!verificationCodeService.validateVerCode(verCode,verId)){
+            throw new BusinessException("验证码校验错误");
+        }
+        userContractService.upgrade(userId,ucId,upgradeId);
         return ResponseResult.success();
     }
 
     @RequestMapping(value = "/rescind",method = POST)
     @ApiOperation("合约解约")
-    public ResponseResult rescind(@RequestParam Integer userId,@RequestParam Integer ucId) throws BusinessException {
+    public ResponseResult rescind(@RequestParam String payPassword,@RequestParam String verCode ,@RequestParam String verId ,@RequestParam Integer userId,@RequestParam Integer ucId) throws BusinessException {
+        userService.validatePayPassword(userId,payPassword);
+        if(!verificationCodeService.validateVerCode(verCode,verId)){
+            throw new BusinessException("验证码校验错误");
+        }
         userContractService.rescind(userId,ucId);
         return ResponseResult.success();
     }

@@ -7,7 +7,6 @@ import com.app.mdc.mapper.system.RoleMapper;
 import com.app.mdc.mapper.system.RoleUserMapper;
 import com.app.mdc.mapper.system.UserMapper;
 import com.app.mdc.mapper.system.UserTokenMapper;
-import com.app.mdc.model.mdc.InCome;
 import com.app.mdc.model.system.*;
 import com.app.mdc.service.mdc.UserContractService;
 import com.app.mdc.service.mdc.WalletService;
@@ -532,6 +531,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return;
         }else{
             this.updateUserLevel(Integer.parseInt(upUserId));
+        }
+
+    }
+
+    @Override
+    public void validatePayPassword(Integer userId, String payPassword) throws BusinessException {
+        User user = this.selectById(userId);
+        if(user == null ){
+            throw new BusinessException("用户不存在");
+        }
+        String needToValidate = Md5Utils.hash(user.getLoginName(), payPassword);
+        if(!user.getPayPassword().equals(needToValidate)){
+           throw new BusinessException("支付密码校验错误");
         }
 
     }
