@@ -258,12 +258,15 @@ public class MdcApplicationTests {
 //
 //    	System.out.println(b.multiply(s).stripTrailingZeros().toPlainString());
 //    	System.out.println(new Uint256(new BigInteger(b.multiply(s).stripTrailingZeros().toPlainString())).getValue());
-		BigDecimal b = new BigDecimal(1.077222040999999997);
+		/*BigDecimal b = new BigDecimal(1.077222040999999997);
 		BigDecimal c = new BigDecimal(1.027201040999978997);
 		BigDecimal d = b.subtract(c);
 		BigDecimal a = new BigDecimal(0.05);
-		BigDecimal e = d.subtract(a);
-		System.out.println(e);
+		BigDecimal e = d.subtract(a);*/
+		if(new Double(0) == 0){
+			System.out.println(1111);
+		}
+
 	}
 
 	@Test

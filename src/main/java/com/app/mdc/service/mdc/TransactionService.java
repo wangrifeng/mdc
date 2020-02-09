@@ -53,6 +53,14 @@ public interface TransactionService extends IService<Transaction> {
     ResponseResult cashOutUSDT(String userId,String walletId,String toAddress,String cashOutMoney) throws InterruptedException;
 
     /**
+     * mdc闪兑
+     * @param userId 用户id
+     * @param convertMoney 兑换数量
+     * @return ResponseResult
+     */
+    ResponseResult convertMDC(String userId,String convertMoney,String payPassword);
+
+    /**
      * 购买合约交易
      * @param userId 用户id
      * @param money 购买钱
