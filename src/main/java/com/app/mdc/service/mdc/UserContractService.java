@@ -6,7 +6,6 @@ import com.app.mdc.model.mdc.UserContract;
 import com.baomidou.mybatisplus.service.IService;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 /**
  * 用户合约关系Service
@@ -50,4 +49,26 @@ public interface UserContractService extends IService<UserContract> {
      * @return
      */
     BigDecimal getUnionAdvanceTotalMoney(Integer userId);
+
+    /**
+     * 合约升级
+     * @param userId
+     * @param ucId
+     * @param payToken
+     */
+    void upgrade(Integer userId, Integer ucId, String payToken) throws BusinessException;
+
+    /**
+     * 获取合约升级差价
+     * @param ucId
+     * @return
+     */
+    BigDecimal getUpgradePriceDifference(Integer ucId) throws BusinessException;
+
+    /**
+     * 用户解约 扣除5%违约金
+     * @param userId
+     * @param ucId
+     */
+    void rescind(Integer userId, Integer ucId) throws BusinessException;
 }

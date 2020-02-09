@@ -107,6 +107,12 @@ public class User {
 	@TableField("gesture_switch")
 	private Integer gestureSwitch;
 
+	@TableField("self_Sign_total_money")
+	private BigDecimal selfSignTotalMoney;
+
+	@TableField("self_advance_total_money")
+	private BigDecimal selfAdvanceTotalMoney;
+
 	public void fromMap(Map<String, Object> map) {
 		if (map.get("id") != null) {
 			this.id = (String) map.get("id");
