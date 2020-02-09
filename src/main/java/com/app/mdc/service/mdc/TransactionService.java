@@ -52,4 +52,6 @@ public interface TransactionService extends IService<Transaction> {
      */
     ResponseResult cashOutUSDT(String userId,String walletId,String toAddress,String cashOutMoney) throws InterruptedException;
 
+    ResponseResult buyContract(String userId,String money);
+
 }

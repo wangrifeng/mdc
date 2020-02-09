@@ -208,6 +208,35 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
+    @Override
+    public ResponseResult buyContract(String userId, String money) {
+        EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
+        walletEntityWrapper.eq("user_id",userId);
+        List<Wallet> wallets = walletMapper.selectList(walletEntityWrapper);
+        if(wallets.size() > 0){
+            Wallet wallet = wallets.get(0);
+            if(wallet.getUstdBlance().doubleValue() < new Double(money)){
+                return ResponseResult.fail(ApiErrEnum.ERR207);
+            }
+            Transaction transaction = new Transaction();
+            transaction.setFromAmount(new BigDecimal(money));
+            transaction.setFromWalletAddress(wallet.getAddress());
+            transaction.setFromWalletType("0");
+            transaction.setFeeAmount(new BigDecimal(0));
+            transaction.setFromUserId(Integer.parseInt(userId));
+            transaction.setCreateTime(new Date());
+            transaction.setTransactionStatus("1");
+            transaction.setTransactionType("4");
+            transactionMapper.insert(transaction);
+            BigDecimal balance = wallet.getUstdBlance();
+            wallet.setUstdBlance(balance.subtract(new BigDecimal(money)));
+            walletMapper.updateById(wallet);
+        }else{
+            return ResponseResult.fail();
+        }
+        return ResponseResult.success();
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public String transfer(String userId,String payPassword,String transferNumber,String fromPath,String fromAddress,String toAddress,String walletType) throws IOException, CipherException, ExecutionException, InterruptedException, BusinessException {
         User u = userMapper.selectById(userId);
