@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 @TableName("mdc_user_contract")
@@ -43,6 +42,9 @@ public class UserContract {
 
     @TableField("update_time")
     private Date updateTime;
+
+    public UserContract() {
+    }
 
     public UserContract(Integer userId, Integer contractId, Integer number, Date date, String userName) {
         this.userId = userId;

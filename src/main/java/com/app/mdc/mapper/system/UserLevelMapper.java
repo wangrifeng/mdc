@@ -1,5 +1,6 @@
 package com.app.mdc.mapper.system;
 
+import com.app.mdc.model.system.User;
 import com.app.mdc.model.system.UserLevel;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.MapKey;
@@ -40,4 +41,32 @@ public interface UserLevelMapper extends BaseMapper<UserLevel> {
      * @return
      */
     List<Integer> selectRecIdsByRecedId(Integer userId);
+
+    /**
+     * 获取直推人数
+     * @param userId
+     * @return
+     */
+    Integer getDirectCount(Integer userId);
+
+    /**
+     * 获取直推用户信息
+     * @param userId
+     * @return
+     */
+    List<User> getDirectUsers(Integer userId);
+
+    /**
+     * 获取用户的团队数量
+     * @param userId
+     * @return
+     */
+    Integer selectMemberSizeByUserId(String userId);
+
+    /**
+     * 查询用户工会成员列表
+     * @param userId
+     * @return
+     */
+    List<Map<String, Object>> list(Integer userId);
 }
