@@ -55,15 +55,17 @@ public interface UserContractService extends IService<UserContract> {
      * @param userId
      * @param ucId
      * @param payToken
+     * @param upgradeId
      */
-    void upgrade(Integer userId, Integer ucId, String payToken) throws BusinessException;
+    void upgrade(Integer userId, Integer ucId, String payToken, Integer upgradeId) throws BusinessException;
 
     /**
      * 获取合约升级差价
      * @param ucId
+     * @param upgradeId
      * @return
      */
-    BigDecimal getUpgradePriceDifference(Integer ucId) throws BusinessException;
+    BigDecimal getUpgradePriceDifference(Integer ucId, Integer upgradeId) throws BusinessException;
 
     /**
      * 用户解约 扣除5%违约金

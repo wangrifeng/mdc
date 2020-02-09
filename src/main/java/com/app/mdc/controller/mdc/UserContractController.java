@@ -36,8 +36,8 @@ public class UserContractController {
 
     @RequestMapping(value = "/getUpgradePriceDifference",method = POST)
     @ApiOperation("获取合约升级差价")
-    public ResponseResult getUpgradePriceDifference(@RequestParam Integer ucId) throws BusinessException {
-        BigDecimal price = userContractService.getUpgradePriceDifference(ucId);
+    public ResponseResult getUpgradePriceDifference(@RequestParam Integer ucId,@RequestParam Integer upgradeId) throws BusinessException {
+        BigDecimal price = userContractService.getUpgradePriceDifference(ucId,upgradeId);
         Map<String,Object> result = new HashMap<>();
         result.put("priceDifference",price);
         return ResponseResult.success().setData(result);
@@ -45,8 +45,8 @@ public class UserContractController {
 
     @RequestMapping(value = "/upgrade",method = POST)
     @ApiOperation("合约升级")
-    public ResponseResult upgrade(@RequestParam Integer userId,@RequestParam Integer ucId,@RequestParam String payToken) throws BusinessException {
-        userContractService.upgrade(userId,ucId,payToken);
+    public ResponseResult upgrade(@RequestParam Integer userId,@RequestParam Integer ucId,@RequestParam Integer upgradeId,@RequestParam String payToken) throws BusinessException {
+        userContractService.upgrade(userId,ucId,payToken,upgradeId);
         return ResponseResult.success();
     }
 
