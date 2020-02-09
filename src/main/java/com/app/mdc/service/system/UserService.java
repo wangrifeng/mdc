@@ -129,4 +129,11 @@ public interface UserService extends IService<User> {
      * @param userId
      */
     void updateUserLevel(Integer userId);
+
+    /**
+     * 验证支付密码是否正确
+     * @param userId
+     * @param payPassword
+     */
+    void validatePayPassword(Integer userId, String payPassword) throws BusinessException;
 }

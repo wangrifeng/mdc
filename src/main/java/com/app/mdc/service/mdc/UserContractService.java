@@ -54,10 +54,9 @@ public interface UserContractService extends IService<UserContract> {
      * 合约升级
      * @param userId
      * @param ucId
-     * @param payToken
      * @param upgradeId
      */
-    void upgrade(Integer userId, Integer ucId, String payToken, Integer upgradeId) throws BusinessException;
+    void upgrade(Integer userId, Integer ucId, Integer upgradeId) throws BusinessException;
 
     /**
      * 获取合约升级差价

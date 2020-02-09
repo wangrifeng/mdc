@@ -6,6 +6,7 @@ import com.app.mdc.model.mdc.Contract;
 import com.app.mdc.model.mdc.UserContract;
 import com.app.mdc.model.system.User;
 import com.app.mdc.service.mdc.ContractService;
+import com.app.mdc.service.mdc.TransactionService;
 import com.app.mdc.service.mdc.UserContractService;
 import com.app.mdc.service.system.UserService;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -29,6 +30,9 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     @Override
     public Contract selectContractByUserId(Integer userId, Integer type) {
@@ -59,11 +63,12 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
             UserContract uc = new UserContract(userId, contractId, 1, new Date(), user.getUserName());
             this.insert(uc);
 
-            //更新用户签约总额
-            User u = new User();
-            u.setId(userId.toString());
-            u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().add(contract.getAmount()));
-            userService.updateById(u);
+            //更新用户余额
+//            User u = new User();
+//            u.setId(userId.toString());
+//            u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().add(contract.getAmount()));
+//            userService.updateById(u);
+            transactionService.buyContract(userId.toString(), contract.getAmount().toString());
         } else {
             //进阶卡
             if (userContract == null) {
@@ -76,10 +81,11 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
                 this.updateById(uc);
             }
             //更新用户进阶总额
-            User u = new User();
-            u.setId(userId.toString());
-            u.setSelfAdvanceTotalMoney(user.getSelfAdvanceTotalMoney().add(contract.getAmount().multiply(new BigDecimal(number))));
-            userService.updateById(u);
+//            User u = new User();
+//            u.setId(userId.toString());
+//            u.setSelfAdvanceTotalMoney(user.getSelfAdvanceTotalMoney().add(contract.getAmount().multiply(new BigDecimal(number))));
+//            userService.updateById(u);
+            transactionService.buyAdvance(userId.toString(), contract.getAmount().multiply(new BigDecimal(number)).toString());
         }
 
         //更新用户的等级
@@ -103,7 +109,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 
     @Override
     @Transactional
-    public void upgrade(Integer userId, Integer ucId, String payToken, Integer upgradeId) throws BusinessException {
+    public void upgrade(Integer userId, Integer ucId, Integer upgradeId) throws BusinessException {
         //TODO 判断支付是否成功 更新支付状态
         UserContract userContract = this.selectById(ucId);
         if (userContract == null) {
@@ -126,12 +132,16 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
         this.updateById(uc);
 
         //更新用户账号余额
-        User user = userService.selectById(userId);
+//        User user = userService.selectById(userId);
+//        BigDecimal subtract = upgradeContract.getAmount().subtract(contract.getAmount());
+//        User u = new User();
+//        u.setId(userId.toString());
+//        u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().add(subtract));
+//        userService.updateById(u);
+
+        //计算差价
         BigDecimal subtract = upgradeContract.getAmount().subtract(contract.getAmount());
-        User u = new User();
-        u.setId(userId.toString());
-        u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().add(subtract));
-        userService.updateById(u);
+        transactionService.buyContract(userId.toString(),subtract.toString());
     }
 
     @Override
@@ -150,7 +160,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
             throw new BusinessException("未查询到升级合约信息,无法升级");
         }
         //计算差价
-        BigDecimal subtract = upgradeContract.getPrice().subtract(contract.getPrice());
+        BigDecimal subtract = upgradeContract.getAmount().subtract(contract.getAmount());
         return subtract;
     }
 
@@ -171,11 +181,12 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
         //计算违约金
         BigDecimal rescindMoney = contract.getAmount().multiply(new BigDecimal("0.05"));
         //更新用户余额
-        User user = userService.selectById(userId);
-        User u = new User();
-        u.setId(userId.toString());
-        u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().subtract(rescindMoney));
-        userService.updateById(u);
+//        User user = userService.selectById(userId);
+//        User u = new User();
+//        u.setId(userId.toString());
+//        u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().subtract(rescindMoney));
+//        userService.updateById(u);
+        transactionService.buyContract(userId.toString(),rescindMoney.toString());
 
         //删除用户签约信息
         this.deleteById(ucId);
