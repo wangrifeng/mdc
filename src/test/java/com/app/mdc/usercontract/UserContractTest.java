@@ -27,6 +27,7 @@ public class UserContractTest {
     public void getUpgradePriceDifference(){
         Map<String,String> param  = new HashMap<>();
         param.put("ucId","47");
+        param.put("upgradeId","4");
         String s = HttpUtil.doPost(HOST + "/userContract/getUpgradePriceDifference", param,"0121188e-f37b-4789-b7ae-95fb93633862");
         System.out.println(s);
     }
@@ -36,6 +37,7 @@ public class UserContractTest {
         Map<String,String> param  = new HashMap<>();
         param.put("userId","155");
         param.put("ucId","47");
+        param.put("upgradeId","4");
         param.put("payToken","123");
         String s = HttpUtil.doPost(HOST + "/userContract/upgrade", param,"0121188e-f37b-4789-b7ae-95fb93633862");
         System.out.println(s);
