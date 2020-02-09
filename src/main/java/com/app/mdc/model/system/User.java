@@ -113,6 +113,9 @@ public class User {
 	@TableField("self_advance_total_money")
 	private BigDecimal selfAdvanceTotalMoney;
 
+	@TableField("member_size")
+	private Integer memberSize;
+
 	public void fromMap(Map<String, Object> map) {
 		if (map.get("id") != null) {
 			this.id = (String) map.get("id");

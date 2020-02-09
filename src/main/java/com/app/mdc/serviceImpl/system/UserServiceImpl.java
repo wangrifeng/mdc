@@ -182,14 +182,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 }
             }
 
+            //更新推荐人的团队成员总数
+            this.updateRecMemberSize(sendUserId);
+
             //添加钱包
             try {
-//                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
+                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
             } catch (Exception e) {
                 return ResponseResult.fail();
             }
             return userCount == 1 ? ResponseResult.success() : ResponseResult.fail();
         }
+    }
+
+    /**
+     * 更新推荐人的团队成员总数
+     * @param userId
+     */
+    private void updateRecMemberSize(String userId) {
+        Integer memberSize = userLevelService.selectMemberSizeByUserId(userId);
+        User user = new User();
+        user.setId(userId);
+        user.setMemberSize(memberSize);
+        this.updateById(user);
+
+        User u = this.selectById(userId);
+        if(u == null || u.getUpUserId()==null){
+            return;
+        }
+        //如果存在推荐人 更新推荐人的 成员个数
+        this.updateRecMemberSize(u.getUpUserId());
     }
 
     @Override

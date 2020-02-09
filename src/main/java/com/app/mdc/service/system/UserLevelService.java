@@ -51,4 +51,18 @@ public interface UserLevelService extends IService<UserLevel> {
      * @return
      */
     List<User> getDirectUsers(Integer userId);
+
+    /**
+     * 获取用户的团队数量
+     * @param userId
+     * @return
+     */
+    Integer selectMemberSizeByUserId(String userId);
+
+    /**
+     * 查询用户的工会成员
+     * @param userId
+     * @return
+     */
+    List<Map<String, Object>> list(Integer userId);
 }

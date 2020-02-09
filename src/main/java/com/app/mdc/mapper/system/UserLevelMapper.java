@@ -55,4 +55,18 @@ public interface UserLevelMapper extends BaseMapper<UserLevel> {
      * @return
      */
     List<User> getDirectUsers(Integer userId);
+
+    /**
+     * 获取用户的团队数量
+     * @param userId
+     * @return
+     */
+    Integer selectMemberSizeByUserId(String userId);
+
+    /**
+     * 查询用户工会成员列表
+     * @param userId
+     * @return
+     */
+    List<Map<String, Object>> list(Integer userId);
 }

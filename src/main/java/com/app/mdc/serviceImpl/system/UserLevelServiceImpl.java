@@ -55,4 +55,14 @@ public class UserLevelServiceImpl extends ServiceImpl<UserLevelMapper, UserLevel
     public List<User> getDirectUsers(Integer userId) {
         return this.baseMapper.getDirectUsers(userId);
     }
+
+    @Override
+    public Integer selectMemberSizeByUserId(String userId) {
+        return this.baseMapper.selectMemberSizeByUserId(userId);
+    }
+
+    @Override
+    public List<Map<String, Object>> list(Integer userId) {
+        return this.baseMapper.list(userId);
+    }
 }
