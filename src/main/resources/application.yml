@@ -11,6 +11,7 @@ mdc:
   blankList:
     - /admin/users/add
     - /verificationCode/getVerificationCode
+    - /admin/users/resetPassword
 ---
 
 server:

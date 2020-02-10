@@ -148,6 +148,25 @@ public class UserController extends BaseController {
     }
 
 
+
+    @RequestMapping("/resetPassword")
+    @ApiOperation("忘记密码")
+    @ResponseBody
+    public ResponseResult resetPassword(
+            @RequestParam String verCode,
+            @RequestParam String verId,
+            @RequestParam String loginName,
+            @RequestParam String password,
+            @RequestParam String payPassword
+    ) throws BusinessException {
+        boolean b = verificationCodeService.validateVerCode(verCode,verId);
+        if(!b){
+            throw new BusinessException("验证码验证失败");
+        }
+        this.userService.resetPassword(loginName,password,password);
+        return ResponseResult.success();
+    }
+
     /**
      * 修改密码
      *

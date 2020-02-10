@@ -28,7 +28,6 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
-
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final UserMapper userMapper;
@@ -306,6 +305,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 throw new BusinessException("密码错误！");
             }
         }
+
+        user.setPassword(null);
+        user.setPayPassword(null);
         result.put("user", user);
         httpSession.setAttribute("user", user);
 
@@ -547,6 +549,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
            throw new BusinessException("支付密码校验错误");
         }
 
+    }
+
+    @Override
+    public void resetPassword(String loginName, String password, String payPassword) throws BusinessException {
+        EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
+        userEntityWrapper.eq("del_flag","0");
+        userEntityWrapper.eq("login_name",loginName);
+        List<User> users = this.selectList(userEntityWrapper);
+        if(users.size() == 0){
+            throw new BusinessException("未查询到响应用户");
+        }
+        User u = users.get(0);
+        User user = new User();
+        user.setId(u.getId());
+        user.setPassword(Md5Utils.hash(loginName,password));
+        user.setPayPassword(Md5Utils.hash(loginName,payPassword));
+        this.updateById(user);
     }
 
 }

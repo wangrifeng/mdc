@@ -136,4 +136,12 @@ public interface UserService extends IService<User> {
      * @param payPassword
      */
     void validatePayPassword(Integer userId, String payPassword) throws BusinessException;
+
+    /**
+     * 重置密码
+     * @param loginName
+     * @param password
+     * @param password1
+     */
+    void resetPassword(String loginName, String password, String password1) throws BusinessException;
 }
