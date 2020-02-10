@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/admin/users")
-@Api("用户管理")
+@Api(description = "用户管理")
 public class UserController extends BaseController {
 
     private final UserService userService;
