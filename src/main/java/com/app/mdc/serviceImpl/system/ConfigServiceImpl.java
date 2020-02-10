@@ -1,12 +1,20 @@
 package com.app.mdc.serviceImpl.system;
 
+import com.app.mdc.model.mdc.Wallet;
 import com.app.mdc.model.system.Config;
 import com.app.mdc.mapper.system.ConfigMapper;
 import com.app.mdc.service.system.ConfigService;
+import com.app.mdc.utils.viewbean.Page;
+import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.pagination.PageHelper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -30,5 +38,12 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         EntityWrapper<Config> entityWrapper = new EntityWrapper<>();
         entityWrapper.eq("config_key",key);
         return configMapper.selectList(entityWrapper).get(0);
+    }
+
+    @Override
+    public ResponseResult getConfig(Page page, Map<String, Object> params) {
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<Config> ConfigList = configMapper.selectByMap(params);
+        return ResponseResult.success().setData(new PageInfo<>(ConfigList));
     }
 }

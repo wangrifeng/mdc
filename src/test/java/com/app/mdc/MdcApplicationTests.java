@@ -1,29 +1,15 @@
 package com.app.mdc;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.app.mdc.controller.socket.MessageSocket;
 import com.app.mdc.model.system.User;
 import com.app.mdc.service.mdc.WalletService;
-import com.app.mdc.service.system.FileService;
-import com.app.mdc.service.system.RoleService;
 import com.app.mdc.utils.date.DateUtil;
-import com.app.mdc.utils.encryptdecrypt.DES;
 import com.app.mdc.utils.encryptdecrypt.MD5EncryptDecrypt;
 import com.app.mdc.utils.file.FileUtil;
-import com.app.mdc.utils.httpclient.HttpUtil;
-import com.app.mdc.utils.jvm.JvmUtils;
-import com.app.mdc.utils.viewbean.Page;
-import com.app.mdc.utils.viewbean.ResponseResult;
-import com.app.mdc.utils.wallet.MonitorTransfer;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.app.mdc.schedule.service.ScheduleService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ReflectionUtils;
 import org.web3j.abi.FunctionEncoder;
@@ -35,15 +21,12 @@ import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.*;
-import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.ClientTransactionManager;
 import org.web3j.tx.Contract;
-import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
@@ -60,8 +43,6 @@ import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -473,17 +454,7 @@ public class MdcApplicationTests {
 
 			System.out.println(transaction.getFrom());
 		});*/
-		ClientTransactionManager transactionManager = new ClientTransactionManager(web3j,
-				"0x5065d510249259532225db0e979368ee084e7c5f");
-		MonitorTransfer token = MonitorTransfer.load("0x53509548c0ce0be4bb88b85f4d2c37b2c5cd1546", web3j, transactionManager,
-				Contract.GAS_PRICE, Contract.GAS_LIMIT);
-		token.transferEventObservable(DefaultBlockParameterName.EARLIEST, DefaultBlockParameterName.LATEST)
-				.subscribe(tx -> {
-							String toAddress = tx._to.getValue();
-							String fromAddress = tx._from.getValue();
-							String txHash = tx._transactionHash.toString();
-							System.out.println("toAddress:"+toAddress+"--------txHash:"+txHash);
-						});
+		
 	}
 
 	@Test
