@@ -10,7 +10,7 @@ spring:
 mdc:
   blankList:
     - /admin/users/add
-
+    - /verificationCode/getVerificationCode
 ---
 
 server:
