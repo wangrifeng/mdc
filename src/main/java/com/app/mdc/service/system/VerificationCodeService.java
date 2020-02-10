@@ -14,6 +14,13 @@ public interface VerificationCodeService extends IService<VerificationCode> {
     Integer getVerificationCode(Integer userId) throws BusinessException;
 
     /**
+     * 短信推送
+     * @return
+     * @param email
+     */
+    Integer getVerificationCode(String email) throws BusinessException;
+
+    /**
      * 验证验证码是狗正确
      * @param verCode
      * @param verId

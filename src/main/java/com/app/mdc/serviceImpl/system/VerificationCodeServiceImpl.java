@@ -53,6 +53,23 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
     }
 
     @Override
+    public Integer getVerificationCode(String email) throws BusinessException {
+        //生成验证码入库
+        String randcode = RandomValidateCodeUtil.getRandcode();
+        VerificationCode verificationCode = new VerificationCode(randcode, "游客", new Date());
+        this.baseMapper.insert(verificationCode);
+
+        //推送验证码给用户邮箱
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailProperties.getUsername());
+        message.setTo(email); // 接收地址,可传入数组进行群发
+        message.setSubject("请妥善保管好您的验证码"); // 标题
+        message.setText("尊敬的用户您好,您的验证码为["+ randcode +"]"); // 内容
+        javaMailSender.send(message);
+        return verificationCode.getId();
+    }
+
+    @Override
     public boolean validateVerCode(String verCode, String verId) {
         VerificationCode verificationCode = this.baseMapper.selectById(verId);
         if(verificationCode == null){

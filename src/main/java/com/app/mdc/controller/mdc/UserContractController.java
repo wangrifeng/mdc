@@ -23,7 +23,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  */
 @RestController
 @RequestMapping("/userContract")
-@Api("用户合同")
+@Api(description = "用户合约模块")
 public class UserContractController {
 
     @Autowired
