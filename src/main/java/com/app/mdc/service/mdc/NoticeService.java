@@ -4,6 +4,8 @@ import com.app.mdc.model.mdc.FeedBack;
 import com.app.mdc.model.mdc.Notice;
 import com.baomidou.mybatisplus.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -19,4 +21,10 @@ public interface NoticeService extends IService<Notice> {
      * @return
      */
     Notice selectNewest();
+
+    /**
+     * 查询公告
+     * @return
+     */
+    List<Notice> list();
 }

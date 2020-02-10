@@ -12,6 +12,7 @@ mdc:
     - /admin/users/add
     - /verificationCode/getVerificationCode
     - /admin/users/resetPassword
+    - /notice/list
 ---
 
 server:

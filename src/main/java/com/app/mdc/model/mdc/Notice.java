@@ -11,9 +11,6 @@ import lombok.Data;
 @Data
 public class Notice {
 
-    @TableId(value = "id",type= IdType.AUTO)
-    private Integer id;
-
     /** 公告ID */
     @TableField("notice_id")
     private Long noticeId;

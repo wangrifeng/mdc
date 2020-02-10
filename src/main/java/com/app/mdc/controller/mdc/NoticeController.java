@@ -29,10 +29,10 @@ public class NoticeController {
 	@Autowired
 	private NoticeService noticeService;
 
-	@RequestMapping("/selectNewest")
-	@ApiOperation("查询最新公告")
-	public ResponseResult selectNewest(){
-		return ResponseResult.success().setData(this.noticeService.selectNewest());
+	@RequestMapping("/list")
+	@ApiOperation("查询公告")
+	public ResponseResult list(){
+		return ResponseResult.success().setData(this.noticeService.list());
 	}
 
 }
