@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.app.mdc.controller.socket.MessageSocket;
 import com.app.mdc.model.system.User;
+import com.app.mdc.service.mdc.WalletService;
 import com.app.mdc.service.system.FileService;
 import com.app.mdc.service.system.RoleService;
 import com.app.mdc.utils.date.DateUtil;
@@ -69,10 +70,12 @@ import java.util.concurrent.ExecutionException;
 public class MdcApplicationTests {
 
 
+	@Autowired
+	WalletService walletService;
 
     @Test
-	public void testFile(){
-
+	public void testFile() throws CipherException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    	walletService.createWallet(1,"123456");
 	}
 
 	@Test
