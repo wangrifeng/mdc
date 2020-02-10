@@ -152,7 +152,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             tbUser.setPassword(Md5Utils.hash(loginName, map.get("password").toString()));
             tbUser.setSendCode(random);
             tbUser.setUpUserId(sendUserId);
-            tbUser.setPayPassword((String)map.get("walletPassword"));
+            tbUser.setPayPassword(Md5Utils.hash(loginName, ((String)map.get("walletPassword"))));
             //获取所有人推荐人id
             String upUserIds = "";
             Object sendUpUserIdsObj = sendUser.get("upUserIds");

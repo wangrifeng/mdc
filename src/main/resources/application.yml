@@ -8,7 +8,7 @@ spring:
     password: jzyolkpytbmyjjja
 
 mdc:
-  blankList:q'q
+  blankList:
     - /admin/users/add
     - /verificationCode/getVerificationCode
 ---

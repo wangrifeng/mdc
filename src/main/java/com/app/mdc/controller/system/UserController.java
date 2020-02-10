@@ -6,6 +6,7 @@ import com.app.mdc.enums.ApiErrEnum;
 import com.app.mdc.exception.BusinessException;
 import com.app.mdc.model.system.User;
 import com.app.mdc.service.system.UserService;
+import com.app.mdc.service.system.VerificationCodeService;
 import com.app.mdc.utils.viewbean.Page;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import com.github.pagehelper.PageHelper;
@@ -32,6 +33,9 @@ import java.util.Map;
 public class UserController extends BaseController {
 
     private final UserService userService;
+
+    @Autowired
+    private VerificationCodeService verificationCodeService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -75,7 +79,14 @@ public class UserController extends BaseController {
     @SystemLogAnno(module = "用户管理", operation = "新增用户")
     @ResponseBody
     @ApiOperation("新增用户")
-    public ResponseResult add(@RequestParam Map<String, Object> map) {
+    public ResponseResult add(@RequestParam Map<String, Object> map) throws BusinessException {
+        if(!map.containsKey("verCode") || !map.containsKey("verId")){
+            throw new BusinessException("验证码验证失败");
+        }
+        boolean b = verificationCodeService.validateVerCode(map.get("verCode").toString(), map.get("verId").toString());
+        if(!b){
+            throw new BusinessException("验证码验证失败");
+        }
         return userService.add(map);
     }
 
