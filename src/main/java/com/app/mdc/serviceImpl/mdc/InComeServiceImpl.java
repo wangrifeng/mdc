@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,5 +30,10 @@ public class InComeServiceImpl extends ServiceImpl<InComeMapper, InCome> impleme
     @Override
     public BigDecimal getTotalSum(Integer userId, Date selDate, double burnValue) {
         return this.baseMapper.getTotalSum(userId,selDate,burnValue);
+    }
+
+    @Override
+    public List<InCome> list(Integer userId) {
+        return this.baseMapper.list(userId);
     }
 }

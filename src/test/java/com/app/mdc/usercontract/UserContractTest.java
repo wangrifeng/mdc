@@ -15,47 +15,68 @@ public class UserContractTest {
 
     @Test
     public void add() {
-        for (int i = 266; i <= 275; i++) {
             Map<String, String> param = new HashMap<>();
-            param.put("userId", String.valueOf(i));
+            param.put("userId", "1");
             param.put("contractId", "3");
             param.put("number", "1");
             param.put("payPassword", "123456");
-            param.put("verCode", "pRhboz");
-            param.put("verId", "9");
-            String s = HttpUtil.doPost(HOST + "/userContract/add", param, "0121188e-f37b-4789-b7ae-95fb93633862");
+            param.put("verCode","8ILD8s");
+            param.put("verId","10");
+            String s = HttpUtil.doPost(HOST + "/userContract/add", param, "fb900165-9342-4772-bc45-2b29b84584c7");
             System.out.println(s);
-        }
     }
 
 
     @Test
     public void getUpgradePriceDifference() {
         Map<String, String> param = new HashMap<>();
-        param.put("ucId", "47");
+        param.put("ucId", "50");
         param.put("upgradeId", "4");
-        String s = HttpUtil.doPost(HOST + "/userContract/getUpgradePriceDifference", param, "0121188e-f37b-4789-b7ae-95fb93633862");
+        String s = HttpUtil.doPost(HOST + "/userContract/getUpgradePriceDifference", param, "fb900165-9342-4772-bc45-2b29b84584c7");
         System.out.println(s);
     }
 
     @Test
     public void upgrade() {
         Map<String, String> param = new HashMap<>();
-        param.put("userId", "155");
-        param.put("ucId", "47");
+        param.put("userId", "180");
+        param.put("ucId", "50");
         param.put("upgradeId", "4");
-        param.put("payToken", "123");
-        String s = HttpUtil.doPost(HOST + "/userContract/upgrade", param, "0121188e-f37b-4789-b7ae-95fb93633862");
+        param.put("verCode","8ILD8s");
+        param.put("verId","10");
+        param.put("payPassword","123456");
+        String s = HttpUtil.doPost(HOST + "/userContract/upgrade", param, "fb900165-9342-4772-bc45-2b29b84584c7");
         System.out.println(s);
     }
 
     @Test
     public void rescind() {
         Map<String, String> param = new HashMap<>();
-        param.put("userId", "155");
-        param.put("ucId", "47");
-        String s = HttpUtil.doPost(HOST + "/userContract/rescind", param, "0121188e-f37b-4789-b7ae-95fb93633862");
+        param.put("userId", "180");
+        param.put("ucId", "50");
+        param.put("verCode","8ILD8s");
+        param.put("verId","10");
+        param.put("payPassword","123456");
+        String s = HttpUtil.doPost(HOST + "/userContract/rescind", param, "fb900165-9342-4772-bc45-2b29b84584c7");
         System.out.println(s);
     }
+
+
+    @Test
+    public void list() {
+        Map<String, String> param = new HashMap<>();
+        String s = HttpUtil.doPost(HOST + "/contract/list", param, "fb900165-9342-4772-bc45-2b29b84584c7");
+        System.out.println(s);
+    }
+
+    @Test
+    public void feedback() {
+        Map<String, String> param = new HashMap<>();
+        param.put("userId", "180");
+        param.put("message", "180");
+        String s = HttpUtil.doPost(HOST + "/feedback/add", param, "fb900165-9342-4772-bc45-2b29b84584c7");
+        System.out.println(s);
+    }
+
 
 }

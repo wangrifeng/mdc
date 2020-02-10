@@ -65,6 +65,9 @@ public class InCome {
     @TableField("manage_salary")
     private BigDecimal manageSalary;
 
+    @TableField("same_level_salary")
+    private BigDecimal sameLevelSalary;
+
     public InCome() {
     }
 
