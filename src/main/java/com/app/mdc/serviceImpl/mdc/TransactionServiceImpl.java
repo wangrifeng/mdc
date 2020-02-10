@@ -268,6 +268,24 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             if(balance.doubleValue() < actualConvert.doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR206);
             }else{
+                Transaction transaction = new Transaction();
+                transaction.setFeeAmount(new BigDecimal(config.getConfigValue()));
+                transaction.setCreateTime(new Date());
+                transaction.setFromAmount(convert);
+                transaction.setFromUserId(Integer.parseInt(userId));
+                transaction.setFromWalletAddress(wallet.getAddress());
+                //0-usdt
+                transaction.setFromWalletType("1");
+                transaction.setToAmount(convert.multiply(mdcConvert));
+                transaction.setToWalletAddress(wallet.getAddress());
+                transaction.setToUserId(Integer.parseInt(userId));
+                //0-usdt
+                transaction.setToWalletType("0");
+                //0-交易进行中
+                transaction.setTransactionStatus("1");
+                //1-提现
+                transaction.setTransactionType("7");
+                transactionMapper.insert(transaction);
                 BigDecimal usdtBalance = wallet.getUstdBlance();
                 wallet.setUstdBlance(usdtBalance.add(convert.multiply(mdcConvert)));
                 wallet.setMdcBlance(balance.subtract(actualConvert));

@@ -22,7 +22,7 @@ import java.util.Map;
  * @since 2019-06-12
  */
 @Controller
-@RequestMapping("/mdc/transaction")
+@RequestMapping("/mdc/wallet")
 public class WalletController {
 
 	private final WalletService walletService;

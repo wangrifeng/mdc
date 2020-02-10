@@ -84,11 +84,11 @@ public class WalletServiceImpl extends ServiceImpl<WalletMapper, Wallet> impleme
 
     @Override
     public ResponseResult getBalance(Page page, Map<String,Object> params) {
-        User u = userMapper.selectById(params.get("user_id").toString());
+        /*User u = userMapper.selectById(params.get("user_id").toString());
         //验证支付密码
         if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), params.get("pay_password").toString()).equals(u.getPayPassword())) {
             return ResponseResult.fail(ApiErrEnum.ERR202);
-        }
+        }*/
         PageHelper.startPage(page.getPageNum(),page.getPageSize());
         List<Wallet> walletList = walletMapper.selectByMap(params);
         return ResponseResult.success().setData(new PageInfo<>(walletList));

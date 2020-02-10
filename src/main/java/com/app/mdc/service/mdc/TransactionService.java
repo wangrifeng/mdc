@@ -45,12 +45,12 @@ public interface TransactionService extends IService<Transaction> {
     /**
      * 提现
      * @param userId 用户id
-     * @param walletId 钱包id
+     * @param payPassword 支付密码
      * @param toAddress 提现地址
      * @param cashOutMoney 提现金额
      * @return ResponseResult
      */
-    ResponseResult cashOutUSDT(String userId,String walletId,String toAddress,String cashOutMoney) throws InterruptedException;
+    ResponseResult cashOutUSDT(String userId,String payPassword,String toAddress,String cashOutMoney) throws InterruptedException;
 
     /**
      * mdc闪兑
