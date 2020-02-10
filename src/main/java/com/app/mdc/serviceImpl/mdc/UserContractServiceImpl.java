@@ -8,8 +8,8 @@ import com.app.mdc.model.system.User;
 import com.app.mdc.service.mdc.ContractService;
 import com.app.mdc.service.mdc.TransactionService;
 import com.app.mdc.service.mdc.UserContractService;
+import com.app.mdc.service.system.ConfigService;
 import com.app.mdc.service.system.UserService;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 用户合约servcieImpl
@@ -33,6 +32,9 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private ConfigService configService;
 
     @Override
     public Contract selectContractByUserId(Integer userId, Integer type) {
@@ -178,8 +180,10 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
         if (contract.getType() == 2) {
             throw new BusinessException("只有签约卡才可以解约");
         }
+        //查询解约金额比率
+        String rescindRate = configService.getByKey("recind_rate").getConfigValue();
         //计算违约金
-        BigDecimal rescindMoney = contract.getAmount().multiply(new BigDecimal("0.05"));
+        BigDecimal rescindMoney = contract.getAmount().multiply(new BigDecimal(rescindRate));
         //更新用户余额
 //        User user = userService.selectById(userId);
 //        User u = new User();
