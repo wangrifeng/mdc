@@ -14,15 +14,19 @@ public class LoginTest {
 
     @Test
     public void register(){
-        Map<String,String> param  = new HashMap<>();
-        param.put("loginName","31-aa");
-        param.put("userName","31-aa");
-        param.put("roleId","10");
-        param.put("password","123456");
-        param.put("email","mdc@qq.com");
-        param.put("sendCode","1111");
-        String s = HttpUtil.doPost(HOST + "/admin/users/add", param,null);
-        System.out.println(s);
+        String prefix = "J";
+        for(int i=1;i<=10;i++){
+            Map<String,String> param  = new HashMap<>();
+            param.put("loginName",prefix+i);
+            param.put("userName",prefix+i);
+            param.put("roleId","10");
+            param.put("password","123456");
+            param.put("email","mdc@qq.com");
+            param.put("sendCode","432769");
+            param.put("walletPassword","123456");
+            String s = HttpUtil.doPost(HOST + "/admin/users/add", param,null);
+            System.out.println(s);
+        }
     }
 
     @Test
@@ -58,8 +62,8 @@ public class LoginTest {
     @Test
     public void getVerificationCode(){
         Map<String,String> param  = new HashMap<>();
-        param.put("userId","105");
-        String s = HttpUtil.doPost(HOST + "/verificationCode/getVerificationCode", param,"2cb5cc2a-05ea-4849-b9aa-13f49dc41c4d");
+        param.put("email","1424547204@qq.com");
+        String s = HttpUtil.doPost(HOST + "/verificationCode/getVerificationCode", param,null);
         System.out.println(s);
     }
 

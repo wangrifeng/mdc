@@ -26,9 +26,10 @@ public class VerificationCodeController {
 
     @RequestMapping("/getVerificationCode")
     @ApiOperation("/获取验证码")
-    public ResponseResult getVerificationCode(Integer userId) throws BusinessException {
+    public ResponseResult getVerificationCode(String email) throws BusinessException {
         Map<String,Object> result = new HashMap<>();
-        result.put("verId",verificationCodeService.getVerificationCode(userId));
+        result.put("verId",verificationCodeService.getVerificationCode(email));
         return ResponseResult.success().setData(result);
     }
+
 }

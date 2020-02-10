@@ -3,12 +3,12 @@ spring:
     active: dev
     include: base
   mail:
-    host: smtp.126.com
-    username: mdc_suppot@126.com
-    password: mdc202002
+    host: smtp.qq.com
+    username: 1424547204@qq.com
+    password: jzyolkpytbmyjjja
 
 mdc:
-  blankList:
+  blankList:q'q
     - /admin/users/add
     - /verificationCode/getVerificationCode
 ---
