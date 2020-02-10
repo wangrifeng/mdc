@@ -7,6 +7,7 @@ import com.app.mdc.mapper.system.RoleMapper;
 import com.app.mdc.mapper.system.RoleUserMapper;
 import com.app.mdc.mapper.system.UserMapper;
 import com.app.mdc.mapper.system.UserTokenMapper;
+import com.app.mdc.model.mdc.Wallet;
 import com.app.mdc.model.system.*;
 import com.app.mdc.service.mdc.UserContractService;
 import com.app.mdc.service.mdc.WalletService;
@@ -404,6 +405,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             user.setPassword(Md5Utils.hash(u.getLoginName(), newPassword));
         } else {
             user.setPayPassword(Md5Utils.hash(u.getLoginName(), newPassword));
+            EntityWrapper<Wallet> wrapper = new EntityWrapper<>();
+            wrapper.eq("user_id",user.getId());
+            Wallet wallet = new Wallet();
+            wallet.setPassword(newPassword);
+            walletMapper.update(wallet,wrapper);
         }
         user.setUpdateTime(new Date());
         return userMapper.updateById(user);
