@@ -52,10 +52,11 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
         Integer type = contract.getType();
         //查询用户是否已拥有对应的合约
         UserContract userContract = this.getUserContractByTypeAndUserId(userId, type);
+        Integer advanceCardMaxNumber = Integer.parseInt(configService.getByKey("advance_card_max_number").getConfigValue());
         if (type == 1 && userContract != null) {
             throw new BusinessException("该用户已存在对应类型的合约,请前往升级操作");
-        } else if (type == 2 && userContract != null && userContract.getNumber() + number >= 30) {
-            throw new BusinessException("进阶卡最多只能购买30张,您已购买" + userContract.getNumber() + "张");
+        } else if (type == 2 && userContract != null && userContract.getNumber() + number >= advanceCardMaxNumber) {
+            throw new BusinessException("进阶卡最多只能购买"+ advanceCardMaxNumber +"张,您已购买" + userContract.getNumber() + "张");
         }
 
         User user = userService.selectById(userId);
