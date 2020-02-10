@@ -50,7 +50,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletMapper, Wallet> impleme
     @Value("${web3j.client-address}")
     private String web3jAddress;
 
-    private static String walletStoreDir = "/usr/wallet";
+    private static String walletStoreDir = "C:\\Users\\14245\\Desktop\\mysql";
     @Autowired
     public WalletServiceImpl(WalletMapper walletMapper,UserMapper userMapper){
         this.walletMapper = walletMapper;

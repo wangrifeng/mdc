@@ -3,6 +3,7 @@ package com.app.mdc.service.mdc;
 import com.app.mdc.model.mdc.Contract;
 import com.baomidou.mybatisplus.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,4 +16,10 @@ public interface ContractService extends IService<Contract> {
      * @return
      */
     Map<Integer, Contract> selectAllContract();
+
+    /**
+     * 查询合约列表
+     * @return
+     */
+    List<Contract> list();
 }
