@@ -7,6 +7,7 @@ import com.app.mdc.mapper.system.RoleMapper;
 import com.app.mdc.mapper.system.RoleUserMapper;
 import com.app.mdc.mapper.system.UserMapper;
 import com.app.mdc.mapper.system.UserTokenMapper;
+import com.app.mdc.model.mdc.UserContract;
 import com.app.mdc.model.mdc.Wallet;
 import com.app.mdc.model.system.*;
 import com.app.mdc.service.mdc.UserContractService;
@@ -111,6 +112,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //       objectMap.put("roleName", roleName.toString());
 //       objectMap.put("roleCode", roleCode.toString());
 
+        //查询用户合约信息
+        EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
+        userContractEntityWrapper.eq("del_flag","0");
+        userContractEntityWrapper.eq("user_id",id);
+        List<UserContract> userContracts = userContractService.selectList(userContractEntityWrapper);
+        objectMap.put("userContractList",userContracts);
         return ResponseResult.success().add(objectMap);
     }
 
