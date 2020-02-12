@@ -16,12 +16,12 @@ public class UserContractTest {
     @Test
     public void add() {
             Map<String, String> param = new HashMap<>();
-            param.put("userId", "1");
+            param.put("userId", "278");
             param.put("contractId", "3");
             param.put("number", "1");
             param.put("payPassword", "123456");
-            param.put("verCode","8ILD8s");
-            param.put("verId","10");
+            param.put("verCode","835062");
+            param.put("verId","47");
             String s = HttpUtil.doPost(HOST + "/userContract/add", param, "fb900165-9342-4772-bc45-2b29b84584c7");
             System.out.println(s);
     }

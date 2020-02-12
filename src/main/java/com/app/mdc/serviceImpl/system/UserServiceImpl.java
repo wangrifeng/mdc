@@ -20,6 +20,7 @@ import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -74,32 +75,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public ResponseResult getOne(String id) {
         //根据用户id获取角色的list，并拼接成ids
-        Map<String, Object> map = new HashMap<>();
-        map.put("user_id", id);
-        List<RoleUser> list = roleUserMapper.selectByMap(map);
-        StringBuilder roleId = new StringBuilder();
-        StringBuilder roleName = new StringBuilder();
-        StringBuilder roleCode = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            String roleid = list.get(i).getRoleId();
-            Role role = roleMapper.selectById(roleid);
-            if (i + 1 == list.size()) {
-                roleId.append(roleid);
-                roleName.append(role.getName());
-                roleCode.append(role.getCode());
-            } else {
-                roleId.append(roleid).append(",");
-                roleName.append(role.getName()).append(",");
-                roleCode.append(role.getCode()).append(",");
-            }
-        }
+        Map<String, Object> objectMap = new HashMap<>();
+//        map.put("user_id", id);
+//        List<RoleUser> list = roleUserMapper.selectByMap(map);
+//        StringBuilder roleId = new StringBuilder();
+//        StringBuilder roleName = new StringBuilder();
+//        StringBuilder roleCode = new StringBuilder();
+//        for (int i = 0; i < list.size(); i++) {
+//            String roleid = list.get(i).getRoleId();
+//            Role role = roleMapper.selectById(roleid);
+//            if (i + 1 == list.size()) {
+//                roleId.append(roleid);
+//                roleName.append(role.getName());
+//                roleCode.append(role.getCode());
+//            } else {
+//                roleId.append(roleid).append(",");
+//                roleName.append(role.getName()).append(",");
+//                roleCode.append(role.getCode()).append(",");
+//            }
+//        }
 
         //取user信息和roleids拼接一下返回给前端
         User user = userMapper.selectById(id);
-        Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("id", user.getId());
-        objectMap.put("status", user.getStatus());
-        objectMap.put("username", user.getUserName());
+        BeanUtils.copyProperties(user,objectMap);
 //       objectMap.put("name", user.getName());
 //       objectMap.put("telephone", user.getTelephone());
 //       objectMap.put("position", user.getPosition());
