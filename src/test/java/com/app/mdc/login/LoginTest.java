@@ -76,12 +76,12 @@ public class LoginTest {
     public void updatePwd() {
         Map<String, String> param = new HashMap<>();
         param.put("type", "0");
-        param.put("id", "277");
-        param.put("oldPassword", "123456");
+        param.put("id", "278");
+        param.put("loginName", "1424547204@qq.com");
         param.put("newPassword", "223456");
-        param.put("verId", "7");
-        param.put("verCode", "IPGICp");
-        String s = HttpUtil.doPost(HOST + "/admin/users/updatePwd", param, "fb900165-9342-4772-bc45-2b29b84584c7");
+        param.put("verId", "48");
+        param.put("verCode", "793879");
+        String s = HttpUtil.doPost(HOST + "/admin/users/updatePwd", param, "7d0d120f-c6aa-49b3-9b0b-30b15e13d749");
         System.out.println(s);
     }
 
