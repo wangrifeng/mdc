@@ -14,7 +14,7 @@ public class LoginTest {
 
     @Test
     public void register(){
-        String prefix = "K";
+        String prefix = "test";
 //        for(int i=1;i<=10;i++){
             Map<String,String> param  = new HashMap<>();
             param.put("loginName",prefix);
@@ -22,7 +22,7 @@ public class LoginTest {
             param.put("roleId","10");
             param.put("password","123456");
             param.put("email","mdc@qq.com");
-            param.put("sendCode","8888");
+            param.put("sendCode","888888");
             param.put("walletPassword","123456");
             param.put("verCode","8ILD8s");
             param.put("verId","10");
@@ -77,7 +77,8 @@ public class LoginTest {
     @Test
     public void getVerificationCode(){
         Map<String,String> param  = new HashMap<>();
-        param.put("email","1424547204@qq.com");
+        param.put("type","1");
+        param.put("phone","17696761809");
         String s = HttpUtil.doPost(HOST + "/verificationCode/getVerificationCode", param,null);
         System.out.println(s);
     }
