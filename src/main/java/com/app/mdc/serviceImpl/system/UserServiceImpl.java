@@ -118,6 +118,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional(rollbackFor = Exception.class)
     public ResponseResult add(Map<String, Object> map) {
         //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
+        Integer registerType = Integer.parseInt(map.get("registerType").toString());
         String loginName = map.get("loginName").toString();
         Integer count = userMapper.user(loginName);
         Integer isRepeat = userMapper.isRepeat(map.get("userName").toString());
@@ -148,7 +149,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             tbUser.setDelFlag(0);
             tbUser.setCreateTime(new Date());
             tbUser.setUpdateTime(new Date());
-            tbUser.setEmail(map.get("email").toString());
+            tbUser.setRegisterType(registerType);
+            if(registerType == 0){
+                tbUser.setEmail(loginName);
+            }else{
+                tbUser.setPhoneNumber(loginName);
+            }
             tbUser.setPassword(Md5Utils.hash(loginName, map.get("password").toString()));
             tbUser.setSendCode(random);
             tbUser.setUpUserId(sendUserId);

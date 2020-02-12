@@ -116,6 +116,9 @@ public class User {
 	@TableField("member_size")
 	private Integer memberSize;
 
+	@TableField("register_type")
+	private Integer registerType;
+
 	public void fromMap(Map<String, Object> map) {
 		if (map.get("id") != null) {
 			this.id = (String) map.get("id");
