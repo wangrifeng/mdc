@@ -63,7 +63,7 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailProperties.getUsername());
         message.setTo(email); // 接收地址,可传入数组进行群发
-        message.setSubject("请妥善保管好您的验证码"); // 标题
+        message.setSubject("MDC验证码"); // 标题
         String content = "尊敬的用户您的验证码是"+ randcode +"请不要把验证码泄漏给其他人,如非本人请勿操作";
         message.setText(content); // 内容
         javaMailSender.send(message);
