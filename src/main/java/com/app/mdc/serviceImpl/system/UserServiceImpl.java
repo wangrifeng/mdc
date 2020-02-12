@@ -97,7 +97,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         //取user信息和roleids拼接一下返回给前端
         User user = userMapper.selectById(id);
-        BeanUtils.copyProperties(user,objectMap);
+        user.setPayPassword(null);
+        user.setPassword(null);
+        objectMap.put("user",user);
 //       objectMap.put("name", user.getName());
 //       objectMap.put("telephone", user.getTelephone());
 //       objectMap.put("position", user.getPosition());
