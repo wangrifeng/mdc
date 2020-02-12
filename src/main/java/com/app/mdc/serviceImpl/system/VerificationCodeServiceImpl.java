@@ -16,6 +16,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +79,13 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
 
         //推送验证码
         String content = "尊敬的用户您的验证码是"+ randcode +"请不要把验证码泄漏给其他人,如非本人请勿操作";
-        String url = "https://mb345.com/ws/BatchSend2.aspx?CorpID=XALKJ0006852&Pwd=zh9527@&Mobile="+ phone +"&Content=" + content + "&SendTime=";
+        String url = null;
+        try {
+            url = "https://mb345.com/ws/BatchSend2.aspx?CorpID=XALKJ0006852&Pwd=zh9527@&Mobile="+ phone +"&Content="
+                    + URLEncoder.encode(content,"gb2312") + "&SendTime=";
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         try{
             Map<String,Object> map = new HashMap<>();
             HttpUtil.doGet(url,map);
