@@ -95,6 +95,14 @@ public class LoginTest {
     }
 
     @Test
+    public void getVerificationCodeByUserId() {
+        Map<String, String> param = new HashMap<>();
+        param.put("userId", "278");
+        String s = HttpUtil.doPost(HOST + "/verificationCode/getVerificationCodeByUserId", param, "7d0d120f-c6aa-49b3-9b0b-30b15e13d749");
+        System.out.println(s);
+    }
+
+    @Test
     public void updateGestureSwitch() {
         Map<String, String> param = new HashMap<>();
         param.put("userId", "105");
