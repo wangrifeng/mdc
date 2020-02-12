@@ -389,7 +389,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Integer updatePwd(Integer type, String id, String newPassword, String oldPassword, String verCode, String verId) throws BusinessException {
+    public Integer updatePwd(Integer type, String id, String newPassword, String loginName, String verCode, String verId) throws BusinessException {
         //验证验证码是否正确
         boolean isVerCodeValidated = verificationCodeService.validateVerCode(verCode, verId);
         if (!isVerCodeValidated) {
@@ -402,15 +402,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("用户不存在");
         }
 
-        //判断旧密码是否正确
-        if (type == 0) {
-            if (!Md5Utils.hash(u.getLoginName(), oldPassword).equals(u.getPassword())) {
-                throw new BusinessException("旧登录密码验证错误");
-            }
-        } else {
-            if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), oldPassword).equals(u.getPayPassword())) {
-                throw new BusinessException("旧支付密码验证错误");
-            }
+        EntityWrapper<User> objectEntityWrapper = new EntityWrapper<>();
+        objectEntityWrapper.eq("login_name",loginName);
+        List<User> users = this.baseMapper.selectList(objectEntityWrapper);
+        if(users.size() == 0|| !users.get(0).getId().equals(id)){
+            throw new BusinessException("请输入当前用户注册时的邮箱或者手机号");
         }
 
         //修改新密码
