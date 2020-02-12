@@ -1,5 +1,6 @@
 package com.app.mdc.schedule.service;
 
+import com.alibaba.fastjson.JSON;
 import com.app.mdc.enums.InfuraInfo;
 import com.app.mdc.mapper.mdc.TransactionMapper;
 import com.app.mdc.mapper.mdc.WalletMapper;
@@ -49,10 +50,10 @@ public class ScheduleTask {
     @Autowired
     private ConfigService configService;
     @Scheduled(cron = "0 */15 * * * ?")
-    private void invest() throws ExecutionException, InterruptedException {
+    public void invest() throws ExecutionException, InterruptedException {
 
-        Config contract = configService.getByKey("USDT_CONTRACT_ADDRESS");
-        String contractAddress = contract.getConfigValue();
+
+        String contractAddress = InfuraInfo.INFURA_ADDRESS.getDesc();
         List<Wallet> wallets = walletMapper.selectByMap(new HashMap<>());
         Config config = configService.getByKey("INFURA_ADDRESS");
         Config walletAddress = configService.getByKey("WALLET_ADDRESS");
@@ -111,8 +112,8 @@ public class ScheduleTask {
         BigDecimal balanceValue;
         ethCall = web3j.ethCall(transactions, DefaultBlockParameterName.LATEST).send();
         List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
-        System.out.println(results);
-        balanceValue = (BigDecimal) results.get(0).getValue();
+        System.out.println(JSON.toJSON(results));
+        balanceValue = new BigDecimal((BigInteger) results.get(0).getValue()).divide(new BigDecimal("1000000"));
         System.out.println(balanceValue);
         return balanceValue;
     }

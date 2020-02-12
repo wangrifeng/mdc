@@ -50,7 +50,7 @@ public class WalletServiceImpl extends ServiceImpl<WalletMapper, Wallet> impleme
     @Value("${web3j.client-address}")
     private String web3jAddress;
 
-    private static String walletStoreDir = "/usr/wallet";
+    private static String walletStoreDir = "/data/mdc/userWallet";
     @Autowired
     public WalletServiceImpl(WalletMapper walletMapper,UserMapper userMapper){
         this.walletMapper = walletMapper;
@@ -61,6 +61,11 @@ public class WalletServiceImpl extends ServiceImpl<WalletMapper, Wallet> impleme
     @Override
     public ResponseResult createWallet(int userId,String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException {
         System.out.println("开始创建钱包，默认地址为"+walletStoreDir);
+        File file = new File(walletStoreDir);
+        System.out.println(file.exists());
+        if(!file.exists()){
+            file.mkdirs();
+        }
         String name = WalletUtils.generateNewWalletFile(password, new File(walletStoreDir), true);
         System.out.println("创建成功，钱包名为："+name);
         String walletFilePath =walletStoreDir+"/"+name;
@@ -89,6 +94,8 @@ public class WalletServiceImpl extends ServiceImpl<WalletMapper, Wallet> impleme
         if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), params.get("pay_password").toString()).equals(u.getPayPassword())) {
             return ResponseResult.fail(ApiErrEnum.ERR202);
         }*/
+        params.remove("pageNum");
+        params.remove("pageSize");
         PageHelper.startPage(page.getPageNum(),page.getPageSize());
         List<Wallet> walletList = walletMapper.selectByMap(params);
         return ResponseResult.success().setData(new PageInfo<>(walletList));

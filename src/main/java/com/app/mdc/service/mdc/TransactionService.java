@@ -76,4 +76,6 @@ public interface TransactionService extends IService<Transaction> {
      */
     ResponseResult buyAdvance(String userId,String money);
 
+    ResponseResult handleInvest() throws ExecutionException, InterruptedException;
+
 }

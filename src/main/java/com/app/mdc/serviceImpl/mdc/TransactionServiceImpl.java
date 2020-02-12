@@ -1,5 +1,6 @@
 package com.app.mdc.serviceImpl.mdc;
 
+import com.alibaba.fastjson.JSON;
 import com.app.mdc.enums.ApiErrEnum;
 import com.app.mdc.enums.InfuraInfo;
 import com.app.mdc.exception.BusinessException;
@@ -10,6 +11,7 @@ import com.app.mdc.mapper.mdc.TransactionMapper;
 import com.app.mdc.model.mdc.Wallet;
 import com.app.mdc.model.system.Config;
 import com.app.mdc.model.system.User;
+import com.app.mdc.schedule.service.ScheduleTask;
 import com.app.mdc.service.mdc.TransactionService;
 import com.app.mdc.service.system.ConfigService;
 import com.app.mdc.utils.Md5Utils;
@@ -22,6 +24,7 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +93,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         if("0".equals(walletType)){
             Config config = configService.getByKey("USDT_TRANS_FEE");
             String value = config.getConfigValue();
-            fee = trans.multiply(new BigDecimal(value));
+            fee = new BigDecimal(value);
             if((trans.add(fee)).doubleValue() > fromWallet.getUstdBlance().doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR205);
             }
@@ -101,7 +104,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         }else if("1".equals(walletType)){
             Config config = configService.getByKey("MDC_TRANS_FEE");
             String value = config.getConfigValue();
-            fee = trans.multiply(new BigDecimal(value));
+            fee = new BigDecimal(value);
             if((trans.add(fee)).doubleValue() > fromWallet.getUstdBlance().doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR206);
             }
@@ -138,6 +141,8 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
     @Override
     public ResponseResult getETHBlance(Page page, Map<String,Object> params) {
+        params.remove("pageNum");
+        params.remove("pageSize");
         PageHelper.startPage(page.getPageNum(),page.getPageSize());
         List<Transaction> transactionList = transactionMapper.selectByMap(params);
         return ResponseResult.success().setData(new PageInfo<>(transactionList));
@@ -164,13 +169,13 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Config config = configService.getByKey("USDT_CONTRACT_ADDRESS");
-        BigDecimal balance = getBalance(toAddress,config.getConfigValue());
+        String usdtCOntractAddress = InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc();
+        BigDecimal balance = getBalance(toAddress,usdtCOntractAddress);
         if(balance != null && balance.doubleValue()>= new Double(investMoney)){
             transaction.setTransactionStatus("1");
             transactionMapper.updateById(transaction);
         }else{
-            confirm(new Date(),toAddress,config.getConfigValue(),investMoney,userId,transaction.getTransactionId().toString());
+            confirm(new Date(),toAddress,usdtCOntractAddress,investMoney,userId,transaction.getTransactionId().toString());
         }
         return ResponseResult.success();
     }
@@ -235,13 +240,13 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Config usdtContractAddress = configService.getByKey("USDT_CONTRACT_ADDRESS");
-        BigDecimal b = getBalance(toAddress,usdtContractAddress.getConfigValue());
+        String usdtContractAddress = InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc();
+        BigDecimal b = getBalance(toAddress,usdtContractAddress);
         if(b != null && b.doubleValue()>= toBalance.doubleValue()){
             transaction.setTransactionStatus("1");
             transactionMapper.updateById(transaction);
         }else{
-            confirm(new Date(),toAddress,usdtContractAddress.getConfigValue(),cashOutMoney,userId,transaction.getTransactionId().toString());
+            confirm(new Date(),toAddress,usdtContractAddress,cashOutMoney,userId,transaction.getTransactionId().toString());
         }
         return ResponseResult.success();
     }
@@ -264,12 +269,12 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             BigDecimal mdcConvert = new BigDecimal(config.getConfigValue());
             BigDecimal convertFee = new BigDecimal(fee.getConfigValue());
             BigDecimal balance = wallet.getMdcBlance();
-            BigDecimal actualConvert = convert.multiply(convertFee).add(convert);
+            BigDecimal actualConvert = convert.add(convertFee);
             if(balance.doubleValue() < actualConvert.doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR206);
             }else{
                 Transaction transaction = new Transaction();
-                transaction.setFeeAmount(new BigDecimal(config.getConfigValue()));
+                transaction.setFeeAmount(convertFee);
                 transaction.setCreateTime(new Date());
                 transaction.setFromAmount(convert);
                 transaction.setFromUserId(Integer.parseInt(userId));
@@ -355,6 +360,49 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
+    @Override
+    public ResponseResult handleInvest() throws ExecutionException, InterruptedException {
+        String contractAddress = InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc();
+        List<Wallet> wallets = walletMapper.selectByMap(new HashMap<>());
+        Config config = configService.getByKey("INFURA_ADDRESS");
+        Config walletAddress = configService.getByKey("WALLET_ADDRESS");
+        /*Web3j web3j = Web3j.build(new HttpService(config.getConfigValue()));
+        Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
+        String clientVersion = web3ClientVersion.getWeb3ClientVersion();
+        System.out.println("version=" + clientVersion);*/
+        for(Wallet wallet : wallets){
+            try {
+                BigDecimal balance = getBalance(wallet.getAddress(),contractAddress);
+                if(balance.doubleValue()> (double) 0){
+                    //充值
+                    String flag = transfer(wallet.getUserId().toString(),wallet.getPassword(),balance.stripTrailingZeros().toPlainString(),wallet.getWalletPath(),wallet.getAddress(),walletAddress.getConfigValue(),"0");
+                    if(flag != null){
+                        Transaction transaction = new Transaction();
+                        transaction.setCreateTime(new Date());
+                        transaction.setToAmount(balance);
+                        transaction.setToUserId(wallet.getUserId());
+                        transaction.setToWalletAddress(wallet.getAddress());
+                        //0-usdt
+                        transaction.setToWalletType("0");
+                        //0-待交易
+                        transaction.setTransactionStatus("1");
+                        //0-充值
+                        transaction.setTransactionType("0");
+                        transactionMapper.insert(transaction);
+                        BigDecimal oldBalance = wallet.getUstdBlance();
+                        wallet.setUstdBlance(oldBalance.add(balance));
+                        walletMapper.updateById(wallet);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+
+        }
+        return ResponseResult.success();
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public String transfer(String userId,String payPassword,String transferNumber,String fromPath,String fromAddress,String toAddress,String walletType) throws IOException, CipherException, ExecutionException, InterruptedException, BusinessException {
         User u = userMapper.selectById(userId);
@@ -385,12 +433,11 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         String contractAddress = "";
         if("0".equals(walletType)){
             eth = new BigDecimal(InfuraInfo.USDT_ETH.getDesc());
-            Config usdtContractAddress = configService.getByKey("USDT_CONTRACT_ADDRESS");
-            contractAddress = usdtContractAddress.getConfigValue();
+
+            contractAddress = InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc();
         }else if("1".equals(walletType)){
             eth = new BigDecimal(InfuraInfo.MDC_ETH.getDesc());
-            Config mdcContractAddress = configService.getByKey("MDC_CONTRACT_ADDRESS");
-            contractAddress = mdcContractAddress.getConfigValue();
+            contractAddress = InfuraInfo.MDC_CONTRACT_ADDRESS.getDesc();
         }else{
             throw new BusinessException("交易失败");
         }
@@ -442,8 +489,8 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         try {
             ethCall = web3j.ethCall(transactions, DefaultBlockParameterName.LATEST).send();
             List<Type> results = FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
-            System.out.println(results);
-            balanceValue = (BigDecimal) results.get(0).getValue();
+            System.out.println(JSON.toJSON(results));
+            balanceValue = new BigDecimal((BigInteger) results.get(0).getValue()).divide(new BigDecimal("1000000"));
             System.out.println(balanceValue);
             return balanceValue;
         } catch (IOException e) {

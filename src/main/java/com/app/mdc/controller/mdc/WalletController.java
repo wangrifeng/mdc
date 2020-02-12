@@ -10,7 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.web3j.crypto.CipherException;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Map;
 
 /**
@@ -41,6 +46,22 @@ public class WalletController {
 	@ResponseBody
 	public ResponseResult getBalance(@RequestParam Map<String, Object> map, Page page) {
 		return walletService.getBalance(page,map);
+	}
+
+	/**
+	 * 获取余额
+	 * @param
+	 * @return 返回的结果，0正确ERR500错误
+	 */
+	@PostMapping("/createWallet")
+	@ResponseBody
+	public ResponseResult createWallet(@RequestParam int id,@RequestParam String password) {
+		try {
+			return walletService.createWallet(id,password);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseResult.fail("ERR505",e.getMessage());
+		}
 	}
 
 

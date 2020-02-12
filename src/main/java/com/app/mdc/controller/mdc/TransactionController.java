@@ -104,5 +104,17 @@ public class TransactionController {
 
 	}
 
+	@PostMapping("/handlerInvest")
+	@SystemLogAnno(module = "充值", operation = "手动充值")
+	@ResponseBody
+	public ResponseResult handlerInvest() {
+		try {
+			return transactionService.handleInvest();
+		}catch (Exception e){
+			return ResponseResult.fail("-999",e.getMessage());
+		}
+
+	}
+
 }
 

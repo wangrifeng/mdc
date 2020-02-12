@@ -184,16 +184,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             //新增用户角色中间表
             String userId = tbUser.getId();
-            String roleId = map.get("roleId").toString();
-            if (StringUtils.isNotEmpty(roleId)) {
-                String[] arr = roleId.split(",");
-                for (String string : arr) {
-                    RoleUser roleUser = new RoleUser();
-                    roleUser.setRoleId(string);
-                    roleUser.setUserId(userId);
-                    roleUserMapper.insert(roleUser);
-                }
-            }
+//            String roleId = map.get("roleId").toString();
+//            if (StringUtils.isNotEmpty(roleId)) {
+//                String[] arr = roleId.split(",");
+//                for (String string : arr) {
+//                    RoleUser roleUser = new RoleUser();
+//                    roleUser.setRoleId(string);
+//                    roleUser.setUserId(userId);
+//                    roleUserMapper.insert(roleUser);
+//                }
+//            }
 
             //更新推荐人的团队成员总数
             this.updateRecMemberSize(sendUserId);

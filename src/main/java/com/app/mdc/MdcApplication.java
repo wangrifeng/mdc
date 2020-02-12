@@ -28,8 +28,8 @@ public class MdcApplication {
 
 	public static void main(String[] args) throws Exception {
 
-		System.out.println(JvmUtils.getWindowsMac());
-		System.out.println(JvmUtils.getCPUIDWindows());
+//		System.out.println(JvmUtils.getWindowsMac());
+//		System.out.println(JvmUtils.getCPUIDWindows());
 
 		/*if (LinceseUtils.getInstance(linceseKey).isCheckLincese()){
 			ConfigurableApplicationContext applicationContext = SpringApplication.run(MdcApplication.class, args);
