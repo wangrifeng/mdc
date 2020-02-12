@@ -66,7 +66,7 @@ public interface TransactionService extends IService<Transaction> {
      * @param money 购买钱
      * @return ResponseResult
      */
-    ResponseResult buyContract(String userId,String money);
+    ResponseResult buyContract(String userId,String money,String remark);
 
     /**
      * 购买进阶卡交易

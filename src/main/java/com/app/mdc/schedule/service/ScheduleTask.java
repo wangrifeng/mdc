@@ -21,12 +21,11 @@ import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthCall;
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
@@ -57,32 +56,40 @@ public class ScheduleTask {
         List<Wallet> wallets = walletMapper.selectByMap(new HashMap<>());
         Config config = configService.getByKey("INFURA_ADDRESS");
         Config walletAddress = configService.getByKey("WALLET_ADDRESS");
+        Config walletPath = configService.getByKey("WALLET_PATH");
         Web3j web3j = Web3j.build(new HttpService(config.getConfigValue()));
         Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
         String clientVersion = web3ClientVersion.getWeb3ClientVersion();
         System.out.println("version=" + clientVersion);
         for(Wallet wallet : wallets){
             try {
-                BigDecimal balance = getBalance(web3j,wallet.getAddress(),contractAddress);
-                if(balance.doubleValue()> (double) 0){
-                    //充值
-                    boolean flag = transfer(web3j,wallet.getPassword(),wallet.getWalletPath(),wallet.getAddress(),walletAddress.getConfigValue(),contractAddress,balance);
-                    if(flag){
-                        Transaction transaction = new Transaction();
-                        transaction.setCreateTime(new Date());
-                        transaction.setToAmount(balance);
-                        transaction.setToUserId(wallet.getUserId());
-                        transaction.setToWalletAddress(wallet.getAddress());
-                        //0-usdt
-                        transaction.setToWalletType("0");
-                        //0-待交易
-                        transaction.setTransactionStatus("1");
-                        //0-充值
-                        transaction.setTransactionType("0");
-                        transactionMapper.insert(transaction);
-                        BigDecimal oldBalance = wallet.getUstdBlance();
-                        wallet.setUstdBlance(oldBalance.add(balance));
-                        walletMapper.updateById(wallet);
+                BigDecimal ethBalance = getEthBalance(web3j,wallet.getAddress());
+                if(ethBalance.doubleValue() < 0.00075){
+                    //转手续费
+                    Credentials credentials = WalletUtils.loadCredentials("123456", walletPath.getConfigValue());
+                    Transfer.sendFunds(web3j, credentials, wallet.getAddress(), new BigDecimal(1), Convert.Unit.FINNEY).send();
+                }else{
+                    BigDecimal balance = getBalance(web3j,wallet.getAddress(),contractAddress);
+                    if(balance.doubleValue()> (double) 0){
+                        //充值
+                        boolean flag = transfer(web3j,wallet.getPassword(),wallet.getWalletPath(),wallet.getAddress(),walletAddress.getConfigValue(),contractAddress,balance);
+                        if(flag){
+                            Transaction transaction = new Transaction();
+                            transaction.setCreateTime(new Date());
+                            transaction.setToAmount(balance);
+                            transaction.setToUserId(wallet.getUserId());
+                            transaction.setToWalletAddress(wallet.getAddress());
+                            //0-usdt
+                            transaction.setToWalletType("0");
+                            //0-待交易
+                            transaction.setTransactionStatus("1");
+                            //0-充值
+                            transaction.setTransactionType("0");
+                            transactionMapper.insert(transaction);
+                            BigDecimal oldBalance = wallet.getUstdBlance();
+                            wallet.setUstdBlance(oldBalance.add(balance));
+                            walletMapper.updateById(wallet);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -91,6 +98,13 @@ public class ScheduleTask {
             }
 
         }
+    }
+
+    private BigDecimal getEthBalance(Web3j web3j,String address) throws IOException {
+        EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
+        //格式转化 wei-ether
+        String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether");
+        return new BigDecimal(blanceETH);
     }
 
     private BigDecimal getBalance(Web3j web3j, String fromAddress, String contractAddress) throws IOException {
