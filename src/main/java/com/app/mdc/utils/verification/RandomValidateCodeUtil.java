@@ -8,7 +8,8 @@ import java.util.Random;
  */
 public class RandomValidateCodeUtil {
     private static Random random = new Random();
-    private static String randString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生的字符串
+//    private static String randString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";//随机产生的字符串
+    private static String randString = "0123456789";//随机产生的字符串
 
     private static int stringNum = 6;// 随机产生的字符数量
 

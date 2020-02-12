@@ -61,7 +61,8 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
         message.setFrom(mailProperties.getUsername());
         message.setTo(email); // 接收地址,可传入数组进行群发
         message.setSubject("请妥善保管好您的验证码"); // 标题
-        message.setText("尊敬的用户您好,您的验证码为["+ randcode +"]"); // 内容
+        String content = "尊敬的用户您的验证码是"+ randcode +"请不要把验证码泄漏给其他人,如非本人请勿操作";
+        message.setText(content); // 内容
         javaMailSender.send(message);
         return verificationCode.getId();
     }
@@ -74,8 +75,8 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
         this.baseMapper.insert(verificationCode);
 
         //推送验证码
-        String content = "尊敬的用户您的验证码是"+ randcode +"请不要把验证码泄漏给其他人,如非本人请勿操作。";
-        String url = "https://mb345.com/ws/BatchSend2.aspx?CorpID=XALKJ0006852&Pwd=zh9527@&Mobile="+ phone +"&Content=" + "123456" + "&SendTime=";
+        String content = "尊敬的用户您的验证码是"+ randcode +"请不要把验证码泄漏给其他人,如非本人请勿操作";
+        String url = "https://mb345.com/ws/BatchSend2.aspx?CorpID=XALKJ0006852&Pwd=zh9527@&Mobile="+ phone +"&Content=" + content + "&SendTime=";
         try{
             Map<String,Object> map = new HashMap<>();
             HttpUtil.doGet(url,map);
