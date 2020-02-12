@@ -121,7 +121,7 @@ public class UserController extends BaseController {
      *
      * @param id          id
      * @param newPassword 新密码
-     * @param oldPassword 老密码
+     * @param loginName 登录名称
      * @param verCode 验证码
      * @param verId 生成验证码的id
      * @throws BusinessException 抛出错误
@@ -134,13 +134,13 @@ public class UserController extends BaseController {
             @RequestParam Integer type,
             @RequestParam String id,
             @RequestParam String newPassword,
-            @RequestParam String oldPassword,
+            @RequestParam String loginName,
             @RequestParam String verCode,
             @RequestParam String verId
             ) {
         ResponseResult responseResult = new ResponseResult();
         try {
-            userService.updatePwd(type, id, newPassword, oldPassword,verCode,verId);
+            userService.updatePwd(type, id, newPassword, loginName,verCode,verId);
         } catch (BusinessException e) {
             responseResult.setErrMsg(ApiErrEnum.ERR500.toString(), e.getMessage());
         }
@@ -180,8 +180,14 @@ public class UserController extends BaseController {
     @ResponseBody
     public ResponseResult updateGestureSwitch(
             @RequestParam Integer gestureSwitch,
-            @RequestParam String userId
-    ) {
+            @RequestParam String userId,
+            @RequestParam String verId ,
+            @RequestParam String verCode
+    ) throws BusinessException {
+        boolean b = verificationCodeService.validateVerCode(verCode,verId);
+        if(!b){
+            throw new BusinessException("验证码验证失败");
+        }
         userService.updateGestureSwitch(gestureSwitch,userId);
         return ResponseResult.success();
     }

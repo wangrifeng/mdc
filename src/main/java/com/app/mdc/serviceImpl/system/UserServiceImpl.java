@@ -20,6 +20,7 @@ import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -74,32 +75,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public ResponseResult getOne(String id) {
         //根据用户id获取角色的list，并拼接成ids
-        Map<String, Object> map = new HashMap<>();
-        map.put("user_id", id);
-        List<RoleUser> list = roleUserMapper.selectByMap(map);
-        StringBuilder roleId = new StringBuilder();
-        StringBuilder roleName = new StringBuilder();
-        StringBuilder roleCode = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            String roleid = list.get(i).getRoleId();
-            Role role = roleMapper.selectById(roleid);
-            if (i + 1 == list.size()) {
-                roleId.append(roleid);
-                roleName.append(role.getName());
-                roleCode.append(role.getCode());
-            } else {
-                roleId.append(roleid).append(",");
-                roleName.append(role.getName()).append(",");
-                roleCode.append(role.getCode()).append(",");
-            }
-        }
+        Map<String, Object> objectMap = new HashMap<>();
+//        map.put("user_id", id);
+//        List<RoleUser> list = roleUserMapper.selectByMap(map);
+//        StringBuilder roleId = new StringBuilder();
+//        StringBuilder roleName = new StringBuilder();
+//        StringBuilder roleCode = new StringBuilder();
+//        for (int i = 0; i < list.size(); i++) {
+//            String roleid = list.get(i).getRoleId();
+//            Role role = roleMapper.selectById(roleid);
+//            if (i + 1 == list.size()) {
+//                roleId.append(roleid);
+//                roleName.append(role.getName());
+//                roleCode.append(role.getCode());
+//            } else {
+//                roleId.append(roleid).append(",");
+//                roleName.append(role.getName()).append(",");
+//                roleCode.append(role.getCode()).append(",");
+//            }
+//        }
 
         //取user信息和roleids拼接一下返回给前端
         User user = userMapper.selectById(id);
-        Map<String, Object> objectMap = new HashMap<>();
-        objectMap.put("id", user.getId());
-        objectMap.put("status", user.getStatus());
-        objectMap.put("username", user.getUserName());
+        user.setPayPassword(null);
+        user.setPassword(null);
+        objectMap.put("user",user);
 //       objectMap.put("name", user.getName());
 //       objectMap.put("telephone", user.getTelephone());
 //       objectMap.put("position", user.getPosition());
@@ -389,7 +389,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Integer updatePwd(Integer type, String id, String newPassword, String oldPassword, String verCode, String verId) throws BusinessException {
+    public Integer updatePwd(Integer type, String id, String newPassword, String loginName, String verCode, String verId) throws BusinessException {
         //验证验证码是否正确
         boolean isVerCodeValidated = verificationCodeService.validateVerCode(verCode, verId);
         if (!isVerCodeValidated) {
@@ -402,15 +402,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("用户不存在");
         }
 
-        //判断旧密码是否正确
-        if (type == 0) {
-            if (!Md5Utils.hash(u.getLoginName(), oldPassword).equals(u.getPassword())) {
-                throw new BusinessException("旧登录密码验证错误");
-            }
-        } else {
-            if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), oldPassword).equals(u.getPayPassword())) {
-                throw new BusinessException("旧支付密码验证错误");
-            }
+        EntityWrapper<User> objectEntityWrapper = new EntityWrapper<>();
+        objectEntityWrapper.eq("login_name",loginName);
+        List<User> users = this.baseMapper.selectList(objectEntityWrapper);
+        if(users.size() == 0|| !users.get(0).getId().equals(id)){
+            throw new BusinessException("请输入当前用户注册时的邮箱或者手机号");
         }
 
         //修改新密码
