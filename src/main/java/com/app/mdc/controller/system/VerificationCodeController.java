@@ -46,4 +46,13 @@ public class VerificationCodeController {
         return ResponseResult.success().setData(result);
     }
 
+    @RequestMapping("/getVerificationCodeByUserId")
+    @ApiOperation("/获取验证码")
+    public ResponseResult getVerificationCodeByUserId(@RequestParam Integer userId) throws BusinessException {
+        Integer id = verificationCodeService.getVerificationCode(userId);
+        Map<String,Object> result = new HashMap<>();
+        result.put("verId",id);
+        return ResponseResult.success().setData(result);
+    }
+
 }

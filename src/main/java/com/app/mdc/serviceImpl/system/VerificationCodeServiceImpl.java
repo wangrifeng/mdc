@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMapper, VerificationCode> implements VerificationCodeService {
@@ -39,20 +40,13 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
             throw new BusinessException("用户不存在");
         }
 
-        //生成验证码入库
-        String randcode = RandomValidateCodeUtil.getRandcode();
-        VerificationCode verificationCode = new VerificationCode(randcode, user.getUserName(), new Date());
-        this.baseMapper.insert(verificationCode);
-
-        //推送验证码给用户邮箱
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailProperties.getUsername());
-        message.setTo(user.getEmail()); // 接收地址,可传入数组进行群发
-        message.setSubject("请妥善保管好您的验证码"); // 标题
-        String content = "尊敬的用户您的验证码是"+ randcode +"请不要把验证码泄漏给其他人,如非本人请勿操作。";
-        message.setText(content); // 内容
-        javaMailSender.send(message);
-        return verificationCode.getId();
+        if(user.getRegisterType() == 0){
+            //邮箱
+            return this.getEmailVerificationCode(user.getLoginName());
+        }else{
+            //手机
+            return this.getPhoneVerificationCode(user.getLoginName());
+        }
     }
 
     @Override
@@ -81,9 +75,10 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
 
         //推送验证码
         String content = "尊敬的用户您的验证码是"+ randcode +"请不要把验证码泄漏给其他人,如非本人请勿操作。";
-        String url = "https://mb345.com/ws/BatchSend2.aspx?CorpID=XALKJ0006852&Pwd=zh9527@&Mobile="+ phone +"&Content=" + content;
+        String url = "https://mb345.com/ws/BatchSend2.aspx?CorpID=XALKJ0006852&Pwd=zh9527@&Mobile="+ phone +"&Content=" + "123456" + "&SendTime=";
         try{
-            HttpUtil.doGet(url,new HashMap<>());
+            Map<String,Object> map = new HashMap<>();
+            HttpUtil.doGet(url,map);
         }
         catch (Exception e){
             throw  new BusinessException("验证码获取失败");
