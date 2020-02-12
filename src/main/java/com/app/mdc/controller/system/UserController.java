@@ -180,8 +180,14 @@ public class UserController extends BaseController {
     @ResponseBody
     public ResponseResult updateGestureSwitch(
             @RequestParam Integer gestureSwitch,
-            @RequestParam String userId
-    ) {
+            @RequestParam String userId,
+            @RequestParam String verId ,
+            @RequestParam String verCode
+    ) throws BusinessException {
+        boolean b = verificationCodeService.validateVerCode(verCode,verId);
+        if(!b){
+            throw new BusinessException("验证码验证失败");
+        }
         userService.updateGestureSwitch(gestureSwitch,userId);
         return ResponseResult.success();
     }
