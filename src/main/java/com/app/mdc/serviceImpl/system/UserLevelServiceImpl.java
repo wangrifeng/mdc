@@ -65,4 +65,9 @@ public class UserLevelServiceImpl extends ServiceImpl<UserLevelMapper, UserLevel
     public List<Map<String, Object>> list(Integer userId) {
         return this.baseMapper.list(userId);
     }
+
+    @Override
+    public List<User> getUsersInUmbrella(Integer userId) {
+        return this.baseMapper.getUsersInUmbrella(userId);
+    }
 }

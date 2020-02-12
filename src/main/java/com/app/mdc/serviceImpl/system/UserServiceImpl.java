@@ -500,12 +500,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //查询公工会的进阶合约总额
         BigDecimal unionAdvanceTotalMoney = userContractService.getUnionAdvanceTotalMoney(userId);
         //获取直推人员等级
-        List<User> directUsers = userLevelService.getDirectUsers(userId);
+        List<User> users = userLevelService.getUsersInUmbrella(userId);
         //判断当前用户等级
         Integer copperCount = 0;
         Integer sliverCount = 0;
         Integer goldCount = 0;
-        for (User du : directUsers) {
+        for (User du : users) {
             switch (du.getLevel()) {
                 case 1:
                     copperCount++;
@@ -515,7 +515,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     goldCount++;
             }
         }
-        Integer directNumber = directUsers.size();
+        Integer directNumber = userLevelService.getDirectCount(userId);
         Integer level = 0;
         if (directNumber >= 15 && goldCount >= 3 && unionSignTotalMoney.compareTo(new BigDecimal("1500000")) >= 0) {
             //王牌玩家

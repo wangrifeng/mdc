@@ -142,6 +142,9 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 //        u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().add(subtract));
 //        userService.updateById(u);
 
+        //更新用户的等级
+        userService.updateUserLevel(userId);
+
         //计算差价
         BigDecimal subtract = upgradeContract.getAmount().subtract(contract.getAmount());
         transactionService.buyContract(userId.toString(),subtract.toString());

@@ -69,4 +69,11 @@ public interface UserLevelMapper extends BaseMapper<UserLevel> {
      * @return
      */
     List<Map<String, Object>> list(Integer userId);
+
+    /**
+     * 查询伞下用户信息
+     * @param userId
+     * @return
+     */
+    List<User> getUsersInUmbrella(Integer userId);
 }
