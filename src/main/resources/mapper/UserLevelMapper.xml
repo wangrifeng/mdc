@@ -86,7 +86,24 @@
         login_name as loginName ,
         ifnull((select sc.name from mdc_user_contract uc left join sys_contract sc on sc.id = uc.contract_id where user_id = su.user_id and sc.type = 1 limit 1),"") as contractName ,
         su.member_size as memberSize ,
-        su.union_sign_total_money as unionSignTotalMoney
+        su.union_sign_total_money as unionSignTotalMoney ,
+        (    SELECT
+        ifnull( count( 1 ), 0 )
+    FROM
+        mdc_user_contract uc
+        JOIN sys_contract c ON c.id = uc.contract_id
+    WHERE
+        c.type = 1 and
+        user_id in(
+        select
+        reced_id
+        from
+        sys_user_level
+        where
+        rec_id =su.user_id
+        union
+        select su.user_id
+        )) as cardNumber
         from
         sys_user su
         where
@@ -121,6 +138,26 @@
         sys_user_level
         where
         rec_id =#{userId}
+        )
+    </select>
+
+    <select id="getUnionCardNumber" resultType="Integer">
+    SELECT
+        ifnull( count( 1 ), 0 )
+    FROM
+        mdc_user_contract uc
+        JOIN sys_contract c ON c.id = uc.contract_id
+    WHERE
+        c.type = 1 and
+        user_id in(
+        select
+        reced_id
+        from
+        sys_user_level
+        where
+        rec_id =#{userId}
+        union
+        select #{userId}
         )
     </select>
 </mapper>
