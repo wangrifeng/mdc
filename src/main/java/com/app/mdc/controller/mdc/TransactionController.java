@@ -57,16 +57,20 @@ public class TransactionController {
 	@PostMapping("/transfer")
 	@SystemLogAnno(module = "交易管理", operation = "交易转账")
 	@ResponseBody
-	public ResponseResult transfer(@RequestParam(required = true)String fromWalletId,
-									 @RequestParam(required = true)String toWalletId,
+	public ResponseResult transfer(
+									 @RequestParam(required = true)String toWalletAddress,
 									 @RequestParam(required = true)String transferNumber,
 									 @RequestParam(required = true)String payPassword,
 									 @RequestParam(required = true)String userId,
-									 @RequestParam(required = true)String toUserId,
 									 @RequestParam(required = true)String walletType,
 								   @RequestParam String verCode,
 								   @RequestParam String verId) {
-		return transactionService.transETH(fromWalletId,toWalletId,transferNumber,payPassword,userId,toUserId,walletType,verCode,verId);
+		try {
+			return transactionService.transETH(toWalletAddress,transferNumber,payPassword,userId,walletType,verCode,verId);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return ResponseResult.fail("ERR500",e.getMessage());
+		}
 	}
 
 	/**

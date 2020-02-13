@@ -82,7 +82,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseResult transETH(String fromWalletId,String toWalletId,String transferNumber,String payPassword,String userId,String toUserId,String walletType,String verCode, String verId) {
+    public ResponseResult transETH(String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException, ExecutionException, BusinessException, CipherException, IOException {
         User u = userMapper.selectById(userId);
         //验证支付密码
         if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), payPassword).equals(u.getPayPassword())) {
@@ -93,8 +93,29 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         if(!flag){
             return ResponseResult.fail(ApiErrEnum.ERR203);
         }
-        Wallet fromWallet = walletMapper.selectById(fromWalletId);
-        Wallet toWallet = walletMapper.selectById(toWalletId);
+        if(!toWalletAddress.startsWith("0x") || toWalletAddress.length() != 42){
+            return ResponseResult.fail(ApiErrEnum.ERR208);
+        }
+        EntityWrapper<Wallet> entityWrapper = new EntityWrapper<>();
+        entityWrapper.eq("user_id",userId);
+        List<Wallet> fromWallets = walletMapper.selectList(entityWrapper);
+        Wallet fromWallet;
+        if(fromWallets.size() > 0){
+            fromWallet = fromWallets.get(0);
+        }else{
+            return ResponseResult.fail();
+        }
+        EntityWrapper<Wallet> toWrapper = new EntityWrapper<>();
+        toWrapper.eq("address",toWalletAddress);
+        List<Wallet> toWallets = walletMapper.selectList(toWrapper);
+        Wallet toWallet = new Wallet();
+        if(toWallets.size() > 0){
+            toWallet = toWallets.get(0);
+        }else{
+            Config walletAddress = configService.getByKey("WALLET_ADDRESS");
+            Config walletPath = configService.getByKey("WALLET_PATH");
+            transfer(userId,payPassword,transferNumber,walletPath.getConfigValue(),walletAddress.getConfigValue(),toWalletAddress,walletType);
+        }
 
         BigDecimal trans = new BigDecimal(transferNumber);
         BigDecimal fee = new BigDecimal(0);
@@ -122,7 +143,6 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             toWallet.setMdcBlance(usdtTo.add(trans));
         }
 
-
         Transaction transaction = new Transaction();
         transaction.setFeeAmount(fee);
         transaction.setCreateTime(new Date());
@@ -133,8 +153,10 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         //0-usdt
         transaction.setFromWalletType("0");
         transaction.setToAmount(trans);
-        transaction.setToUserId(Integer.parseInt(toUserId));
-        transaction.setToWalletAddress(toWallet.getAddress());
+        if(toWallet.getUserId() != null || toWallet.getUserId() != 0){
+            transaction.setToUserId(toWallet.getUserId());
+        }
+        transaction.setToWalletAddress(toWalletAddress);
         transaction.setToWalletType(walletType);
         //1-交易完成
         transaction.setTransactionStatus("1");
