@@ -2,8 +2,12 @@ package com.app.mdc.serviceImpl.mdc;
 
 import com.app.mdc.mapper.mdc.InComeMapper;
 import com.app.mdc.model.mdc.InCome;
+import com.app.mdc.model.mdc.Transaction;
 import com.app.mdc.service.mdc.InComeService;
+import com.app.mdc.service.mdc.TransactionService;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,6 +20,9 @@ import java.util.Map;
  */
 @Service
 public class InComeServiceImpl extends ServiceImpl<InComeMapper, InCome> implements InComeService {
+
+    @Autowired
+    private TransactionService transactionService;
 
     @Override
     public Map<Integer, Map<String,Object>> selectStaticIncomeGroupByLevel(Map<Integer, Map<String,Object>> levelIds, Date selDate, BigDecimal burnValue) {
@@ -35,5 +42,13 @@ public class InComeServiceImpl extends ServiceImpl<InComeMapper, InCome> impleme
     @Override
     public List<InCome> list(Integer userId) {
         return this.baseMapper.list(userId);
+    }
+
+    @Override
+    public List<Transaction> history(Integer userId) {
+        EntityWrapper<Transaction> transactionEntityWrapper = new EntityWrapper<>();
+        transactionEntityWrapper.eq("transaction_type","4");
+        transactionEntityWrapper.eq("from_user_id",userId);
+        return transactionService.selectList(transactionEntityWrapper);
     }
 }

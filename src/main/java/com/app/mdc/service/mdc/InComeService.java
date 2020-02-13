@@ -1,6 +1,7 @@
 package com.app.mdc.service.mdc;
 
 import com.app.mdc.model.mdc.InCome;
+import com.app.mdc.model.mdc.Transaction;
 import com.baomidou.mybatisplus.service.IService;
 
 import java.math.BigDecimal;
@@ -45,4 +46,11 @@ public interface InComeService extends IService<InCome> {
      * @return
      */
     List<InCome> list(Integer userId);
+
+    /**
+     * 用户交易记录
+     * @param userId
+     * @return
+     */
+    List<Transaction> history(Integer userId);
 }

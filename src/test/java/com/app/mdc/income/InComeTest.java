@@ -23,6 +23,15 @@ public class InComeTest {
         System.out.println(s);
     }
 
+    @Test
+    public void history(){
+        Map<String,String> param  = new HashMap<>();
+        param.put("userId","278");
+        param.put("pageNumber","1");
+        param.put("pageSize","10");
+        String s = HttpUtil.doPost(HOST + "/income/history", param,"7d0d120f-c6aa-49b3-9b0b-30b15e13d749");
+        System.out.println(s);
+    }
 
 
 }

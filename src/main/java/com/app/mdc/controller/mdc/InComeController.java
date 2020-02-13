@@ -1,6 +1,7 @@
 package com.app.mdc.controller.mdc;
 
 import com.app.mdc.model.mdc.InCome;
+import com.app.mdc.model.mdc.Transaction;
 import com.app.mdc.service.mdc.InComeService;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import com.github.pagehelper.PageHelper;
@@ -28,5 +29,14 @@ public class InComeController {
         PageHelper.startPage(pageNumber,pageSize);
         List<InCome> list = inComeService.list(userId);
         return ResponseResult.success().setData(new PageInfo<InCome>(list));
+    }
+
+    @PostMapping("/history")
+    @ResponseBody
+    @ApiOperation("/交易记录")
+    public ResponseResult history(@RequestParam Integer pageSize,@RequestParam Integer pageNumber,@RequestParam Integer userId ) {
+        PageHelper.startPage(pageNumber,pageSize);
+        List<Transaction> list = inComeService.history(userId);
+        return ResponseResult.success().setData(new PageInfo<Transaction>(list));
     }
 }
