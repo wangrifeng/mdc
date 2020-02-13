@@ -63,8 +63,10 @@ public class TransactionController {
 									 @RequestParam(required = true)String payPassword,
 									 @RequestParam(required = true)String userId,
 									 @RequestParam(required = true)String toUserId,
-									 @RequestParam(required = true)String walletType) {
-		return transactionService.transETH(fromWalletId,toWalletId,transferNumber,payPassword,userId,toUserId,walletType);
+									 @RequestParam(required = true)String walletType,
+								   @RequestParam String verCode,
+								   @RequestParam String verId) {
+		return transactionService.transETH(fromWalletId,toWalletId,transferNumber,payPassword,userId,toUserId,walletType,verCode,verId);
 	}
 
 	/**

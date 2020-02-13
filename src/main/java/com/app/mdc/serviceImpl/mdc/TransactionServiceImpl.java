@@ -14,6 +14,7 @@ import com.app.mdc.model.system.User;
 import com.app.mdc.schedule.service.ScheduleTask;
 import com.app.mdc.service.mdc.TransactionService;
 import com.app.mdc.service.system.ConfigService;
+import com.app.mdc.service.system.VerificationCodeService;
 import com.app.mdc.utils.Md5Utils;
 import com.app.mdc.utils.date.DateUtil;
 import com.app.mdc.utils.viewbean.Page;
@@ -66,24 +67,31 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     private final TransactionMapper transactionMapper;
     private final Web3j web3j;
     private final ConfigService configService;
+    private final VerificationCodeService verificationCodeService;
 
     @Autowired
-    public TransactionServiceImpl(ConfigService configService,TransactionMapper transactionMapper,WalletMapper walletMapper,UserMapper userMapper){
+    public TransactionServiceImpl(ConfigService configService,TransactionMapper transactionMapper,WalletMapper walletMapper,UserMapper userMapper,VerificationCodeService verificationCodeService){
         this.configService = configService;
         this.walletMapper = walletMapper;
         this.userMapper = userMapper;
         this.transactionMapper = transactionMapper;
         Config config = configService.getByKey("INFURA_ADDRESS");
         this.web3j = Web3j.build(new HttpService(config.getConfigValue()));
+        this.verificationCodeService = verificationCodeService;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseResult transETH(String fromWalletId,String toWalletId,String transferNumber,String payPassword,String userId,String toUserId,String walletType) {
+    public ResponseResult transETH(String fromWalletId,String toWalletId,String transferNumber,String payPassword,String userId,String toUserId,String walletType,String verCode, String verId) {
         User u = userMapper.selectById(userId);
         //验证支付密码
         if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), payPassword).equals(u.getPayPassword())) {
             return ResponseResult.fail(ApiErrEnum.ERR202);
+        }
+        //验证校验码
+        boolean flag = verificationCodeService.validateVerCode(verCode,verId);
+        if(!flag){
+            return ResponseResult.fail(ApiErrEnum.ERR203);
         }
         Wallet fromWallet = walletMapper.selectById(fromWalletId);
         Wallet toWallet = walletMapper.selectById(toWalletId);
