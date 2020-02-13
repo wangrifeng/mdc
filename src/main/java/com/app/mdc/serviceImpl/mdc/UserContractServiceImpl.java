@@ -72,7 +72,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 //            u.setId(userId.toString());
 //            u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().add(contract.getAmount()));
 //            userService.updateById(u);
-            transactionService.buyContract(userId.toString(), contract.getAmount().toString(),"用户"+user.getUserName() + "购买签约卡" + JSON.toJSONString(contract));
+            transactionService.buyContract(userId.toString(), contract.getAmount().toString(),"用户"+user.getUserName() + "购买签约卡" + JSON.toJSONString(contract),"1");
         } else {
             //进阶卡
             if (userContract == null) {
@@ -148,7 +148,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 
         //计算差价
         BigDecimal subtract = upgradeContract.getAmount().subtract(contract.getAmount());
-        transactionService.buyContract(userId.toString(),subtract.toString(),"用户" + userId + "升级合约"  + contract.getId() + "->" + upgradeId + ",差价为" + subtract);
+        transactionService.buyContract(userId.toString(),subtract.toString(),"用户" + userId + "升级合约"  + contract.getId() + "->" + upgradeId + ",差价为" + subtract,"2");
     }
 
     @Override
@@ -195,7 +195,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 //        u.setId(userId.toString());
 //        u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().subtract(rescindMoney));
 //        userService.updateById(u);
-        transactionService.buyContract(userId.toString(),rescindMoney.toString(),"用户解除合约" + contract.getId()+ ",扣除解约费用" + rescindMoney + "USTD"+ "合约信息为" + JSON.toJSONString(contract));
+        transactionService.buyContract(userId.toString(),rescindMoney.toString(),"用户解除合约" + contract.getId()+ ",扣除解约费用" + rescindMoney + "USTD"+ "合约信息为" + JSON.toJSONString(contract),"3");
 
         //删除用户签约信息
         this.deleteById(ucId);
