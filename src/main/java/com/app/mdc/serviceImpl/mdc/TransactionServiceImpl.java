@@ -184,8 +184,8 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     @Override
     public ResponseResult cashOutUSDT(String userId,String payPassword, String toAddress, String cashOutMoney) throws InterruptedException {
         BigDecimal cashOut = new BigDecimal(cashOutMoney);
-        Config contractAddress = configService.getByKey("USDT_CONTRACT_ADDRESS");
-        BigDecimal toBalance = getBalance(toAddress,contractAddress.getConfigValue());
+        //Config contractAddress = configService.getByKey("USDT_CONTRACT_ADDRESS");
+        //BigDecimal toBalance = getBalance(toAddress,contractAddress.getConfigValue());
         EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
         walletEntityWrapper.eq("user_id",userId);
         List<Wallet> wallets = walletMapper.selectList(walletEntityWrapper);
@@ -205,22 +205,22 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         }else{
             return ResponseResult.fail(ApiErrEnum.ERR204);
         }
-        Config walletPath = configService.getByKey("WALLET_PATH");
-        Config walletAddress = configService.getByKey("WALLET_ADDRESS");
+        /*Config walletPath = configService.getByKey("WALLET_PATH");
+        Config walletAddress = configService.getByKey("WALLET_ADDRESS");*/
         Transaction transaction = new Transaction();
-        try {
+        /*try {
             String transactionHash = transfer(userId,payPassword,cashOutMoney,walletPath.getConfigValue(),walletAddress.getConfigValue(),toAddress,"0");
             transaction.setTransactionHash(transactionHash);
         }catch (Exception e){
             return ResponseResult.fail("-999",e.getMessage());
-        }
-        BigInteger gasPrice = Convert.toWei(new BigDecimal(InfuraInfo.GAS_PRICE.getDesc()), Convert.Unit.GWEI).toBigInteger();
+        }*/
+        //BigInteger gasPrice = Convert.toWei(new BigDecimal(InfuraInfo.GAS_PRICE.getDesc()), Convert.Unit.GWEI).toBigInteger();
         //BigDecimal fee = new BigDecimal(gasPrice.toString()).divide(new BigDecimal(InfuraInfo.MDC_ETH.getDesc()));
         transaction.setFeeAmount(new BigDecimal(config.getConfigValue()));
         transaction.setCreateTime(new Date());
         transaction.setFromAmount(cashOut);
         transaction.setFromUserId(Integer.parseInt(userId));
-        transaction.setFromWalletAddress(walletAddress.getConfigValue());
+        transaction.setFromWalletAddress(wallet.getAddress());
         //0-usdt
         transaction.setFromWalletType("0");
         transaction.setToAmount(cashOut);
@@ -235,7 +235,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
         walletMapper.updateById(wallet);
 
-        try {
+        /*try {
             Thread.sleep(60000);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -247,7 +247,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             transactionMapper.updateById(transaction);
         }else{
             confirm(new Date(),toAddress,usdtContractAddress,cashOutMoney,userId,transaction.getTransactionId().toString());
-        }
+        }*/
         return ResponseResult.success();
     }
 
@@ -414,7 +414,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         BigDecimal trans = new BigDecimal(transferNumber);
 
         //判断转出地址
-        if(!toAddress.startsWith("0x")){
+        if(!toAddress.startsWith("0x") || toAddress.length() != 42){
             throw new BusinessException(ApiErrEnum.ERR208);
         }
         Credentials credentials = WalletUtils.loadCredentials(payPassword, fromPath);
@@ -466,7 +466,10 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     private BigDecimal getETHBalance(String address) throws IOException {
         EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
         //格式转化 wei-ether
-        String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether");
+        String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether").replace("ether","");
+        if(blanceETH == null || "".equals(blanceETH.trim())){
+            return new BigDecimal(0);
+        }
         return new BigDecimal(blanceETH);
     }
 
