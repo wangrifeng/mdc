@@ -30,4 +30,9 @@ public class Notice {
     /** 公告状态（0正常 1关闭） */
     @TableField("status")
     private String status;
+
+    /** 创建时间 */
+    @TableField("create_time")
+    private String createTime;
+
 }
