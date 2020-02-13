@@ -73,6 +73,8 @@ public class Transaction extends Model<Transaction> {
 
     private String transactionHash;
 
+    private String contractType;
+
     public Integer getTransactionId() {
         return transactionId;
     }
@@ -191,6 +193,14 @@ public class Transaction extends Model<Transaction> {
 
     public void setTransactionHash(String transactionHash) {
         this.transactionHash = transactionHash;
+    }
+
+    public String getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(String contractType) {
+        this.contractType = contractType;
     }
 
     @Override

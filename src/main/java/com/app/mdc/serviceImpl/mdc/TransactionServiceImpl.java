@@ -303,7 +303,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     }
 
     @Override
-    public ResponseResult buyContract(String userId, String money,String remark) {
+    public ResponseResult buyContract(String userId, String money,String remark,String contractType) {
         EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
         walletEntityWrapper.eq("user_id",userId);
         List<Wallet> wallets = walletMapper.selectList(walletEntityWrapper);
@@ -322,6 +322,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             transaction.setTransactionStatus("1");
             transaction.setTransactionType("4");
             transaction.setRemark(remark);
+            transaction.setContractType(contractType);
             transactionMapper.insert(transaction);
             BigDecimal balance = wallet.getUstdBlance();
             wallet.setUstdBlance(balance.subtract(new BigDecimal(money)));
