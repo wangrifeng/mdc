@@ -414,7 +414,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         BigDecimal trans = new BigDecimal(transferNumber);
 
         //判断转出地址
-        if(!toAddress.startsWith("0x")){
+        if(!toAddress.startsWith("0x") || toAddress.length() != 42){
             throw new BusinessException(ApiErrEnum.ERR208);
         }
         Credentials credentials = WalletUtils.loadCredentials(payPassword, fromPath);
@@ -466,7 +466,10 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     private BigDecimal getETHBalance(String address) throws IOException {
         EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
         //格式转化 wei-ether
-        String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether");
+        String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether").replace("ether","");
+        if(blanceETH == null || "".equals(blanceETH.trim())){
+            return new BigDecimal(0);
+        }
         return new BigDecimal(blanceETH);
     }
 

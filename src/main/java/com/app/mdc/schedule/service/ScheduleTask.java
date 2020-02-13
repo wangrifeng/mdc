@@ -52,7 +52,7 @@ public class ScheduleTask {
     public void invest() throws ExecutionException, InterruptedException {
 
 
-        String contractAddress = InfuraInfo.INFURA_ADDRESS.getDesc();
+        String contractAddress = InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc();
         List<Wallet> wallets = walletMapper.selectByMap(new HashMap<>());
         Config config = configService.getByKey("INFURA_ADDRESS");
         Config walletAddress = configService.getByKey("WALLET_ADDRESS");
@@ -103,8 +103,11 @@ public class ScheduleTask {
     private BigDecimal getEthBalance(Web3j web3j,String address) throws IOException {
         EthGetBalance balance = web3j.ethGetBalance(address, DefaultBlockParameter.valueOf("latest")).send();
         //格式转化 wei-ether
-        String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether");
-        return new BigDecimal(blanceETH);
+        String blanceETH = Convert.fromWei(balance.getBalance().toString(), Convert.Unit.ETHER).toPlainString().concat(" ether").replace("ether","");
+        if(blanceETH == null || "".equals(blanceETH.trim())){
+            return new BigDecimal(0);
+        }
+        return new BigDecimal(blanceETH.trim());
     }
 
     private BigDecimal getBalance(Web3j web3j, String fromAddress, String contractAddress) throws IOException {
