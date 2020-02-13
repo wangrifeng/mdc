@@ -70,4 +70,9 @@ public class UserLevelServiceImpl extends ServiceImpl<UserLevelMapper, UserLevel
     public List<User> getUsersInUmbrella(Integer userId) {
         return this.baseMapper.getUsersInUmbrella(userId);
     }
+
+    @Override
+    public Integer getUnionCardNumber(Integer userId) {
+        return this.baseMapper.getUnionCardNumber(userId);
+    }
 }

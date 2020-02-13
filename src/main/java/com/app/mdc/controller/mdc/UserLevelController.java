@@ -37,8 +37,10 @@ public class UserLevelController {
         Page<Map> page = PageHelper.startPage(pageNumber, pageSize);
         List<Map<String,Object>> members =  this.userLevelService.list(userId);
         User user = userService.selectById(userId);
+        Integer cardNumber = userLevelService.getUnionCardNumber(userId);
         Map<String,Object> result = new HashMap<>();
         result.put("memberSize",user.getMemberSize());
+        result.put("cardNumber",cardNumber);
         result.put("unionSignTotalMoney",user.getUnionSignTotalMoney());
         result.put("memberList",members);
         return ResponseResult.success().setData(result);

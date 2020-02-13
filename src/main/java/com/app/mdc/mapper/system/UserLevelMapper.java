@@ -76,4 +76,11 @@ public interface UserLevelMapper extends BaseMapper<UserLevel> {
      * @return
      */
     List<User> getUsersInUmbrella(Integer userId);
+
+    /**
+     * 获取团队合约卡数
+     * @param userId
+     * @return
+     */
+    Integer getUnionCardNumber(Integer userId);
 }

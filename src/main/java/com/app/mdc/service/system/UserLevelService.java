@@ -72,4 +72,11 @@ public interface UserLevelService extends IService<UserLevel> {
      * @return
      */
     List<User> getUsersInUmbrella(Integer userId);
+
+    /**
+     * 获取用户合约卡数
+     * @param userId
+     * @return
+     */
+    Integer getUnionCardNumber(Integer userId);
 }
