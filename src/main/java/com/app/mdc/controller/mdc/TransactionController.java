@@ -67,7 +67,7 @@ public class TransactionController {
 								   @RequestParam String verId) {
 		try {
 			return transactionService.transETH(toWalletAddress,transferNumber,payPassword,userId,walletType,verCode,verId);
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseResult.fail("ERR500",e.getMessage());
 		}
@@ -89,9 +89,9 @@ public class TransactionController {
 	@PostMapping("/cashOut")
 	@SystemLogAnno(module = "交易管理", operation = "交易提现")
 	@ResponseBody
-	public ResponseResult cashOut(@RequestParam String userId,@RequestParam String payPassword,@RequestParam String toAddress,@RequestParam String cashOutMoney) {
+	public ResponseResult cashOut(@RequestParam String userId,@RequestParam String payPassword,@RequestParam String toAddress,@RequestParam String cashOutMoney,@RequestParam String verCode,@RequestParam String verId) {
 		try {
-			return transactionService.cashOutUSDT(userId, payPassword, toAddress, cashOutMoney);
+			return transactionService.cashOutUSDT(userId, payPassword, toAddress, cashOutMoney,verCode,verId);
 		}catch (Exception e){
 			return ResponseResult.fail("-999",e.getMessage());
 		}

@@ -212,7 +212,17 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseResult cashOutUSDT(String userId,String payPassword, String toAddress, String cashOutMoney) throws InterruptedException {
+    public ResponseResult cashOutUSDT(String userId,String payPassword, String toAddress, String cashOutMoney,String verCode, String verId) throws InterruptedException {
+        User u = userMapper.selectById(userId);
+        //验证支付密码
+        if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), payPassword).equals(u.getPayPassword())) {
+            return ResponseResult.fail(ApiErrEnum.ERR202);
+        }
+        //验证校验码
+        boolean flag = verificationCodeService.validateVerCode(verCode,verId);
+        if(!flag){
+            return ResponseResult.fail(ApiErrEnum.ERR203);
+        }
         BigDecimal cashOut = new BigDecimal(cashOutMoney);
         //Config contractAddress = configService.getByKey("USDT_CONTRACT_ADDRESS");
         //BigDecimal toBalance = getBalance(toAddress,contractAddress.getConfigValue());

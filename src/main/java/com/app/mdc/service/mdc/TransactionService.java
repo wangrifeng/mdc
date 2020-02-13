@@ -1,5 +1,6 @@
 package com.app.mdc.service.mdc;
 
+import com.app.mdc.exception.BusinessException;
 import com.app.mdc.model.mdc.Transaction;
 import com.app.mdc.utils.viewbean.Page;
 import com.app.mdc.utils.viewbean.ResponseResult;
@@ -25,7 +26,7 @@ public interface TransactionService extends IService<Transaction> {
      * ETH钱包转账
      * @return ResponseResult
      */
-    ResponseResult transETH(String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException;
+    ResponseResult transETH(String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException, ExecutionException, BusinessException, CipherException, IOException;
 
     /**
      * ETH钱包余额查询
@@ -50,7 +51,7 @@ public interface TransactionService extends IService<Transaction> {
      * @param cashOutMoney 提现金额
      * @return ResponseResult
      */
-    ResponseResult cashOutUSDT(String userId,String payPassword,String toAddress,String cashOutMoney) throws InterruptedException;
+    ResponseResult cashOutUSDT(String userId,String payPassword,String toAddress,String cashOutMoney,String verCode, String verId) throws InterruptedException;
 
     /**
      * mdc闪兑
