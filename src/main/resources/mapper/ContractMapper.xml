@@ -14,4 +14,12 @@
         sys_contract sc
     </select>
 
+    <select id="getHigherContract" resultType="com.app.mdc.model.mdc.Contract">
+        select
+        <include refid="baseSql"></include>
+        from
+        sys_contract sc
+        where
+        sc.type  = 1 and sc.level > (select level from sys_contract where id = #{contractId})
+    </select>
 </mapper>

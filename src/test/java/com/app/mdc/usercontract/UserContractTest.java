@@ -78,5 +78,13 @@ public class UserContractTest {
         System.out.println(s);
     }
 
+    @Test
+    public void getHigherContract() {
+        Map<String, String> param = new HashMap<>();
+        param.put("contractId", "1");
+        String s = HttpUtil.doPost(HOST + "/userContract/getHigherContract", param, "1d49e5b1-c211-430d-9502-52d78adec4d8");
+        System.out.println(s);
+    }
+
 
 }

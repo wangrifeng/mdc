@@ -22,4 +22,11 @@ public interface ContractService extends IService<Contract> {
      * @return
      */
     List<Contract> list();
+
+    /**
+     * 获取高等级的用户合约
+     * @param contractId
+     * @return
+     */
+    List<Contract> getHigherContract(String contractId);
 }

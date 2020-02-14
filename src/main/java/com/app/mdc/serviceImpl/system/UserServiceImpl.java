@@ -99,7 +99,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = userMapper.selectById(id);
         user.setPayPassword(null);
         user.setPassword(null);
-        objectMap.put("user",user);
+        objectMap.put("user", user);
 //       objectMap.put("name", user.getName());
 //       objectMap.put("telephone", user.getTelephone());
 //       objectMap.put("position", user.getPosition());
@@ -114,10 +114,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         //查询用户合约信息
         EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
-        userContractEntityWrapper.eq("del_flag","0");
-        userContractEntityWrapper.eq("user_id",id);
+        userContractEntityWrapper.eq("del_flag", "0");
+        userContractEntityWrapper.eq("user_id", id);
         List<UserContract> userContracts = userContractService.selectList(userContractEntityWrapper);
-        objectMap.put("userContractList",userContracts);
+        objectMap.put("userContractList", userContracts);
         return ResponseResult.success().add(objectMap);
     }
 
@@ -157,15 +157,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             tbUser.setCreateTime(new Date());
             tbUser.setUpdateTime(new Date());
             tbUser.setRegisterType(registerType);
-            if(registerType == 0){
+            if (registerType == 0) {
                 tbUser.setEmail(loginName);
-            }else{
+            } else {
                 tbUser.setPhoneNumber(loginName);
             }
             tbUser.setPassword(Md5Utils.hash(loginName, map.get("password").toString()));
             tbUser.setSendCode(random);
             tbUser.setUpUserId(sendUserId);
-            tbUser.setPayPassword(Md5Utils.hash(loginName, ((String)map.get("walletPassword"))));
+            tbUser.setPayPassword(Md5Utils.hash(loginName, ((String) map.get("walletPassword"))));
             //获取所有人推荐人id
             String upUserIds = "";
             Object sendUpUserIdsObj = sendUser.get("upUserIds");
@@ -200,7 +200,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
             //添加钱包
             try {
-                walletService.createWallet(Integer.parseInt(userId),(String)map.get("walletPassword"));
+                walletService.createWallet(Integer.parseInt(userId), (String) map.get("walletPassword"));
             } catch (Exception e) {
                 return ResponseResult.fail();
             }
@@ -210,6 +210,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     /**
      * 更新推荐人的团队成员总数
+     *
      * @param userId
      */
     private void updateRecMemberSize(String userId) {
@@ -220,7 +221,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         this.updateById(user);
 
         User u = this.selectById(userId);
-        if(u == null || u.getUpUserId()==null){
+        if (u == null || u.getUpUserId() == null) {
             return;
         }
         //如果存在推荐人 更新推荐人的 成员个数
@@ -403,9 +404,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         EntityWrapper<User> objectEntityWrapper = new EntityWrapper<>();
-        objectEntityWrapper.eq("login_name",loginName);
+        objectEntityWrapper.eq("login_name", loginName);
         List<User> users = this.baseMapper.selectList(objectEntityWrapper);
-        if(users.size() == 0|| !users.get(0).getId().equals(id)){
+        if (users.size() == 0 || !users.get(0).getId().equals(id)) {
             throw new BusinessException("请输入当前用户注册时的邮箱或者手机号");
         }
 
@@ -417,10 +418,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         } else {
             user.setPayPassword(Md5Utils.hash(u.getLoginName(), newPassword));
             EntityWrapper<Wallet> wrapper = new EntityWrapper<>();
-            wrapper.eq("user_id",user.getId());
+            wrapper.eq("user_id", user.getId());
             Wallet wallet = new Wallet();
             wallet.setPassword(newPassword);
-            walletMapper.update(wallet,wrapper);
+            walletMapper.update(wallet, wrapper);
         }
         user.setUpdateTime(new Date());
         return userMapper.updateById(user);
@@ -523,13 +524,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (directNumber >= 15 && goldCount >= 3 && unionSignTotalMoney.compareTo(new BigDecimal("1500000")) >= 0) {
             //王牌玩家
             level = 4;
-        }else if(directNumber >= 15 && sliverCount >= 3 && unionSignTotalMoney.compareTo(new BigDecimal("500000")) >= 0){
+        } else if (directNumber >= 15 && sliverCount >= 3 && unionSignTotalMoney.compareTo(new BigDecimal("500000")) >= 0) {
             //金牌玩家
             level = 3;
-        }else if(directNumber >= 10 && copperCount >= 2 && unionSignTotalMoney.compareTo(new BigDecimal("200000")) >= 0){
+        } else if (directNumber >= 10 && copperCount >= 2 && unionSignTotalMoney.compareTo(new BigDecimal("200000")) >= 0) {
             //银牌玩家
             level = 2;
-        }else if(directNumber >= 10  && unionSignTotalMoney.compareTo(new BigDecimal("80000")) >= 0){
+        } else if (directNumber >= 10 && unionSignTotalMoney.compareTo(new BigDecimal("80000")) >= 0) {
             //铜牌玩家
             level = 1;
         }
@@ -544,10 +545,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //当前用户更新完成 更新父用户的level及签约 进阶总额
         User currentUser = this.selectById(userId);
         String upUserId = currentUser.getUpUserId();
-        if(StringUtils.isEmpty(upUserId)){
+        if (StringUtils.isEmpty(upUserId)) {
             //到顶 没有父级
             return;
-        }else{
+        } else {
             this.updateUserLevel(Integer.parseInt(upUserId));
         }
 
@@ -556,12 +557,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void validatePayPassword(Integer userId, String payPassword) throws BusinessException {
         User user = this.selectById(userId);
-        if(user == null ){
+        if (user == null) {
             throw new BusinessException("用户不存在");
         }
         String needToValidate = Md5Utils.hash(user.getLoginName(), payPassword);
-        if(!user.getPayPassword().equals(needToValidate)){
-           throw new BusinessException("支付密码校验错误");
+        if (!user.getPayPassword().equals(needToValidate)) {
+            throw new BusinessException("支付密码校验错误");
         }
 
     }
@@ -569,18 +570,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void resetPassword(String loginName, String password, String payPassword) throws BusinessException {
         EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
-        userEntityWrapper.eq("del_flag","0");
-        userEntityWrapper.eq("login_name",loginName);
+        userEntityWrapper.eq("del_flag", "0");
+        userEntityWrapper.eq("login_name", loginName);
         List<User> users = this.selectList(userEntityWrapper);
-        if(users.size() == 0){
+        if (users.size() == 0) {
             throw new BusinessException("未查询到响应用户");
         }
         User u = users.get(0);
         User user = new User();
         user.setId(u.getId());
-        user.setPassword(Md5Utils.hash(loginName,password));
-        user.setPayPassword(Md5Utils.hash(loginName,payPassword));
+        user.setPassword(Md5Utils.hash(loginName, password));
+        user.setPayPassword(Md5Utils.hash(loginName, payPassword));
         this.updateById(user);
+    }
+
+    @Override
+    public void updateUserName(String userId, String userName) throws BusinessException {
+        EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
+        userEntityWrapper.eq("del_flag","0");
+        userEntityWrapper.eq("user_name",userName);
+        List<User> users = this.baseMapper.selectList(userEntityWrapper);
+        if(users.size() > 0){
+            throw new BusinessException("该昵称已存在");
+        }
+        User user = new User();
+        user.setId(userId);
+        user.setUserName(userName);
+        this.baseMapper.updateById(user);
     }
 
 }

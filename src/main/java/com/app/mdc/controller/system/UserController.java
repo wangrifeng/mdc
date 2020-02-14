@@ -69,6 +69,14 @@ public class UserController extends BaseController {
         return userService.getOne(id);
     }
 
+
+    @RequestMapping("/updateUserName")
+    @ResponseBody
+    public ResponseResult updateUserName(@RequestParam String userId, @RequestParam String userName) throws BusinessException {
+        userService.updateUserName(userId, userName);
+        return ResponseResult.success();
+    }
+
     /**
      * 新增
      *
@@ -80,11 +88,11 @@ public class UserController extends BaseController {
     @ResponseBody
     @ApiOperation("新增用户")
     public ResponseResult add(@RequestParam Map<String, Object> map) throws BusinessException {
-        if(!map.containsKey("verCode") || !map.containsKey("verId")){
+        if (!map.containsKey("verCode") || !map.containsKey("verId")) {
             throw new BusinessException("验证码验证失败");
         }
         boolean b = verificationCodeService.validateVerCode(map.get("verCode").toString(), map.get("verId").toString());
-        if(!b){
+        if (!b) {
             throw new BusinessException("验证码验证失败");
         }
         return userService.add(map);
@@ -121,9 +129,9 @@ public class UserController extends BaseController {
      *
      * @param id          id
      * @param newPassword 新密码
-     * @param loginName 登录名称
-     * @param verCode 验证码
-     * @param verId 生成验证码的id
+     * @param loginName   登录名称
+     * @param verCode     验证码
+     * @param verId       生成验证码的id
      * @throws BusinessException 抛出错误
      */
     @RequestMapping("/updatePwd")
@@ -137,16 +145,15 @@ public class UserController extends BaseController {
             @RequestParam String loginName,
             @RequestParam String verCode,
             @RequestParam String verId
-            ) {
+    ) {
         ResponseResult responseResult = new ResponseResult();
         try {
-            userService.updatePwd(type, id, newPassword, loginName,verCode,verId);
+            userService.updatePwd(type, id, newPassword, loginName, verCode, verId);
         } catch (BusinessException e) {
             responseResult.setErrMsg(ApiErrEnum.ERR500.toString(), e.getMessage());
         }
         return responseResult;
     }
-
 
 
     @RequestMapping("/resetPassword")
@@ -159,19 +166,19 @@ public class UserController extends BaseController {
             @RequestParam String password,
             @RequestParam String payPassword
     ) throws BusinessException {
-        boolean b = verificationCodeService.validateVerCode(verCode,verId);
-        if(!b){
+        boolean b = verificationCodeService.validateVerCode(verCode, verId);
+        if (!b) {
             throw new BusinessException("验证码验证失败");
         }
-        this.userService.resetPassword(loginName,password,password);
+        this.userService.resetPassword(loginName, password, password);
         return ResponseResult.success();
     }
 
     /**
      * 修改密码
      *
-     * @param gestureSwitch    0关 1开
-     * @param userId 用户id
+     * @param gestureSwitch 0关 1开
+     * @param userId        用户id
      * @throws BusinessException 抛出错误
      */
     @RequestMapping("/updateGestureSwitch")
@@ -181,14 +188,14 @@ public class UserController extends BaseController {
     public ResponseResult updateGestureSwitch(
             @RequestParam Integer gestureSwitch,
             @RequestParam String userId,
-            @RequestParam String verId ,
+            @RequestParam String verId,
             @RequestParam String verCode
     ) throws BusinessException {
-        boolean b = verificationCodeService.validateVerCode(verCode,verId);
-        if(!b){
+        boolean b = verificationCodeService.validateVerCode(verCode, verId);
+        if (!b) {
             throw new BusinessException("验证码验证失败");
         }
-        userService.updateGestureSwitch(gestureSwitch,userId);
+        userService.updateGestureSwitch(gestureSwitch, userId);
         return ResponseResult.success();
     }
 

@@ -6,6 +6,7 @@ import com.app.mdc.model.mdc.UserContract;
 import com.baomidou.mybatisplus.service.IService;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 用户合约关系Service
@@ -72,4 +73,11 @@ public interface UserContractService extends IService<UserContract> {
      * @param ucId
      */
     void rescind(Integer userId, Integer ucId) throws BusinessException;
+
+    /**
+     * 获取高等级的合约
+     * @param contractId
+     * @return
+     */
+    List<Contract> getHigherContract(String contractId);
 }
