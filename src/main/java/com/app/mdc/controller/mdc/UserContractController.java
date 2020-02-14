@@ -75,4 +75,11 @@ public class UserContractController {
         return ResponseResult.success();
     }
 
+    @RequestMapping(value = "/getHigherContract",method = POST)
+    @ApiOperation("获取高等级的用户合约")
+    public ResponseResult getHigherContract(@RequestParam String contractId) {
+        return ResponseResult.success().setData( userContractService.getHigherContract(contractId));
+    }
+
+
 }

@@ -61,4 +61,9 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         }
         return contracts;
     }
+
+    @Override
+    public List<Contract> getHigherContract(String contractId) {
+        return this.baseMapper.getHigherContract(contractId);
+    }
 }

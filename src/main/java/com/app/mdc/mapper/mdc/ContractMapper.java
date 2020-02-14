@@ -16,4 +16,11 @@ public interface ContractMapper extends BaseMapper<Contract> {
 
     @MapKey("id")
     Map<Integer,Contract> selectAllContract();
+
+    /**
+     * 获取高等级的用户合约
+     * @param contractId
+     * @return
+     */
+    List<Contract> getHigherContract(String contractId);
 }

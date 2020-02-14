@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 用户合约servcieImpl
@@ -199,5 +200,10 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 
         //删除用户签约信息
         this.deleteById(ucId);
+    }
+
+    @Override
+    public List<Contract> getHigherContract(String contractId) {
+        return contractService.getHigherContract(contractId);
     }
 }
