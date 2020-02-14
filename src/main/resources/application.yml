@@ -26,6 +26,7 @@ mdc:
     - /verificationCode/getVerificationCode
     - /admin/users/resetPassword
     - /notice/list
+  pchost: http://124.156.171.72:8080
 ---
 
 server:

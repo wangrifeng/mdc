@@ -46,6 +46,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserContractService userContractService;
     @Value("${license.key}")
     private String linceseKey;
+    @Value("${mdc.pchost}")
+    private String pcHost;
+
 
     //用户账号停用状态
     private static final String USER_STATUS_FROZEN = "1";
@@ -111,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //       objectMap.put("roleId", roleId.toString());
 //       objectMap.put("roleName", roleName.toString());
 //       objectMap.put("roleCode", roleCode.toString());
-
+        objectMap.put("shareUrl",pcHost+"/register?sendCode=" + user.getSendCode());
         //查询用户合约信息
         EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
         userContractEntityWrapper.eq("del_flag", "0");
