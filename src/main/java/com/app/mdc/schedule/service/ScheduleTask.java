@@ -56,7 +56,9 @@ public class ScheduleTask {
         List<Wallet> wallets = walletMapper.selectByMap(new HashMap<>());
         Config config = configService.getByKey("INFURA_ADDRESS");
         Config walletAddress = configService.getByKey("WALLET_ADDRESS");
-        Config walletPath = configService.getByKey("WALLET_PATH");
+        Config wallet_path = configService.getByKey("WALLET_PATH");
+        String walletPath = wallet_path.getConfigValue();
+        //String walletPath = "/Users/wangrifeng/wallet/UTC--2020-02-07T13-31-22.32000000Z--eb04131fbe988d43c0f9c0d8a30ccc3636994dda.json";
         Web3j web3j = Web3j.build(new HttpService(config.getConfigValue()));
         Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
         String clientVersion = web3ClientVersion.getWeb3ClientVersion();
@@ -64,10 +66,10 @@ public class ScheduleTask {
         for(Wallet wallet : wallets){
             try {
                 BigDecimal ethBalance = getEthBalance(web3j,wallet.getAddress());
-                if(ethBalance.doubleValue() < 0.00075){
+                if(ethBalance.doubleValue() <= 0.001){
                     //转手续费
-                    Credentials credentials = WalletUtils.loadCredentials("123456", walletPath.getConfigValue());
-                    Transfer.sendFunds(web3j, credentials, wallet.getAddress(), new BigDecimal(1), Convert.Unit.FINNEY).send();
+                    Credentials credentials = WalletUtils.loadCredentials("123456", walletPath);
+                    Transfer.sendFunds(web3j, credentials, wallet.getAddress(), new BigDecimal(3), Convert.Unit.FINNEY).send();
                 }else{
                     BigDecimal balance = getBalance(web3j,wallet.getAddress(),contractAddress);
                     if(balance.doubleValue()> (double) 0){

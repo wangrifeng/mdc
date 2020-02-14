@@ -265,10 +265,10 @@ public class MdcApplicationTests {
 
 		String keyStoreDir = "/Users/wangrifeng/wallet";
 		System.out.println("生成keyStore文件的默认目录：" + keyStoreDir);
-		String passWord="123456";
+		String passWord="654321";
 		//String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
 		//System.out.println(name);
-		String walleFilePath=keyStoreDir+"/UTC--2020-02-12T04-46-49.728000000Z--d42c07023b184a1f6981153a724878312b7b0512.json";
+		String walleFilePath=keyStoreDir+"/UTC--2020-02-14T05-58-18.553000000Z--7a5350a7b7c9006b90b6084ddb8e0d7ac6fb9096.json";
         //String walleFilePath=keyStoreDir+"/"+name;
 
 		Credentials credentials = WalletUtils.loadCredentials(passWord, walleFilePath);
@@ -343,7 +343,7 @@ public class MdcApplicationTests {
 	public void testMDC() throws ExecutionException, InterruptedException, IOException, CipherException {
     	//BigInteger p = BigInteger.valueOf(1000000000000000000L);
     	String p = "000000000000000000";
-    	String fromAddress = "0xd42c07023b184a1f6981153a724878312b7b0512";
+    	String fromAddress = "0x7a5350a7b7c9006b90b6084ddb8e0d7ac6fb9096";
     	String contractAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7";
 
 		Web3j web3j = Web3j.build(new HttpService("https://mainnet.infura.io/v3/50d1c4c05dbd472b85e4acf1cf58b01b"));
@@ -353,10 +353,10 @@ public class MdcApplicationTests {
 		System.out.println("version=" + clientVersion);
 
 
-		String passWord="123456";
+		String passWord="654321";
 //		String name = WalletUtils.generateNewWalletFile(passWord, new File(keyStoreDir), true);
 //		System.out.println(name);
-		String walleFilePath="/Users/wangrifeng/wallet/UTC--2020-02-12T04-46-49.728000000Z--d42c07023b184a1f6981153a724878312b7b0512.json";
+		String walleFilePath="/Users/wangrifeng/wallet/UTC--2020-02-14T05-58-18.553000000Z--7a5350a7b7c9006b90b6084ddb8e0d7ac6fb9096.json";
 
 		Credentials credentials = WalletUtils.loadCredentials(passWord, walleFilePath);
 		//String fromAddress = credentials.getAddress();
@@ -366,8 +366,8 @@ public class MdcApplicationTests {
 		EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(
 				fromAddress, DefaultBlockParameterName.LATEST).sendAsync().get();
 		BigInteger nonce = ethGetTransactionCount.getTransactionCount();
-		Address toAddress = new Address("0x5065d510249259532225db0e979368ee084e7c5f");
-		BigInteger b = new BigInteger("200000");
+		Address toAddress = new Address("eb04131fbe988d43c0f9c0d8a30ccc3636994dda");
+		BigInteger b = new BigInteger("1000000");
 		Uint256 value = new Uint256(b);
 		List<Type> parametersList = new ArrayList<>();
 		parametersList.add(toAddress);
@@ -377,7 +377,7 @@ public class MdcApplicationTests {
 		String encodedFunction = FunctionEncoder.encode(transfer);
 		BigInteger gasPrice = Convert.toWei(BigDecimal.valueOf(18), Convert.Unit.GWEI).toBigInteger();
 		System.out.println(gasPrice);
-		/*RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice,
+		RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice,
 				BigInteger.valueOf(100000), contractAddress, encodedFunction);
 		byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
 		String hexValue = Numeric.toHexString(signedMessage);
@@ -387,7 +387,7 @@ public class MdcApplicationTests {
 		System.out.println(transactionHash);
         System.out.println(ethSendTransaction.getResult());
         System.out.println(JSON.toJSON(ethSendTransaction));
-		Thread.sleep(60000);*/
+		Thread.sleep(60000);
 		String methodName = "balanceOf";
 		List<Type> inputParameters = new ArrayList<>();
 		List<TypeReference<?>> outputParameters = new ArrayList<>();
