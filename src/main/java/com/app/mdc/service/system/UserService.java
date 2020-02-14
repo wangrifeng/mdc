@@ -144,4 +144,12 @@ public interface UserService extends IService<User> {
      * @param password1
      */
     void resetPassword(String loginName, String password, String password1) throws BusinessException;
+
+    /**
+     * 修改昵称
+     * @param userId
+     * @param userName
+     * @return
+     */
+    void updateUserName(String userId, String userName) throws BusinessException;
 }

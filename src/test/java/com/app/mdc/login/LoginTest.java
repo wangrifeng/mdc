@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public class LoginTest {
 
+//    private final String HOST = "http://124.156.171.72:8081";
     private final String HOST = "http://localhost:8081";
 
     @Test
@@ -36,8 +37,17 @@ public class LoginTest {
     @Test
     public void getOne() {
         Map<String, String> param = new HashMap<>();
-        param.put("id", "278");
-        String s = HttpUtil.doPost(HOST + "/admin/users/getOne", param, "7d0d120f-c6aa-49b3-9b0b-30b15e13d749");
+        param.put("id", "283");
+        String s = HttpUtil.doPost(HOST + "/admin/users/getOne", param, "1d49e5b1-c211-430d-9502-52d78adec4d8");
+        System.out.println(s);
+    }
+
+    @Test
+    public void updateUserName() {
+        Map<String, String> param = new HashMap<>();
+        param.put("userId", "1");
+        param.put("userName", "admin");
+        String s = HttpUtil.doPost(HOST + "/admin/users/updateUserName", param, "1d49e5b1-c211-430d-9502-52d78adec4d8");
         System.out.println(s);
     }
 
