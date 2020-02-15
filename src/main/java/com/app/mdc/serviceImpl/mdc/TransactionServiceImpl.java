@@ -63,17 +63,19 @@ import java.util.concurrent.ExecutionException;
 public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Transaction> implements TransactionService {
 
     private final WalletMapper walletMapper;
-    private final UserMapper userMapper;
     private final TransactionMapper transactionMapper;
     private final Web3j web3j;
     private final ConfigService configService;
     private final VerificationCodeService verificationCodeService;
 
+
     @Autowired
-    public TransactionServiceImpl(ConfigService configService,TransactionMapper transactionMapper,WalletMapper walletMapper,UserMapper userMapper,VerificationCodeService verificationCodeService){
+    private UserMapper userMapper;
+
+    @Autowired
+    public TransactionServiceImpl(ConfigService configService,TransactionMapper transactionMapper,WalletMapper walletMapper,VerificationCodeService verificationCodeService){
         this.configService = configService;
         this.walletMapper = walletMapper;
-        this.userMapper = userMapper;
         this.transactionMapper = transactionMapper;
         Config config = configService.getByKey("INFURA_ADDRESS");
         this.web3j = Web3j.build(new HttpService(config.getConfigValue()));
@@ -342,15 +344,16 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseResult buyContract(String userId, String money,String remark,String contractType) {
+    public ResponseResult buyContract(String userId, String money,String remark,String contractType) throws BusinessException {
         EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
         walletEntityWrapper.eq("user_id",userId);
         List<Wallet> wallets = walletMapper.selectList(walletEntityWrapper);
         if(wallets.size() > 0){
             Wallet wallet = wallets.get(0);
             if(wallet.getUstdBlance().doubleValue() < new Double(money)){
-                return ResponseResult.fail(ApiErrEnum.ERR207);
+                throw new BusinessException(ApiErrEnum.ERR207);
             }
             Transaction transaction = new Transaction();
             transaction.setFromAmount(new BigDecimal(money));
@@ -368,7 +371,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             wallet.setUstdBlance(balance.subtract(new BigDecimal(money)));
             walletMapper.updateById(wallet);
         }else{
-            return ResponseResult.fail();
+            throw new BusinessException("钱包不存在");
         }
         return ResponseResult.success();
     }
