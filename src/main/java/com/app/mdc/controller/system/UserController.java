@@ -170,7 +170,7 @@ public class UserController extends BaseController {
         if (!b) {
             throw new BusinessException("验证码验证失败");
         }
-        this.userService.resetPassword(loginName, password, password);
+        this.userService.resetPassword(loginName, password, payPassword);
         return ResponseResult.success();
     }
 
