@@ -16,10 +16,10 @@ public class UserLeveltTest {
     @Test
     public void list(){
         Map<String,String> param  = new HashMap<>();
-        param.put("userId","181");
+        param.put("userId","1");
         param.put("pageNumber","1");
         param.put("pageSize","10");
-        String s = HttpUtil.doPost(HOST + "/userLevel/list", param,"fb900165-9342-4772-bc45-2b29b84584c7");
+        String s = HttpUtil.doPost(HOST + "/userLevel/list", param,"1d49e5b1-c211-430d-9502-52d78adec4d8");
         System.out.println(s);
     }
 

@@ -80,4 +80,11 @@ public interface UserContractService extends IService<UserContract> {
      * @return
      */
     List<Contract> getHigherContract(String contractId);
+
+    /**
+     * 获取解约手续费
+     * @param contractId
+     * @return
+     */
+    BigDecimal getRescindMoney(Integer contractId) throws BusinessException;
 }

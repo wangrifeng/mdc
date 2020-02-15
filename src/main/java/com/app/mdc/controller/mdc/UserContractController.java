@@ -32,6 +32,7 @@ public class UserContractController {
     private UserService userService;
     @Autowired
     private VerificationCodeService verificationCodeService;
+    private Integer contractId;
 
     @RequestMapping(value = "/add",method = POST)
     @ApiOperation("新增用户合同")
@@ -63,6 +64,16 @@ public class UserContractController {
         userContractService.upgrade(userId,ucId,upgradeId);
         return ResponseResult.success();
     }
+
+    @RequestMapping(value = "/getRescindMoney",method = POST)
+    @ApiOperation("获取解约金额")
+    public ResponseResult getRescindMoney(@RequestParam Integer contractId) throws BusinessException {
+        BigDecimal price = userContractService.getRescindMoney(contractId);
+        Map<String,Object> result = new HashMap<>();
+        result.put("rescindMoney",price);
+        return ResponseResult.success().setData(result);
+    }
+
 
     @RequestMapping(value = "/rescind",method = POST)
     @ApiOperation("合约解约")

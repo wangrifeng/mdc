@@ -206,4 +206,17 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
     public List<Contract> getHigherContract(String contractId) {
         return contractService.getHigherContract(contractId);
     }
+
+    @Override
+    public BigDecimal getRescindMoney(Integer contractId) throws BusinessException {
+        Contract contract = contractService.selectById(contractId);
+        if(contract == null){
+            throw new BusinessException("用户绑定合约不存在");
+        }
+        //查询解约金额比率
+        String rescindRate = configService.getByKey("recind_rate").getConfigValue();
+        //计算违约金
+        BigDecimal rescindMoney = contract.getAmount().multiply(new BigDecimal(rescindRate));
+        return rescindMoney;
+    }
 }

@@ -16,7 +16,7 @@ public class LoginTest {
 
     @Test
     public void register() {
-        String prefix = "test@qq.com";
+        String prefix = "tes2131t@qq.com";
 //        for(int i=1;i<=10;i++){
         Map<String, String> param = new HashMap<>();
         param.put("loginName", prefix);
@@ -24,7 +24,7 @@ public class LoginTest {
         param.put("roleId", "10");
         param.put("password", "123456");
         param.put("sendCode", "888888");
-        param.put("walletPassword", "123456");
+        param.put("walletPassword", "11232123456");
         param.put("verCode", "835062");
         param.put("verId", "47");
         param.put("registerType", "0");
@@ -45,9 +45,9 @@ public class LoginTest {
     @Test
     public void updateUserName() {
         Map<String, String> param = new HashMap<>();
-        param.put("userId", "1");
-        param.put("userName", "admin");
-        String s = HttpUtil.doPost(HOST + "/admin/users/updateUserName", param, "1d49e5b1-c211-430d-9502-52d78adec4d8");
+        param.put("userId", "278");
+        param.put("userName", "test222");
+        String s = HttpUtil.doPost(HOST + "/admin/users/updateUserName", param, "31ddc0a8-2d72-48a2-9621-bb286a8617ea");
         System.out.println(s);
     }
 
@@ -64,9 +64,9 @@ public class LoginTest {
     @Test
     public void resetPassword() {
         Map<String, String> param = new HashMap<>();
-        param.put("verCode", "8ILD8s");
-        param.put("verId", "10");
-        param.put("loginName", "K");
+        param.put("verCode", "835062");
+        param.put("verId", "47");
+        param.put("loginName", "1424547204@qq.com");
         param.put("password", "123456");
         param.put("payPassword", "123456");
         String s = HttpUtil.doPost(HOST + "/admin/users/resetPassword", param, null);
