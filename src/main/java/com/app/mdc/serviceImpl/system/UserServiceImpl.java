@@ -126,8 +126,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseResult add(Map<String, Object> map) {
+    public ResponseResult add(Map<String, Object> map) throws BusinessException {
         //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
+        validatePayPassword(((String) map.get("walletPassword")));
         Integer registerType = Integer.parseInt(map.get("registerType").toString());
         String loginName = map.get("loginName").toString();
         Integer count = userMapper.user(loginName);
@@ -211,6 +212,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
     }
 
+    private void validatePayPassword(String payPassword) throws BusinessException {
+        if(payPassword == null || payPassword.length() != 6){
+            throw new BusinessException("支付密码的长度只能为6");
+        }
+    }
     /**
      * 更新推荐人的团队成员总数
      *
@@ -419,6 +425,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (type == 0) {
             user.setPassword(Md5Utils.hash(u.getLoginName(), newPassword));
         } else {
+            validatePayPassword(newPassword);
             user.setPayPassword(Md5Utils.hash(u.getLoginName(), newPassword));
             EntityWrapper<Wallet> wrapper = new EntityWrapper<>();
             wrapper.eq("user_id", user.getId());
@@ -572,6 +579,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void resetPassword(String loginName, String password, String payPassword) throws BusinessException {
+        validatePayPassword(payPassword);
+
         EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
         userEntityWrapper.eq("del_flag", "0");
         userEntityWrapper.eq("login_name", loginName);

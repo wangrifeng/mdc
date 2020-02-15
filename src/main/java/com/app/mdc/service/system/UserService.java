@@ -23,7 +23,7 @@ public interface UserService extends IService<User> {
      * @param map   id   username password    name    telephone   position    remark  status  roleId  companyid   rank    code
      * @return
      */
-    ResponseResult add(Map<String,Object> map);
+    ResponseResult add(Map<String,Object> map) throws BusinessException;
 
     /**
      *  修改
