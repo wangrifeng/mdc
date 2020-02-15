@@ -344,7 +344,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     @Override
     public ResponseResult buyContract(String userId, String money,String remark,String contractType) throws BusinessException {
         EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
