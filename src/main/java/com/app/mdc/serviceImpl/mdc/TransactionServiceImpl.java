@@ -376,15 +376,16 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseResult buyAdvance(String userId, String money) {
+    public ResponseResult buyAdvance(String userId, String money) throws BusinessException {
         EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
         walletEntityWrapper.eq("user_id",userId);
         List<Wallet> wallets = walletMapper.selectList(walletEntityWrapper);
         if(wallets.size() > 0){
             Wallet wallet = wallets.get(0);
             if(wallet.getMdcBlance().doubleValue() < new Double(money)){
-                return ResponseResult.fail(ApiErrEnum.ERR207);
+                throw new BusinessException(ApiErrEnum.ERR207);
             }
             Transaction transaction = new Transaction();
             transaction.setFromAmount(new BigDecimal(money));
@@ -400,7 +401,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             wallet.setMdcBlance(balance.subtract(new BigDecimal(money)));
             walletMapper.updateById(wallet);
         }else{
-            return ResponseResult.fail();
+            throw new BusinessException("钱包不存在");
         }
         return ResponseResult.success();
     }

@@ -75,7 +75,7 @@ public interface TransactionService extends IService<Transaction> {
      * @param money 购买钱
      * @return ResponseResult
      */
-    ResponseResult buyAdvance(String userId,String money);
+    ResponseResult buyAdvance(String userId,String money) throws BusinessException;
 
     ResponseResult handleInvest() throws ExecutionException, InterruptedException;
 
