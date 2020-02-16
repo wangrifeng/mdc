@@ -152,4 +152,6 @@ public interface UserService extends IService<User> {
      * @return
      */
     void updateUserName(String userId, String userName) throws BusinessException;
+
+    ResponseResult registerAdd(String userName, String loginName, String password, String walletPassword, Integer sendCode, Integer registerType);
 }
