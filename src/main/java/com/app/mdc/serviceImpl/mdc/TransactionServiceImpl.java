@@ -127,9 +127,13 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                 return ResponseResult.fail(ApiErrEnum.ERR205);
             }
             BigDecimal usdtFrom = fromWallet.getUstdBlance();
-            BigDecimal usdtTo = toWallet.getUstdBlance();
+
             fromWallet.setUstdBlance(usdtFrom.subtract(trans));
-            toWallet.setUstdBlance(usdtTo.add(trans).subtract(fee));
+            if(toWallet.getUserId() != null){
+                BigDecimal usdtTo = toWallet.getUstdBlance();
+                toWallet.setUstdBlance(usdtTo.add(trans).subtract(fee));
+            }
+
         }else if("1".equals(walletType)){
             Config config = configService.getByKey("MDC_TRANS_FEE");
             String value = config.getConfigValue();
@@ -139,9 +143,13 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             }
 
             BigDecimal usdtFrom = fromWallet.getMdcBlance();
-            BigDecimal usdtTo = toWallet.getMdcBlance();
+
             fromWallet.setMdcBlance(usdtFrom.subtract(trans));
-            toWallet.setMdcBlance(usdtTo.add(trans).subtract(fee));
+            if(toWallet.getUserId() != null){
+                BigDecimal usdtTo = toWallet.getMdcBlance();
+                toWallet.setMdcBlance(usdtTo.add(trans).subtract(fee));
+            }
+
         }
 
         Transaction transaction = new Transaction();
@@ -154,7 +162,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         //0-usdt
         transaction.setFromWalletType("0");
         transaction.setToAmount(trans.subtract(fee));
-        if(toWallet.getUserId() != null || toWallet.getUserId() != 0){
+        if(toWallet.getUserId() != null){
             transaction.setToUserId(toWallet.getUserId());
         }
         transaction.setToWalletAddress(toWalletAddress);
@@ -229,6 +237,9 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         boolean flag = verificationCodeService.validateVerCode(verCode,verId);
         if(!flag){
             return ResponseResult.fail(ApiErrEnum.ERR203);
+        }
+        if(!toAddress.startsWith("0x") || toAddress.length() != 42){
+            return ResponseResult.fail(ApiErrEnum.ERR208);
         }
         BigDecimal cashOut = new BigDecimal(cashOutMoney);
         //Config contractAddress = configService.getByKey("USDT_CONTRACT_ADDRESS");
