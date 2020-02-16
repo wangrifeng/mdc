@@ -20,9 +20,9 @@ import com.app.mdc.utils.date.DateUtil;
 import com.app.mdc.utils.viewbean.Page;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.pagination.PageHelper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -183,9 +183,9 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
     @Override
     public ResponseResult getETHBlance(Page page, Map<String,Object> params) {
+        PageHelper.startPage(Integer.parseInt(params.get("pageNum").toString()),Integer.parseInt(params.get("pageSize").toString()));
         params.remove("pageNum");
         params.remove("pageSize");
-        PageHelper.startPage(page.getPageNum(),page.getPageSize());
         List<Transaction> transactionList = transactionMapper.selectByMap(params);
         return ResponseResult.success().setData(new PageInfo<>(transactionList));
     }
