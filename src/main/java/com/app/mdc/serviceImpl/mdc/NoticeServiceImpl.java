@@ -28,6 +28,8 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 
     @Override
     public List<Notice> list() {
-        return this.selectList(new EntityWrapper<>());
+        EntityWrapper<Notice> objectEntityWrapper = new EntityWrapper<>();
+        objectEntityWrapper.orderBy("create_time",false);
+        return this.selectList(objectEntityWrapper);
     }
 }
