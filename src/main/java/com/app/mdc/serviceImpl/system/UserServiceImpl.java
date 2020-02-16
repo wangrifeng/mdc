@@ -114,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //       objectMap.put("roleId", roleId.toString());
 //       objectMap.put("roleName", roleName.toString());
 //       objectMap.put("roleCode", roleCode.toString());
-        objectMap.put("shareUrl",pcHost+"/register?sendCode=" + user.getSendCode());
+        objectMap.put("shareUrl",pcHost+"/register.html?sendCode=" + user.getSendCode());
         //查询用户合约信息
         EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
         userContractEntityWrapper.eq("del_flag", "0");
@@ -611,4 +611,95 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         this.baseMapper.updateById(user);
     }
 
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseResult registerAdd(String userName, String loginName, String password, String walletPassword, Integer sendCode, Integer registerType) {
+        try{
+            validatePayPassword(walletPassword);
+        }catch (BusinessException e){
+            return ResponseResult.fail("500",e.getMessage());
+        }
+
+        //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
+        Integer count = userMapper.user(loginName);
+        Integer isRepeat = userMapper.isRepeat(userName);
+        if (count > 0) {
+            //登录名称重复
+            return ResponseResult.fail("403","登录名称重复");
+        } else if (isRepeat > 0) {
+            //用户名称重复
+            return ResponseResult.fail("403","用户名称重复");
+        } else if (sendCode == null) {
+            //推荐码不存在
+            return ResponseResult.fail("403","推荐码不存在");
+        } else {
+            // 新增用户
+            //获取推送人id
+            Map<String, Object> sendUser = userMapper.getUserBySendCode(sendCode);
+            if (sendUser == null || sendUser.get("userId") == null) {
+                //推送码失效
+                return ResponseResult.fail("403","推送码失效");
+            }
+            String sendUserId = sendUser.get("userId").toString();
+            //生成6位随机的邀请码
+            int random = (int) ((Math.random() * 9 + 1) * 100000);
+            //新增用户
+            User tbUser = new User();
+            tbUser.setUserName(userName);
+            tbUser.setLoginName(loginName);
+            tbUser.setDelFlag(0);
+            tbUser.setCreateTime(new Date());
+            tbUser.setUpdateTime(new Date());
+            tbUser.setRegisterType(registerType);
+            if (registerType == 0) {
+                tbUser.setEmail(loginName);
+            } else {
+                tbUser.setPhoneNumber(loginName);
+            }
+            tbUser.setPassword(Md5Utils.hash(loginName+ password));
+            tbUser.setSendCode(random);
+            tbUser.setUpUserId(sendUserId);
+            tbUser.setPayPassword(Md5Utils.hash(loginName+ walletPassword));
+            //获取所有人推荐人id
+            String upUserIds = "";
+            Object sendUpUserIdsObj = sendUser.get("upUserIds");
+            if (sendUser.get("upUserId") == null) {
+                //推荐人本身没有推荐人 最顶级
+                upUserIds = sendUserId;
+            } else {
+                //推荐人还有推荐人
+                upUserIds = sendUpUserIdsObj.toString() + "," + sendUserId;
+            }
+            tbUser.setUpUserIds(upUserIds);
+            int userCount = userMapper.insert(tbUser);
+
+            //新增用户层级关系
+            userLevelService.addLevelRelation(upUserIds, tbUser.getId());
+
+            //新增用户角色中间表
+            String userId = tbUser.getId();
+//            String roleId = map.get("roleId").toString();
+//            if (StringUtils.isNotEmpty(roleId)) {
+//                String[] arr = roleId.split(",");
+//                for (String string : arr) {
+//                    RoleUser roleUser = new RoleUser();
+//                    roleUser.setRoleId(string);
+//                    roleUser.setUserId(userId);
+//                    roleUserMapper.insert(roleUser);
+//                }
+//            }
+
+            //更新推荐人的团队成员总数
+            this.updateRecMemberSize(sendUserId);
+
+            //添加钱包
+            try {
+                walletService.createWallet(Integer.parseInt(userId), walletPassword);
+            } catch (Exception e) {
+                return ResponseResult.fail();
+            }
+            return userCount == 1 ? ResponseResult.success() : ResponseResult.fail();
+        }
+    }
 }

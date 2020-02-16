@@ -6,16 +6,17 @@ import com.app.mdc.enums.ApiErrEnum;
 import com.app.mdc.exception.BusinessException;
 import com.app.mdc.model.system.File;
 import com.app.mdc.model.system.Params;
-import com.app.mdc.service.system.AppVersionLogService;
-import com.app.mdc.service.system.FileService;
-import com.app.mdc.service.system.ParamsService;
-import com.app.mdc.service.system.UserService;
+import com.app.mdc.service.system.*;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -43,6 +44,8 @@ public class MainController extends BaseController {
     private final FileService fileService;
     private final PicConfig picConfig;
     private final AppVersionLogService appVersionLogService;
+    @Autowired
+    private  VerificationCodeService verificationCodeService;
 
     public MainController(UserService userService, ParamsService paramsService, FileService fileService, PicConfig picConfig, AppVersionLogService appVersionLogService) {
         this.userService = userService;
@@ -63,6 +66,31 @@ public class MainController extends BaseController {
         Map<String, String> params = paramsService.findSystemParams();
         return params.get("app_version");
     }
+
+    /**
+     * 用户分享注册
+     */
+    @PostMapping("/registerAdd")
+    @Transactional(rollbackFor = Exception.class)
+    @ResponseBody
+    public ResponseResult registerAdd(
+            @RequestParam String userName,
+            @RequestParam String loginName,
+            @RequestParam String password,
+            @RequestParam String walletPassword,
+            @RequestParam Integer sendCode,
+            @RequestParam String verCode,
+            @RequestParam String verId,
+            @RequestParam Integer registerType
+    )
+    {
+        boolean b = verificationCodeService.validateVerCode(verCode, verId);
+        if(!b){
+            return ResponseResult.fail("403","验证码校验错误");
+        }
+        return this.userService.registerAdd(userName,loginName,password,walletPassword,sendCode,registerType);
+    }
+
 
     /**
      * 用户登录接口
