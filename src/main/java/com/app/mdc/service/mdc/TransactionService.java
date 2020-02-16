@@ -9,6 +9,7 @@ import org.web3j.crypto.CipherException;
 import org.web3j.protocol.exceptions.TransactionException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -79,4 +80,5 @@ public interface TransactionService extends IService<Transaction> {
 
     ResponseResult handleInvest() throws ExecutionException, InterruptedException;
 
+    List<Transaction> incomeHistory(Integer userId);
 }

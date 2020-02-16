@@ -457,6 +457,11 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
+    @Override
+    public List<Transaction> incomeHistory(Integer userId) {
+        return this.baseMapper.incomeHistory(userId);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public String transfer(String userId,String payPassword,String walletPassword,String transferNumber,String fromPath,String fromAddress,String toAddress,String walletType) throws IOException, CipherException, ExecutionException, InterruptedException, BusinessException {
         User u = userMapper.selectById(userId);

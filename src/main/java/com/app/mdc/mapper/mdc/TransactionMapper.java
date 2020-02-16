@@ -6,6 +6,8 @@ import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -17,4 +19,5 @@ import org.springframework.stereotype.Component;
 @Component
 public interface TransactionMapper extends BaseMapper<Transaction> {
 
+    List<Transaction> incomeHistory(Integer userId);
 }

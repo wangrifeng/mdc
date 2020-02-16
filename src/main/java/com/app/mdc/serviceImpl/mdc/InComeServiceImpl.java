@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,8 @@ public class InComeServiceImpl extends ServiceImpl<InComeMapper, InCome> impleme
     @Override
     public List<Transaction> history(Integer userId) {
         EntityWrapper<Transaction> transactionEntityWrapper = new EntityWrapper<>();
-        transactionEntityWrapper.eq("transaction_type","4");
-        transactionEntityWrapper.eq("from_user_id",userId);
-        return transactionService.selectList(transactionEntityWrapper);
+        transactionEntityWrapper.eq("transaction_type", 4).and().eq("from_user_id",userId);
+        transactionEntityWrapper.eq("transaction_type", 6).and().eq("to_user_id",userId);
+        return transactionService.incomeHistory(userId);
     }
 }

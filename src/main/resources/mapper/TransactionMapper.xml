@@ -3,5 +3,27 @@
 <mapper namespace="com.app.mdc.mapper.mdc.TransactionMapper">
 
 
-
+    <select id="incomeHistory" resultType="com.app.mdc.model.mdc.Transaction">
+        select
+        transaction_id as transactionId ,
+        from_user_id as fromUserId,
+        from_wallet_address as fromWalletAddress ,
+        to_user_id as toUserId ,
+        to_wallet_address as toWalletAddress ,
+        from_amount as fromAmount ,
+        from_wallet_type as fromWalletType ,
+        to_amount as toAmount ,
+        to_wallet_type as toWalletType ,
+        fee_amount as feeAmount ,
+        transaction_type as transactionType ,
+        create_time as createTime ,
+        remark ,
+        transaction_status as transactionStatus ,
+        transaction_hash as transactionHash ,
+        contract_type as contractType
+        from
+        mdc_transaction
+        where
+        (transaction_type = 4 and from_user_id = #{userId}) or (transaction_type = 6 and to_user_id = #{userId})
+    </select>
 </mapper>
