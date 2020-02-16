@@ -101,6 +101,7 @@
         union
         select #{userId}
         )
+        order by su.user_id desc
      </select>
 
     <select id="getUsersInUmbrella" resultType="com.app.mdc.model.system.User">
