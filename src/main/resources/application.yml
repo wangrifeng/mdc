@@ -30,7 +30,7 @@ mdc:
 ---
 
 server:
-  port: 8081
+  port: 80
 #spring基本配置，开发环境
 spring:
   profiles: dev
@@ -43,10 +43,10 @@ license:
   key: "b266593f-21d6-4772-9ef9-795a5faffc78"
 
 pic:
-  postUrl: http://127.0.0.1:8081
+  postUrl: http://127.0.0.1:80
   APPID : IdsRsnLAoS7d3O1FDHHSc6
   APPKEY : BCMTPnVbqg8PVL1zbeBDj3
   MASTERSECRET : 9GfC5TVPQJAXfbTUJ2ms98
-  msgPushUrl : http:///127.0.0.1:8081/appMsgPush
+  msgPushUrl : http:///127.0.0.1:80/appMsgPush
   appPackagaName: ywApp.dclond
 
