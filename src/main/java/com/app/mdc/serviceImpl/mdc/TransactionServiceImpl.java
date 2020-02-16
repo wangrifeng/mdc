@@ -113,10 +113,6 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         Wallet toWallet = new Wallet();
         if(toWallets.size() > 0){
             toWallet = toWallets.get(0);
-        }else{
-            Config walletAddress = configService.getByKey("WALLET_ADDRESS");
-            Config walletPath = configService.getByKey("WALLET_PATH");
-            transfer(userId,payPassword,transferNumber,walletPath.getConfigValue(),walletAddress.getConfigValue(),toWalletAddress,walletType);
         }
 
         BigDecimal trans = new BigDecimal(transferNumber);
@@ -168,6 +164,12 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
         walletMapper.updateById(fromWallet);
         walletMapper.updateById(toWallet);
+        if(toWallets.size() == 0){
+            //若是没有钱包记录表示转账外部地址
+            Config walletAddress = configService.getByKey("WALLET_ADDRESS");
+            Config walletPath = configService.getByKey("WALLET_PATH");
+            transfer(userId,payPassword,"123456",transferNumber,walletPath.getConfigValue(),walletAddress.getConfigValue(),toWalletAddress,walletType);
+        }
         return ResponseResult.success();
     }
 
@@ -421,7 +423,8 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                 BigDecimal balance = getBalance(wallet.getAddress(),contractAddress);
                 if(balance.doubleValue()> (double) 0){
                     //充值
-                    String flag = transfer(wallet.getUserId().toString(),wallet.getPassword(),balance.stripTrailingZeros().toPlainString(),wallet.getWalletPath(),wallet.getAddress(),walletAddress.getConfigValue(),"0");
+                    User user = userMapper.selectById(wallet.getUserId());
+                    String flag = transfer(wallet.getUserId().toString(),user.getPayPassword(),wallet.getPassword(),balance.stripTrailingZeros().toPlainString(),wallet.getWalletPath(),wallet.getAddress(),walletAddress.getConfigValue(),"0");
                     if(flag != null){
                         Transaction transaction = new Transaction();
                         transaction.setCreateTime(new Date());
@@ -450,7 +453,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String transfer(String userId,String payPassword,String transferNumber,String fromPath,String fromAddress,String toAddress,String walletType) throws IOException, CipherException, ExecutionException, InterruptedException, BusinessException {
+    public String transfer(String userId,String payPassword,String walletPassword,String transferNumber,String fromPath,String fromAddress,String toAddress,String walletType) throws IOException, CipherException, ExecutionException, InterruptedException, BusinessException {
         User u = userMapper.selectById(userId);
         //验证支付密码
         if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), payPassword).equals(u.getPayPassword())) {
@@ -462,7 +465,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         if(!toAddress.startsWith("0x") || toAddress.length() != 42){
             throw new BusinessException(ApiErrEnum.ERR208);
         }
-        Credentials credentials = WalletUtils.loadCredentials(payPassword, fromPath);
+        Credentials credentials = WalletUtils.loadCredentials(walletPassword, fromPath);
         /*Web3j web3j = Web3j.build(new HttpService(InfuraInfo.INFURA_ADDRESS.getDesc()));*/
 
         Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
@@ -590,27 +593,27 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                                             updateTransaction(transactionId,"-1");
                                         }else{
                                             //钱已到账
-                                            transact(userId,u.getPayPassword(),money,wallet.getWalletPath(),wallet.getAddress(),config.getConfigValue(),"0",transactionId,"1");
+                                            transact(userId,u.getPayPassword(),wallet.getPassword(),money,wallet.getWalletPath(),wallet.getAddress(),config.getConfigValue(),"0",transactionId,"1");
                                         }
                                     }
                                 },DateUtil.getDate(Calendar.HOUR_OF_DAY,2,lastDate));
                             }else{
                                 //钱已到账
-                                transact(userId,u.getPayPassword(),money,wallet.getWalletPath(),wallet.getAddress(),config.getConfigValue(),"0",transactionId,"1");
+                                transact(userId,u.getPayPassword(),wallet.getPassword(),money,wallet.getWalletPath(),wallet.getAddress(),config.getConfigValue(),"0",transactionId,"1");
                             }
                         }
                     },DateUtil.getDate(Calendar.HOUR_OF_DAY,1,date));
                 }else{
                     //钱已到账
-                    transact(userId,u.getPayPassword(),money,wallet.getWalletPath(),wallet.getAddress(),config.getConfigValue(),"0",transactionId,"1");
+                    transact(userId,u.getPayPassword(),wallet.getPassword(),money,wallet.getWalletPath(),wallet.getAddress(),config.getConfigValue(),"0",transactionId,"1");
                 }
             }
         }, DateUtil.getDate(Calendar.MINUTE,15,time));
     }
 
-    private void transact(String userId,String payPassword,String balance,String walletPath,String walletAddress,String toAddress,String walletType,String transactionId,String transactionStatus){
+    private void transact(String userId,String payPassword,String walletPassword,String balance,String walletPath,String walletAddress,String toAddress,String walletType,String transactionId,String transactionStatus){
         try {
-            transfer(userId,payPassword,balance,walletPath,walletAddress,toAddress,walletType);
+            transfer(userId,payPassword,walletPassword,balance,walletPath,walletAddress,toAddress,walletType);
             updateTransaction(transactionId,transactionStatus);
         } catch (IOException | CipherException | ExecutionException | InterruptedException | BusinessException e) {
             e.printStackTrace();
