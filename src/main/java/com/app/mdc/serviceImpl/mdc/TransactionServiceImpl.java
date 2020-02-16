@@ -121,14 +121,11 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         if("0".equals(walletType)){
             Config config = configService.getByKey("USDT_TRANS_FEE");
             String value = config.getConfigValue();
-            fee = new BigDecimal(value);
+            fee = trans.multiply(new BigDecimal(value));
+
             if(trans.doubleValue() > fromWallet.getUstdBlance().doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR205);
             }
-            if(trans.doubleValue() < fee.doubleValue()){
-                return ResponseResult.fail("ERR209","转账金额必须大于手续费");
-            }
-
             BigDecimal usdtFrom = fromWallet.getUstdBlance();
             BigDecimal usdtTo = toWallet.getUstdBlance();
             fromWallet.setUstdBlance(usdtFrom.subtract(trans));
@@ -136,13 +133,11 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         }else if("1".equals(walletType)){
             Config config = configService.getByKey("MDC_TRANS_FEE");
             String value = config.getConfigValue();
-            fee = new BigDecimal(value);
+            fee = trans.multiply(new BigDecimal(value));
             if(trans.doubleValue() > fromWallet.getMdcBlance().doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR206);
             }
-            if(trans.doubleValue() < fee.doubleValue()){
-                return ResponseResult.fail("ERR209","转账金额必须大于手续费");
-            }
+
             BigDecimal usdtFrom = fromWallet.getMdcBlance();
             BigDecimal usdtTo = toWallet.getMdcBlance();
             fromWallet.setMdcBlance(usdtFrom.subtract(trans));
@@ -321,13 +316,11 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             Wallet wallet = wallets.get(0);
             BigDecimal convert = new BigDecimal(convertMoney);
             BigDecimal mdcConvert = new BigDecimal(config.getConfigValue());
-            BigDecimal convertFee = new BigDecimal(fee.getConfigValue());
+            BigDecimal convertFee = convert.multiply(new BigDecimal(fee.getConfigValue()));
             BigDecimal balance = wallet.getMdcBlance();
             BigDecimal actualConvert = convert.add(convertFee);
             if(balance.doubleValue() < convert.doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR206);
-            }else if(convert.doubleValue() < convertFee.doubleValue()){
-                return ResponseResult.fail("ERR209","MDC兑换USDT金额必须大于手续费");
             }else{
                 Transaction transaction = new Transaction();
                 transaction.setFeeAmount(convertFee);
