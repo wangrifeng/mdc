@@ -98,11 +98,13 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
 
 
     @Override
-    public boolean validateVerCode(String verCode, String verId) {
+    public boolean validateVerCode(String verCode, String verId)  {
         VerificationCode verificationCode = this.baseMapper.selectById(verId);
         if(verificationCode == null){
             return false;
         }
+        //验证成功后删除该验证码
+        this.baseMapper.deleteById(verificationCode.getId());
         return verCode.equals(verificationCode.getCode());
     }
 
