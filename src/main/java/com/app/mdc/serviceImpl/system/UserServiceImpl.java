@@ -114,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //       objectMap.put("roleId", roleId.toString());
 //       objectMap.put("roleName", roleName.toString());
 //       objectMap.put("roleCode", roleCode.toString());
-        objectMap.put("shareUrl",pcHost+"/register?sendCode=" + user.getSendCode());
+        objectMap.put("shareUrl",pcHost+"/register.html?sendCode=" + user.getSendCode());
         //查询用户合约信息
         EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
         userContractEntityWrapper.eq("del_flag", "0");
