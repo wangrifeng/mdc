@@ -114,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //       objectMap.put("roleId", roleId.toString());
 //       objectMap.put("roleName", roleName.toString());
 //       objectMap.put("roleCode", roleCode.toString());
-        objectMap.put("shareUrl",pcHost+"/register.html?sendCode=" + user.getSendCode());
+        objectMap.put("shareUrl", pcHost + "/register.html?sendCode=" + user.getSendCode());
         //查询用户合约信息
         EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
         userContractEntityWrapper.eq("del_flag", "0");
@@ -132,14 +132,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Integer registerType = Integer.parseInt(map.get("registerType").toString());
         String loginName = map.get("loginName").toString();
         Integer count = userMapper.user(loginName);
-        Integer isRepeat = userMapper.isRepeat(map.get("userName").toString());
+//        Integer isRepeat = userMapper.isRepeat(map.get("userName").toString());
         if (count > 0) {
             //登录名称重复
             return ResponseResult.fail(ApiErrEnum.ERR600);
-        } else if (isRepeat > 0) {
-            //用户名称重复
-            return ResponseResult.fail(ApiErrEnum.ERR602);
-        } else if (map.get("sendCode") == null) {
+        }
+        //else if (isRepeat > 0) {
+//            //用户名称重复
+//            return ResponseResult.fail(ApiErrEnum.ERR602);
+//        }
+        else if (map.get("sendCode") == null) {
             //推荐码不存在
             return ResponseResult.fail();
         } else {
@@ -213,10 +215,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private void validatePayPassword(String payPassword) throws BusinessException {
-        if(payPassword == null || payPassword.length() != 6){
+        if (payPassword == null || payPassword.length() != 6) {
             throw new BusinessException("支付密码的长度只能为6");
         }
     }
+
     /**
      * 更新推荐人的团队成员总数
      *
@@ -599,10 +602,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void updateUserName(String userId, String userName) throws BusinessException {
         EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
-        userEntityWrapper.eq("del_flag","0");
-        userEntityWrapper.eq("user_name",userName);
+        userEntityWrapper.eq("del_flag", "0");
+        userEntityWrapper.eq("user_name", userName);
         List<User> users = this.baseMapper.selectList(userEntityWrapper);
-        if(users.size() > 0){
+        if (users.size() > 0) {
             throw new BusinessException("该昵称已存在");
         }
         User user = new User();
@@ -615,31 +618,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResponseResult registerAdd(String userName, String loginName, String password, String walletPassword, Integer sendCode, Integer registerType) {
-        try{
+        try {
             validatePayPassword(walletPassword);
-        }catch (BusinessException e){
-            return ResponseResult.fail("500",e.getMessage());
+        } catch (BusinessException e) {
+            return ResponseResult.fail("500", e.getMessage());
         }
 
         //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
         Integer count = userMapper.user(loginName);
-        Integer isRepeat = userMapper.isRepeat(userName);
+//        Integer isRepeat = userMapper.isRepeat(userName);
         if (count > 0) {
             //登录名称重复
-            return ResponseResult.fail("403","登录名称重复");
-        } else if (isRepeat > 0) {
-            //用户名称重复
-            return ResponseResult.fail("403","用户名称重复");
-        } else if (sendCode == null) {
+            return ResponseResult.fail("403", "登录名称重复");
+        }
+//        else if (isRepeat > 0) {
+//            //用户名称重复
+//            return ResponseResult.fail("403", "用户名称重复");
+//        }
+        else if (sendCode == null) {
             //推荐码不存在
-            return ResponseResult.fail("403","推荐码不存在");
+            return ResponseResult.fail("403", "推荐码不存在");
         } else {
             // 新增用户
             //获取推送人id
             Map<String, Object> sendUser = userMapper.getUserBySendCode(sendCode);
             if (sendUser == null || sendUser.get("userId") == null) {
                 //推送码失效
-                return ResponseResult.fail("403","推送码失效");
+                return ResponseResult.fail("403", "推送码失效");
             }
             String sendUserId = sendUser.get("userId").toString();
             //生成6位随机的邀请码
@@ -657,10 +662,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             } else {
                 tbUser.setPhoneNumber(loginName);
             }
-            tbUser.setPassword(Md5Utils.hash(loginName+ password));
+            tbUser.setPassword(Md5Utils.hash(loginName + password));
             tbUser.setSendCode(random);
             tbUser.setUpUserId(sendUserId);
-            tbUser.setPayPassword(Md5Utils.hash(loginName+ walletPassword));
+            tbUser.setPayPassword(Md5Utils.hash(loginName + walletPassword));
             //获取所有人推荐人id
             String upUserIds = "";
             Object sendUpUserIdsObj = sendUser.get("upUserIds");
