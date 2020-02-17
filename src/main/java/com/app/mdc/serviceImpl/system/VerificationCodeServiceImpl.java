@@ -10,6 +10,7 @@ import com.app.mdc.service.system.UserService;
 import com.app.mdc.service.system.VerificationCodeService;
 import com.app.mdc.utils.httpclient.HttpUtil;
 import com.app.mdc.utils.verification.RandomValidateCodeUtil;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,9 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -45,15 +46,27 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
 
         if(user.getRegisterType() == 0){
             //邮箱
-            return this.getEmailVerificationCode(user.getLoginName());
+            return this.getEmailVerificationCode(user.getLoginName(), 0);
         }else{
             //手机
-            return this.getPhoneVerificationCode(user.getLoginName());
+            return this.getPhoneVerificationCode(user.getLoginName(), 0);
         }
     }
 
     @Override
-    public Integer getEmailVerificationCode(String email) throws BusinessException {
+    public Integer getEmailVerificationCode(String email, Integer kind) throws BusinessException {
+        //找回密码 判断用户是否存在
+        if(kind == 10){
+            EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
+            userEntityWrapper.eq("del_flag","0");
+            userEntityWrapper.eq("login_name",email);
+            List<User> users = userService.selectList(userEntityWrapper);
+            if(users.size() == 0){
+                throw new BusinessException("该账号不存在");
+            }
+        }
+
+
         //生成验证码入库
         String randcode = RandomValidateCodeUtil.getRandcode();
         VerificationCode verificationCode = new VerificationCode(randcode, "游客", new Date());
@@ -71,7 +84,17 @@ public class VerificationCodeServiceImpl extends ServiceImpl<VerificationCodeMap
     }
 
     @Override
-    public Integer getPhoneVerificationCode(String phone) throws BusinessException {
+    public Integer getPhoneVerificationCode(String phone, Integer kind) throws BusinessException {
+        //找回密码 判断用户是否存在
+        if(kind == 10){
+            EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
+            userEntityWrapper.eq("del_flag","0");
+            userEntityWrapper.eq("login_name",phone);
+            List<User> users = userService.selectList(userEntityWrapper);
+            if(users.size() == 0){
+                throw new BusinessException("该账号不存在");
+            }
+        }
         //生成验证码入库
         String randcode = RandomValidateCodeUtil.getRandcode();
         VerificationCode verificationCode = new VerificationCode(randcode, "游客", new Date());
