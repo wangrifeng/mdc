@@ -44,7 +44,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void add(Integer userId, Integer contractId, Integer number) throws BusinessException {
         //查询订购的合约详情
         Contract contract = contractService.selectById(contractId);
@@ -113,7 +113,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void upgrade(Integer userId, Integer ucId, Integer upgradeId) throws BusinessException {
         //TODO 判断支付是否成功 更新支付状态
         UserContract userContract = this.selectById(ucId);
@@ -173,7 +173,7 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void rescind(Integer userId, Integer ucId) throws BusinessException {
         UserContract userContract = this.selectById(ucId);
         if (userContract == null) {

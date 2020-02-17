@@ -32,7 +32,7 @@ public class AllRewardJob {
 
     private static final Executor executor = Executors.newFixedThreadPool(10);
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void execute() throws BusinessException {
         //找出所有用户ids
         List<Integer> userIds = userService.findAllUserIds();
