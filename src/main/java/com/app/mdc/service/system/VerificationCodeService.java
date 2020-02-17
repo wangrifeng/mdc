@@ -17,8 +17,9 @@ public interface VerificationCodeService extends IService<VerificationCode> {
      * 获取email验证码
      * @return
      * @param email
+     * @param kind
      */
-    Integer getEmailVerificationCode(String email) throws BusinessException;
+    Integer getEmailVerificationCode(String email, Integer kind) throws BusinessException;
 
     /**
      * 验证验证码是狗正确
@@ -31,7 +32,8 @@ public interface VerificationCodeService extends IService<VerificationCode> {
     /**
      * 获取手机验证码
      * @param phone
+     * @param kind
      * @return
      */
-    Integer getPhoneVerificationCode(String phone) throws BusinessException;
+    Integer getPhoneVerificationCode(String phone, Integer kind) throws BusinessException;
 }

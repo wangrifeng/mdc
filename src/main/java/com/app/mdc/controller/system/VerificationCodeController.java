@@ -28,20 +28,21 @@ public class VerificationCodeController {
 
     @RequestMapping("/getVerificationCode")
     @ApiOperation("/获取验证码")
-    public ResponseResult getVerificationCode(@RequestParam Integer type,@RequestParam(required = false) String phone,@RequestParam(required = false) String email) throws BusinessException {
+    public ResponseResult getVerificationCode(@RequestParam Integer kind,@RequestParam Integer type,@RequestParam(required = false) String phone,@RequestParam(required = false) String email) throws BusinessException {
+        //kine = 10 找回面貌
         Map<String,Object> result = new HashMap<>();
         if(type == 0){
             //邮箱验证
             if(StringUtils.isEmpty(email)){
                 throw new BusinessException("请输入邮箱");
             }
-            result.put("verId",verificationCodeService.getEmailVerificationCode(email));
+            result.put("verId",verificationCodeService.getEmailVerificationCode(email,kind));
         }else if(type == 1){
             if(StringUtils.isEmpty(phone)){
                 throw new BusinessException("请输入手机号");
             }
             //手机验证
-            result.put("verId",verificationCodeService.getPhoneVerificationCode(phone));
+            result.put("verId",verificationCodeService.getPhoneVerificationCode(phone,kind));
         }
         return ResponseResult.success().setData(result);
     }
