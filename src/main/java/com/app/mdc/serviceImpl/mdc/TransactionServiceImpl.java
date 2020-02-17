@@ -17,6 +17,7 @@ import com.app.mdc.service.system.ConfigService;
 import com.app.mdc.service.system.VerificationCodeService;
 import com.app.mdc.utils.Md5Utils;
 import com.app.mdc.utils.date.DateUtil;
+import com.app.mdc.utils.jdbc.SqlUtils;
 import com.app.mdc.utils.viewbean.Page;
 import com.app.mdc.utils.viewbean.ResponseResult;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -189,7 +190,17 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         PageHelper.startPage(Integer.parseInt(params.get("pageNum").toString()),Integer.parseInt(params.get("pageSize").toString()));
         params.remove("pageNum");
         params.remove("pageSize");
-        List<Transaction> transactionList = transactionMapper.selectByMap(params);
+        String transactionType = (String) params.get("transaction_type");
+        EntityWrapper<Transaction> entityWrapper = new EntityWrapper<>();
+        params.forEach((k,v)->{
+            if(!"transaction_type".equals(k)){
+                entityWrapper.eq(k,v);
+            }else{
+                entityWrapper.in("transaction_type",transactionType.split(","));
+            }
+        });
+        entityWrapper.orderDesc(SqlUtils.orderBy("create_time"));
+        List<Transaction> transactionList = transactionMapper.selectList(entityWrapper);
         return ResponseResult.success().setData(new PageInfo<>(transactionList));
     }
 

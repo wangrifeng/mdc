@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -20,4 +21,7 @@ import java.util.List;
 public interface TransactionMapper extends BaseMapper<Transaction> {
 
     List<Transaction> incomeHistory(Integer userId);
+
+    List<Transaction> getTransaction(Map<String,Object> params);
+
 }
