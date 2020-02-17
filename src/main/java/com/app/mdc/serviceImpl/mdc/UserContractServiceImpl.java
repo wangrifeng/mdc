@@ -200,6 +200,9 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 
         //删除用户签约信息
         this.deleteById(ucId);
+
+        //更新用户level
+        userService.updateUserLevel(userId);
     }
 
     @Override
