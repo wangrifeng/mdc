@@ -180,6 +180,19 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             //若是没有钱包记录表示转账外部地址
             Config walletAddress = configService.getByKey("WALLET_ADDRESS");
             Config walletPath = configService.getByKey("WALLET_PATH");
+            if("1".equals(walletType)){
+                BigDecimal mdcBalance = getBalance(walletAddress.getConfigValue(),InfuraInfo.MDC_CONTRACT_ADDRESS.getDesc());
+                if(mdcBalance.doubleValue() < trans.doubleValue()){
+                    throw new BusinessException("交易失败,MDC不足");
+                }
+
+            }else if("0".equals(walletType)){
+                BigDecimal usdtBalance = getBalance(walletAddress.getConfigValue(),InfuraInfo.USDT_CONTRACT_ADDRESS.getDesc());
+                if(usdtBalance.doubleValue() < trans.doubleValue()){
+                    throw new BusinessException("交易失败,USDT不足");
+                }
+            }
+
             transfer(userId,payPassword,"123456",transferNumber,walletPath.getConfigValue(),walletAddress.getConfigValue(),toWalletAddress,walletType);
         }
         return ResponseResult.success();
@@ -538,6 +551,9 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
         EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).send();
         transactionHash = ethSendTransaction.getTransactionHash();
+        if(transactionHash == null || "".equals(transactionHash)){
+            throw new BusinessException("交易失败");
+        }
         System.out.println(transactionHash);
 
         return transactionHash;
