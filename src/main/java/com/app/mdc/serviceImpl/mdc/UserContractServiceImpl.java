@@ -196,8 +196,10 @@ public class UserContractServiceImpl extends ServiceImpl<UserContractMapper, Use
 //        u.setId(userId.toString());
 //        u.setSelfSignTotalMoney(user.getSelfSignTotalMoney().subtract(rescindMoney));
 //        userService.updateById(u);
+        //扣除手续费
         transactionService.buyContract(userId.toString(),rescindMoney.toString(),"用户解除合约" + contract.getId()+ ",扣除解约费用" + rescindMoney + "USTD"+ "合约信息为" + JSON.toJSONString(contract),"6");
-
+        //解约返还
+        transactionService.addContract(userId.toString(),contract.getAmount().toString(),"解约返还","7");
         //删除用户签约信息
         this.deleteById(ucId);
 
