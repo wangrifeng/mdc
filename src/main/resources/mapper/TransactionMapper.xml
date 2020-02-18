@@ -25,6 +25,7 @@
         mdc_transaction
         where
         (transaction_type = 4 and from_user_id = #{userId})
+        order by transaction_id desc
     </select>
 
     <select id="getTransaction" resultType="com.app.mdc.model.mdc.Transaction">
