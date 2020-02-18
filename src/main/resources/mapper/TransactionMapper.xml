@@ -24,6 +24,6 @@
         from
         mdc_transaction
         where
-        (transaction_type = 4 and from_user_id = #{userId}) or (transaction_type = 6 and to_user_id = #{userId})
+        (transaction_type = 4 and from_user_id = #{userId})
     </select>
 </mapper>
