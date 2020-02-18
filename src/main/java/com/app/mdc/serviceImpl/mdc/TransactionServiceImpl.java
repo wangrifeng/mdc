@@ -89,14 +89,14 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     public ResponseResult transETH(String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException, ExecutionException, BusinessException, CipherException, IOException {
         User u = userMapper.selectById(userId);
         //验证支付密码
-        if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), payPassword).equals(u.getPayPassword())) {
+        /*if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), payPassword).equals(u.getPayPassword())) {
             return ResponseResult.fail(ApiErrEnum.ERR202);
-        }
+        }*/
         //验证校验码
-        boolean flag = verificationCodeService.validateVerCode(verCode,verId);
+        /*boolean flag = verificationCodeService.validateVerCode(verCode,verId);
         if(!flag){
             return ResponseResult.fail(ApiErrEnum.ERR203);
-        }
+        }*/
         if(!toWalletAddress.startsWith("0x") || toWalletAddress.length() != 42){
             return ResponseResult.fail(ApiErrEnum.ERR208);
         }
@@ -117,6 +117,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             toWallet = toWallets.get(0);
         }
 
+
         BigDecimal trans = new BigDecimal(transferNumber);
         BigDecimal fee = new BigDecimal(0);
         if("0".equals(walletType)){
@@ -124,15 +125,15 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             String value = config.getConfigValue();
             fee = trans.multiply(new BigDecimal(value));
 
-            if(trans.doubleValue() > fromWallet.getUstdBlance().doubleValue()){
+            if(trans.add(fee).doubleValue() > fromWallet.getUstdBlance().doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR205);
             }
             BigDecimal usdtFrom = fromWallet.getUstdBlance();
 
-            fromWallet.setUstdBlance(usdtFrom.subtract(trans));
+            fromWallet.setUstdBlance(usdtFrom.subtract(trans).subtract(fee));
             if(toWallet.getUserId() != null){
                 BigDecimal usdtTo = toWallet.getUstdBlance();
-                toWallet.setUstdBlance(usdtTo.add(trans).subtract(fee));
+                toWallet.setUstdBlance(usdtTo.add(trans));
             }
 
         }else if("1".equals(walletType)){
@@ -145,10 +146,10 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
             BigDecimal usdtFrom = fromWallet.getMdcBlance();
 
-            fromWallet.setMdcBlance(usdtFrom.subtract(trans));
+            fromWallet.setMdcBlance(usdtFrom.subtract(trans).subtract(fee));
             if(toWallet.getUserId() != null){
                 BigDecimal usdtTo = toWallet.getMdcBlance();
-                toWallet.setMdcBlance(usdtTo.add(trans).subtract(fee));
+                toWallet.setMdcBlance(usdtTo.add(trans));
             }
 
         }
@@ -162,7 +163,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         transaction.setFromWalletType(walletType);
         //0-usdt
         transaction.setFromWalletType("0");
-        transaction.setToAmount(trans.subtract(fee));
+        transaction.setToAmount(trans);
         if(toWallet.getUserId() != null){
             transaction.setToUserId(toWallet.getUserId());
         }
@@ -173,9 +174,38 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         //1-提现
         transaction.setTransactionType("2");
         transactionMapper.insert(transaction);
+        if(toWallet.getUserId() != null && fromWallet.getUserId().intValue() == toWallet.getUserId().intValue()){
+            if("0".equals(walletType)){
+                Config config = configService.getByKey("USDT_TRANS_FEE");
+                String value = config.getConfigValue();
+                fee = trans.multiply(new BigDecimal(value));
+                fromWallet = walletMapper.selectById(fromWallet.getWalletId());
+                BigDecimal usdtFrom = fromWallet.getUstdBlance();
 
-        walletMapper.updateById(fromWallet);
-        walletMapper.updateById(toWallet);
+                fromWallet.setUstdBlance(usdtFrom.subtract(fee));
+
+            }else if("1".equals(walletType)){
+                Config config = configService.getByKey("MDC_TRANS_FEE");
+                String value = config.getConfigValue();
+                fee = trans.multiply(new BigDecimal(value));
+                if(trans.doubleValue() > fromWallet.getMdcBlance().doubleValue()){
+                    return ResponseResult.fail(ApiErrEnum.ERR206);
+                }
+
+                BigDecimal usdtFrom = fromWallet.getMdcBlance();
+
+                fromWallet.setMdcBlance(usdtFrom.subtract(fee));
+
+
+            }
+            walletMapper.updateById(fromWallet);
+        }else if(toWallet.getUserId() != null && fromWallet.getUserId().intValue() != toWallet.getUserId().intValue()){
+            walletMapper.updateById(fromWallet);
+            walletMapper.updateById(toWallet);
+        }else{
+            walletMapper.updateById(fromWallet);
+        }
+
         if(toWallets.size() == 0){
             //若是没有钱包记录表示转账外部地址
             Config walletAddress = configService.getByKey("WALLET_ADDRESS");
@@ -286,6 +316,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                 return ResponseResult.fail("ERR209","提现金额必须大于手续费");
             }
             wallet.setUstdBlance(balance.subtract(cashOut));
+            walletMapper.updateById(wallet);
         }else{
             return ResponseResult.fail(ApiErrEnum.ERR204);
         }
@@ -317,7 +348,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         transaction.setTransactionType("1");
         transactionMapper.insert(transaction);
 
-        walletMapper.updateById(wallet);
+
 
         /*try {
             Thread.sleep(60000);
@@ -355,9 +386,13 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             BigDecimal convertFee = convert.multiply(new BigDecimal(fee.getConfigValue()));
             BigDecimal balance = wallet.getMdcBlance();
             BigDecimal actualConvert = convert.add(convertFee);
-            if(balance.doubleValue() < convert.doubleValue()){
+            if(balance.doubleValue() < actualConvert.doubleValue()){
                 return ResponseResult.fail(ApiErrEnum.ERR206);
             }else{
+                BigDecimal usdtBalance = wallet.getUstdBlance();
+                wallet.setUstdBlance(usdtBalance.add(convert.multiply(mdcConvert)));
+                wallet.setMdcBlance(balance.subtract(actualConvert));
+                walletMapper.updateById(wallet);
                 Transaction transaction = new Transaction();
                 transaction.setFeeAmount(convertFee);
                 transaction.setCreateTime(new Date());
@@ -366,7 +401,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                 transaction.setFromWalletAddress(wallet.getAddress());
                 //0-usdt
                 transaction.setFromWalletType("1");
-                transaction.setToAmount((convert.subtract(convertFee)).multiply(mdcConvert));
+                transaction.setToAmount(convert.multiply(mdcConvert));
                 transaction.setToWalletAddress(wallet.getAddress());
                 transaction.setToUserId(Integer.parseInt(userId));
                 //0-usdt
@@ -376,10 +411,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                 //1-提现
                 transaction.setTransactionType("7");
                 transactionMapper.insert(transaction);
-                BigDecimal usdtBalance = wallet.getUstdBlance();
-                wallet.setUstdBlance(usdtBalance.add((convert.subtract(convertFee)).multiply(mdcConvert)));
-                wallet.setMdcBlance(balance.subtract(convert));
-                walletMapper.updateById(wallet);
+
             }
         }else{
             return ResponseResult.fail();
@@ -398,6 +430,9 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             if(wallet.getUstdBlance().doubleValue() < new Double(money)){
                 throw new BusinessException(ApiErrEnum.ERR207);
             }
+            BigDecimal balance = wallet.getUstdBlance();
+            wallet.setUstdBlance(balance.subtract(new BigDecimal(money)));
+            walletMapper.updateById(wallet);
             Transaction transaction = new Transaction();
             transaction.setFromAmount(new BigDecimal(money));
             transaction.setFromWalletAddress(wallet.getAddress());
@@ -410,9 +445,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             transaction.setRemark(remark);
             transaction.setContractType(contractType);
             transactionMapper.insert(transaction);
-            BigDecimal balance = wallet.getUstdBlance();
-            wallet.setUstdBlance(balance.subtract(new BigDecimal(money)));
-            walletMapper.updateById(wallet);
+
         }else{
             throw new BusinessException("钱包不存在");
         }
@@ -430,6 +463,9 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             if(wallet.getMdcBlance().doubleValue() < new Double(money)){
                 throw new BusinessException(ApiErrEnum.ERR207);
             }
+            BigDecimal balance = wallet.getUstdBlance();
+            wallet.setMdcBlance(balance.subtract(new BigDecimal(money)));
+            walletMapper.updateById(wallet);
             Transaction transaction = new Transaction();
             transaction.setFromAmount(new BigDecimal(money));
             transaction.setFromWalletAddress(wallet.getAddress());
@@ -440,9 +476,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
             transaction.setTransactionStatus("1");
             transaction.setTransactionType("5");
             transactionMapper.insert(transaction);
-            BigDecimal balance = wallet.getUstdBlance();
-            wallet.setMdcBlance(balance.subtract(new BigDecimal(money)));
-            walletMapper.updateById(wallet);
+
         }else{
             throw new BusinessException("钱包不存在");
         }
