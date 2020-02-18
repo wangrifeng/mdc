@@ -126,7 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseResult add(Map<String, Object> map) throws BusinessException {
+    public synchronized ResponseResult add(Map<String, Object> map) throws BusinessException {
         //count>0说明username已存在，isRepeat>0说明姓名已存在，重复需要加标识
         validatePayPassword(((String) map.get("walletPassword")));
         Integer registerType = Integer.parseInt(map.get("registerType").toString());
@@ -242,7 +242,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseResult update(Map<String, Object> map) {
+    public synchronized ResponseResult update(Map<String, Object> map) {
         //判断username是否重复
         EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
         userEntityWrapper.eq("login_name", map.get("loginName")).eq("del_flag", 0);
@@ -617,7 +617,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseResult registerAdd(String userName, String loginName, String password, String walletPassword, Integer sendCode, Integer registerType) {
+    public synchronized ResponseResult registerAdd(String userName, String loginName, String password, String walletPassword, Integer sendCode, Integer registerType) {
         try {
             validatePayPassword(walletPassword);
         } catch (BusinessException e) {

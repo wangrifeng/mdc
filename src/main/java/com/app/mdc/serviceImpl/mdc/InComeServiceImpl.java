@@ -47,9 +47,9 @@ public class InComeServiceImpl extends ServiceImpl<InComeMapper, InCome> impleme
 
     @Override
     public List<Transaction> history(Integer userId) {
-        EntityWrapper<Transaction> transactionEntityWrapper = new EntityWrapper<>();
-        transactionEntityWrapper.eq("transaction_type", 4).and().eq("from_user_id",userId);
-        transactionEntityWrapper.eq("transaction_type", 6).and().eq("to_user_id",userId);
+//        EntityWrapper<Transaction> transactionEntityWrapper = new EntityWrapper<>();
+//        transactionEntityWrapper.eq("transaction_type", 4).and().eq("from_user_id",userId);
+//        transactionEntityWrapper.eq("transaction_type", 6).and().eq("to_user_id",userId);
         return transactionService.incomeHistory(userId);
     }
 }
