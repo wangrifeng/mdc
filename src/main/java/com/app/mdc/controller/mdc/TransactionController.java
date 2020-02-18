@@ -64,9 +64,10 @@ public class TransactionController {
 									 @RequestParam(required = true)String userId,
 									 @RequestParam(required = true)String walletType,
 								   @RequestParam String verCode,
-								   @RequestParam String verId) {
+								   @RequestParam String verId,
+									 @RequestParam String remark) {
 		try {
-			return transactionService.transETH(toWalletAddress,transferNumber,payPassword,userId,walletType,verCode,verId);
+			return transactionService.transETH(remark,toWalletAddress,transferNumber,payPassword,userId,walletType,verCode,verId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseResult.fail("ERR500",e.getMessage());

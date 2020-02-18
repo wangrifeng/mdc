@@ -86,7 +86,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseResult transETH(String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException, ExecutionException, BusinessException, CipherException, IOException {
+    public ResponseResult transETH(String remark,String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException, ExecutionException, BusinessException, CipherException, IOException {
         User u = userMapper.selectById(userId);
         //验证支付密码
         if (StringUtils.isNotEmpty(u.getPayPassword()) && !Md5Utils.hash(u.getLoginName(), payPassword).equals(u.getPayPassword())) {
@@ -172,6 +172,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         transaction.setTransactionStatus("1");
         //1-提现
         transaction.setTransactionType("2");
+        transaction.setRemark(remark);
         transactionMapper.insert(transaction);
 
         walletMapper.updateById(fromWallet);
@@ -335,6 +336,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ResponseResult convertMDC(String userId, String convertMoney,String payPassword) {
         User u = userMapper.selectById(userId);
@@ -374,6 +376,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                 transaction.setTransactionStatus("1");
                 //1-提现
                 transaction.setTransactionType("7");
+                transaction.setRemark("MDC兑换USDT");
                 transactionMapper.insert(transaction);
                 BigDecimal usdtBalance = wallet.getUstdBlance();
                 wallet.setUstdBlance(usdtBalance.add((convert.subtract(convertFee)).multiply(mdcConvert)));
