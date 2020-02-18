@@ -27,7 +27,7 @@ public interface TransactionService extends IService<Transaction> {
      * ETH钱包转账
      * @return ResponseResult
      */
-    ResponseResult transETH(String remark,String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException, ExecutionException, BusinessException, CipherException, IOException;
+    ResponseResult transETH(String toWalletAddress,String transferNumber,String payPassword,String userId,String walletType,String verCode, String verId) throws InterruptedException, ExecutionException, BusinessException, CipherException, IOException;
 
     /**
      * ETH钱包余额查询
