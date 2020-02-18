@@ -62,6 +62,8 @@ public interface TransactionService extends IService<Transaction> {
      */
     ResponseResult convertMDC(String userId,String convertMoney,String payPassword);
 
+    ResponseResult addContract(String userId,String money,String remark,String contractType) throws BusinessException;
+
     /**
      * 购买合约交易
      * @param userId 用户id

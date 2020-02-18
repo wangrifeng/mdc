@@ -419,6 +419,36 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return ResponseResult.success();
     }
 
+    @Override
+    public ResponseResult addContract(String userId, String money,String remark,String contractType) throws BusinessException {
+        EntityWrapper<Wallet> walletEntityWrapper = new EntityWrapper<>();
+        walletEntityWrapper.eq("user_id",userId);
+        List<Wallet> wallets = walletMapper.selectList(walletEntityWrapper);
+        if(wallets.size() > 0){
+            Wallet wallet = wallets.get(0);
+
+            BigDecimal balance = wallet.getUstdBlance();
+            wallet.setUstdBlance(balance.add(new BigDecimal(money)));
+            walletMapper.updateById(wallet);
+            Transaction transaction = new Transaction();
+            transaction.setToAmount(new BigDecimal(money));
+            transaction.setToWalletAddress(wallet.getAddress());
+            transaction.setToWalletType("0");
+            transaction.setFeeAmount(new BigDecimal(0));
+            transaction.setToUserId(Integer.parseInt(userId));
+            transaction.setCreateTime(new Date());
+            transaction.setTransactionStatus("1");
+            transaction.setTransactionType("4");
+            transaction.setRemark(remark);
+            transaction.setContractType(contractType);
+            transactionMapper.insert(transaction);
+
+        }else{
+            throw new BusinessException("钱包不存在");
+        }
+        return ResponseResult.success();
+    }
+
 //    @Transactional(rollbackFor = Exception.class)
     @Override
     public ResponseResult buyContract(String userId, String money,String remark,String contractType) throws BusinessException {
