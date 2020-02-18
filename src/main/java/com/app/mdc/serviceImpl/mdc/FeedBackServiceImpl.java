@@ -31,7 +31,7 @@ public class FeedBackServiceImpl extends ServiceImpl<FeedBackMapper, FeedBack> i
         User user = userService.selectById(userId);
         FeedBack feedBack = new FeedBack();
         feedBack.setMessage(message);
-        feedBack.setCreateBy(user.getUserName());
+        feedBack.setCreateBy(user.getLoginName());
         feedBack.setCreateTime(new Date());
         this.baseMapper.insert(feedBack);
     }
