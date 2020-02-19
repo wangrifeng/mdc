@@ -8,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,9 @@ public class InComeController {
     @ResponseBody
     @ApiOperation("/收益列表")
     public ResponseResult list(@RequestParam Integer pageSize,@RequestParam Integer pageNumber,@RequestParam Integer userId ) {
-        PageHelper.startPage(pageNumber,pageSize);
-        List<InCome> list = inComeService.list(userId);
-        return ResponseResult.success().setData(new PageInfo<InCome>(list));
+//        PageHelper.startPage(pageNumber,pageSize);
+        List<InCome.IncomeNode> list = inComeService.list(userId,pageSize,pageNumber);
+        return ResponseResult.success().setData((list));
     }
 
     @PostMapping("/history")
