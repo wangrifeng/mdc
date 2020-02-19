@@ -65,14 +65,14 @@ public class ScheduleTask {
         System.out.println("version=" + clientVersion);
         for(Wallet wallet : wallets){
             try {
-                BigDecimal ethBalance = getEthBalance(web3j,wallet.getAddress());
-                if(ethBalance.doubleValue() <= 0.001){
-                    //转手续费
-                    Credentials credentials = WalletUtils.loadCredentials("123456", walletPath);
-                    Transfer.sendFunds(web3j, credentials, wallet.getAddress(), new BigDecimal(3), Convert.Unit.FINNEY).send();
-                }else{
-                    BigDecimal balance = getBalance(web3j,wallet.getAddress(),contractAddress);
-                    if(balance.doubleValue()> (double) 0){
+                BigDecimal balance = getBalance(web3j,wallet.getAddress(),contractAddress);
+                if(balance.doubleValue()> (double) 0){
+                    BigDecimal ethBalance = getEthBalance(web3j,wallet.getAddress());
+                    if(ethBalance.doubleValue() <= 0.001){
+                        //转手续费
+                        Credentials credentials = WalletUtils.loadCredentials("123456", walletPath);
+                        Transfer.sendFunds(web3j, credentials, wallet.getAddress(), new BigDecimal(3), Convert.Unit.FINNEY).send();
+                    }else{
                         //充值
                         boolean flag = transfer(web3j,wallet.getPassword(),wallet.getWalletPath(),wallet.getAddress(),walletAddress.getConfigValue(),contractAddress,balance);
                         if(flag){
@@ -93,6 +93,7 @@ public class ScheduleTask {
                             walletMapper.updateById(wallet);
                         }
                     }
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
