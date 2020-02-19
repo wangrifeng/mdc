@@ -82,4 +82,11 @@ public class InCome {
         this.selDate = selDate;
         this.createTime = createTime;
     }
+
+    @Data
+    public static class IncomeNode{
+        private Date selDate;
+        private Integer type;
+        private BigDecimal salary;
+    }
 }

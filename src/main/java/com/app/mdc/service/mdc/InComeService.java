@@ -43,9 +43,11 @@ public interface InComeService extends IService<InCome> {
     /**
      * 查询用户收益列表
      * @param userId
+     * @param pageSize
+     * @param pageNumber
      * @return
      */
-    List<InCome> list(Integer userId);
+    List<InCome.IncomeNode> list(Integer userId, Integer pageSize, Integer pageNumber);
 
     /**
      * 用户交易记录
