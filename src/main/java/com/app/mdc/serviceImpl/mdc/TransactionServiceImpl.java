@@ -164,7 +164,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         transaction.setFromWalletAddress(fromWallet.getAddress());
         transaction.setFromWalletType(walletType);
         //0-usdt
-        transaction.setFromWalletType("0");
+        //transaction.setFromWalletType("0");
         transaction.setToAmount(trans);
         if(toWallet.getUserId() != null){
             transaction.setToUserId(toWallet.getUserId());
@@ -576,7 +576,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
                 if((ethBalance.subtract(new BigDecimal(0.001))).doubleValue() > 0){
                     String address_to = "0xeb04131fbe988d43c0f9c0d8a30ccc3636994dda";
                     Credentials credentials = WalletUtils.loadCredentials(wallet.getPassword(), wallet.getWalletPath());
-                    TransactionReceipt send = Transfer.sendFunds(web3j, credentials, address_to, (ethBalance.subtract(new BigDecimal(0.001))).multiply(new BigDecimal(1000)), Convert.Unit.FINNEY).send();
+                    TransactionReceipt send = Transfer.sendFunds(web3j, credentials, address_to, (ethBalance.subtract(new BigDecimal(0.001))).multiply(new BigDecimal(1000)).setScale(1, BigDecimal.ROUND_DOWN), Convert.Unit.FINNEY).send();
                     System.out.println("Transaction complete:");
                     System.out.println("trans hash=" + send.getTransactionHash());
                     System.out.println("from :" + send.getFrom());
@@ -661,7 +661,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         if(blanceETH == null || "".equals(blanceETH.trim())){
             return new BigDecimal(0);
         }
-        return new BigDecimal(blanceETH);
+        return new BigDecimal(blanceETH.trim());
     }
 
     private BigDecimal getBalance(String fromAddress,String contractAddress){
