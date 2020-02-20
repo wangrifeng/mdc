@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,4 +36,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("select user_id as id,user_name as userName,level from sys_user where find_in_set(user_id,#{0})")
     List<User> getDirectUserLevel(String ids);
+
+    @Select("select level from mdc_user_tmp_level where user_id = #{id} and out_date >= #{date}")
+    Integer findTmpLevel(@Param("id") String id,@Param("date") Date date);
 }

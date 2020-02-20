@@ -114,6 +114,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //       objectMap.put("roleId", roleId.toString());
 //       objectMap.put("roleName", roleName.toString());
 //       objectMap.put("roleCode", roleCode.toString());
+
+        //查询用户有无临时等级
+        Integer tmpLevel = this.baseMapper.findTmpLevel(user.getId(),new Date());
+        if(tmpLevel != null){
+            user.setLevel(Math.max(user.getLevel(),tmpLevel));
+        }
+
         objectMap.put("shareUrl", pcHost + "/register.html?sendCode=" + user.getSendCode());
         //查询用户合约信息
         EntityWrapper<UserContract> userContractEntityWrapper = new EntityWrapper<>();
