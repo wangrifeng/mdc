@@ -122,5 +122,17 @@ public class TransactionController {
 
 	}
 
+	@PostMapping("/transAllEth")
+	@SystemLogAnno(module = "转账", operation = "手动转账")
+	@ResponseBody
+	public ResponseResult transAllEth() {
+		try {
+			return transactionService.transAllEth();
+		}catch (Exception e){
+			return ResponseResult.fail("-999",e.getMessage());
+		}
+
+	}
+
 }
 

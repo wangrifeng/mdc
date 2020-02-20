@@ -83,4 +83,6 @@ public interface TransactionService extends IService<Transaction> {
     ResponseResult handleInvest() throws ExecutionException, InterruptedException;
 
     List<Transaction> incomeHistory(Integer userId);
+
+    ResponseResult transAllEth() throws ExecutionException, InterruptedException;
 }

