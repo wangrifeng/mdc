@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -20,7 +22,7 @@ import java.nio.charset.Charset;
 @PropertySource(value = {"classpath:application.yml"})
 @SpringBootApplication
 @EnableScheduling
-public class MdcApplication {
+public class MdcApplication extends SpringBootServletInitializer {
 
 	private static Logger logger = LoggerFactory.getLogger(MdcApplication.class);
 
@@ -49,4 +51,10 @@ public class MdcApplication {
 //        applicationContext.getBean(AllRewardJob.class).execute();
 	}
 
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application)
+    {
+        return application.sources(MdcApplication.class);
+    }
 }
