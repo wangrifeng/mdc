@@ -262,9 +262,9 @@
         var url = "";
         if (userName.indexOf("@") >= 0) {
             //邮箱
-            url = "/verificationCode/getVerificationCode?type=0&email=" + userName;
+            url = "/verificationCode/getVerificationCode?kind=0&type=0&email=" + userName;
         } else {
-            url = "/verificationCode/getVerificationCode?type=1&phone=" + userName;
+            url = "/verificationCode/getVerificationCode?kind=0&type=1&phone=" + userName;
         }
         $.ajax({
             url: url,
