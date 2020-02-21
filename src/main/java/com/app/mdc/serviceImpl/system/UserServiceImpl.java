@@ -376,8 +376,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //        String companyId = user.getCompanyid();
 
 
-        //重新登录后，有效的token自动刷新12小时
-        long currentTime = System.currentTimeMillis() + 12 * 60 * 60 * 1000;
+        //重新登录后，有效的token自动刷新1个星期
+        long currentTime = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000;
         Date tokenData = new Date(currentTime);
         if (userTokens.size() == 0) {
             userToken = new UserToken();
